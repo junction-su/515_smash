@@ -544,6 +544,13 @@ function showWarmupCount() {
 // ── GAME FLOW ─────────────────────────────────────────────────────────────────
 
 function startObjectPhase() {
+  // Hide sandbag
+  const bagWrap = document.getElementById('bag-wrap');
+  bagWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.4,0,1,1)';
+  bagWrap.style.opacity    = '0';
+  bagWrap.style.transform  = 'translateX(-50%) translateY(-40px)';
+  setTimeout(() => { bagWrap.style.display = 'none'; }, 420);
+
   S.queue = shuffle(STRESS_ITEMS);
   S.phase = 'OBJECT_WAITING';
   $ghost.textContent = 'DESTROY';
@@ -637,6 +644,17 @@ function showCleared() {
       $ghost.textContent = 'STRESS';
       $typoScript.textContent = 'Stress';
       $typoBold.textContent   = 'SMASH';
+      // Bring sandbag back
+      const bagWrap = document.getElementById('bag-wrap');
+      bagWrap.style.display    = 'block';
+      bagWrap.style.transition = 'none';
+      bagWrap.style.opacity    = '0';
+      bagWrap.style.transform  = 'translateX(-50%) translateY(-40px)';
+      requestAnimationFrame(() => {
+        bagWrap.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+        bagWrap.style.opacity    = '1';
+        bagWrap.style.transform  = 'translateX(-50%)';
+      });
     }, 420);
   }, 2200);
 }
