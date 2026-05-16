@@ -312,7 +312,7 @@ html, body {
   <!-- Sandbag -->
   <div id="bag-wrap">
     <div id="bag-cord"></div>
-    <img id="bag-img" src="assets/sandbag.png" alt=""
+    <img id="bag-img" src="asset/sandbag.png" alt=""
          onerror="this.style.display='none';document.getElementById('bag-svg-wrap').style.display='block'">
     <div id="bag-svg-wrap" style="display:none">
       <svg id="bag-svg" width="220" height="312" viewBox="0 0 148 210" fill="none">
@@ -328,7 +328,7 @@ html, body {
 
   <!-- Boxing glove -->
   <div id="glove-wrap">
-    <img id="glove-img" src="assets/glove.png" alt="">
+    <img id="glove-img" src="asset/glove_right.png" alt="">
   </div>
 
   <!-- Stress object -->
@@ -575,7 +575,7 @@ function loadObj(key) {
   const img = new Image();
   img.onload = () => {
     const el = getImg(); const sv = getSvg();
-    if (el) { el.src = `assets/${key}.png`; el.style.display = 'block'; }
+    if (el) { el.src = `asset/${key}.png`; el.style.display = 'block'; }
     if (sv) sv.innerHTML = '';
     showObj();
   };
@@ -585,7 +585,7 @@ function loadObj(key) {
     if (sv) sv.innerHTML = SVG[key] || '';
     showObj();
   };
-  img.src = `assets/${key}.png`;
+  img.src = `asset/${key}.png`;
 }
 
 function showObj() {
@@ -724,9 +724,9 @@ function animateGlove() {
   const rot   = dir * -38;   // rotation at rest (below)
   const hitRot= dir * 8;     // slight angle at contact
 
-  // Flip image for left-side punch
+  // Use correct directional glove image
   const img = document.getElementById('glove-img');
-  if (img) img.style.transform = dir === -1 ? 'scaleX(-1)' : '';
+  if (img) img.src = dir === 1 ? 'asset/glove_right.png' : 'asset/glove_left.png';
 
   // Park below, invisible
   glove.style.transition = 'none';
