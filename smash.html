@@ -78,20 +78,22 @@ html, body {
 }
 #bag-cord {
   display: block; margin: 0 auto;
-  width: 1px; height: 80px;
+  width: 1px; height: 60px;
   background: linear-gradient(to bottom, #B0ACA4, #989088);
 }
 #bag-img {
-  display: block; width: 220px; height: auto; margin: 0 auto;
-  filter: drop-shadow(0 24px 48px rgba(17,17,16,0.14));
+  display: block;
+  height: clamp(420px, 68dvh, 820px); width: auto; margin: 0 auto;
+  filter: drop-shadow(0 32px 64px rgba(17,17,16,0.16));
+  transition: transform 0.08s ease;
 }
 #bag-svg { display: block; margin: 0 auto; }
 
 /* ── BOXING GLOVE ────────────────────────────────────────── */
 #glove-wrap {
   position: absolute;
-  /* anchor at sandbag hit zone: cord(80px) + ~60% of bag body */
-  top: 196px; left: 50%;
+  /* anchor at sandbag hit zone — scales with bag height */
+  top: calc(60px + 42dvh); left: 50%;
   transform: translateX(-50%);
   z-index: 4; pointer-events: none;
   will-change: transform, opacity;
@@ -242,11 +244,14 @@ html, body {
 }
 
 /* ── FLOATING HUD ────────────────────────────────────────── */
-#hud {
+#hud-container {
   position: absolute;
   bottom: 1.75rem; left: 50%;
   transform: translateX(-50%);
   z-index: 30;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+#hud {
   display: flex; align-items: center; gap: 14px;
   background: rgba(188, 207, 230, 0.55);
   color: rgba(30, 42, 60, 0.85);
@@ -288,8 +293,9 @@ html, body {
 
 #hud-hint {
   font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.08em;
-  color: rgba(30,42,60,0.45);
+  font-size: 9px; letter-spacing: 0.1em;
+  color: rgba(30,42,60,0.4);
+  text-align: center;
 }
 </style>
 </head>
@@ -315,7 +321,7 @@ html, body {
     <img id="bag-img" src="asset/sandbag.png" alt=""
          onerror="this.style.display='none';document.getElementById('bag-svg-wrap').style.display='block'">
     <div id="bag-svg-wrap" style="display:none">
-      <svg id="bag-svg" width="220" height="312" viewBox="0 0 148 210" fill="none">
+      <svg id="bag-svg" style="height:clamp(420px,68dvh,820px);width:auto" viewBox="0 0 148 210" fill="none">
         <ellipse cx="74" cy="26" rx="11" ry="7" fill="#CEC5B0" stroke="#B0A490" stroke-width="1.5"/>
         <rect x="20" y="32" width="108" height="154" rx="6" fill="#EDE8DF" stroke="#BDB5A4" stroke-width="1.5"/>
         <line x1="20" y1="84"  x2="128" y2="84"  stroke="#BDB5A4" stroke-width="0.75" stroke-dasharray="5 4"/>
@@ -355,13 +361,14 @@ html, body {
   </div>
 
   <!-- Floating HUD -->
-  <div id="hud">
-    <div id="hud-dot"></div>
-    <span id="hud-status">disconnected</span>
-    <div id="hud-sep"></div>
-    <button id="hud-btn">connect device</button>
-    <div id="hud-sep2" style="width:1px;height:14px;background:rgba(30,42,60,0.15)"></div>
-    <span id="hud-hint">1 shake · 2 wave · 3 idle</span>
+  <div id="hud-container">
+    <div id="hud">
+      <div id="hud-dot"></div>
+      <span id="hud-status">disconnected</span>
+      <div id="hud-sep"></div>
+      <button id="hud-btn">connect device</button>
+    </div>
+    <div id="hud-hint">keyboard: 1 shake · 2 wave · 3 idle</div>
   </div>
 </div>
 
@@ -741,9 +748,19 @@ function animateGlove() {
       glove.style.transform  = `translateX(calc(-50% + ${dir * 12}px)) translateY(0px) rotate(${hitRot}deg)`;
       glove.style.opacity    = '1';
 
-      // Trigger bag + particles at contact (t=260ms)
+      // Trigger bag squish + swing at contact (t=240ms)
       setTimeout(() => {
-        punchBag(16);
+        punchBag(20);
+        // Squish impact on bag image
+        const bagImg = document.getElementById('bag-img') || document.getElementById('bag-svg');
+        if (bagImg) {
+          bagImg.style.transition = 'transform 0.07s ease';
+          bagImg.style.transform  = `scaleX(${1 + dir * 0.06}) scaleY(0.92)`;
+          setTimeout(() => {
+            bagImg.style.transition = 'transform 0.35s cubic-bezier(0.16,1,0.3,1)';
+            bagImg.style.transform  = '';
+          }, 70);
+        }
       }, 240);
 
       // Retreat — ease-in, quick pull-back
@@ -834,11 +851,11 @@ function gesture(raw) {
   if (g === 'shake') {
     animateGlove(); doShake();
     if (S.phase === 'OBJECT_ACTIVE') destroyObj('shake');
-    else if (S.phase === 'IDLE' && S.connected) startGame();
+    else if (S.phase === 'IDLE') startGame();
   } else if (g === 'wave') {
     punchBag(6);
     if (S.phase === 'OBJECT_ACTIVE') destroyObj('wave');
-    else if (S.phase === 'IDLE' && S.connected) startGame();
+    else if (S.phase === 'IDLE') startGame();
   }
 }
 
