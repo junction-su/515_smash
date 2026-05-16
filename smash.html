@@ -38,23 +38,14 @@ html, body {
 
 #canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 
-/* ── EDITORIAL CORNER LABELS ────────────────────────────── */
+/* ── CORNER LABEL ───────────────────────────────────────── */
 .corner {
   position: absolute; z-index: 5; pointer-events: none;
   font-family: 'Geist Mono', monospace;
   font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
   color: var(--dim);
 }
-#c-tl { top: 1.75rem; left: 2rem; }
-#c-tr { top: 1.75rem; right: 2rem; text-align: right; }
 #c-bl { bottom: 5.5rem; left: 2rem; }
-
-/* Top rule */
-#rule {
-  position: absolute; top: 3.25rem; left: 0; right: 0;
-  height: 1px; background: var(--line);
-  z-index: 4; pointer-events: none;
-}
 
 /* ── GHOST BG TEXT ───────────────────────────────────────── */
 #ghost {
@@ -242,8 +233,8 @@ html, body {
   transform: translateX(-50%);
   z-index: 30;
   display: flex; align-items: center; gap: 14px;
-  background: rgba(17,17,16,0.86);
-  color: rgba(250,250,248,0.75);
+  background: rgba(71, 89, 115, 0.88);
+  color: rgba(226,232,240,0.8);
   padding: 9px 18px;
   border-radius: 100px;
   backdrop-filter: blur(12px);
@@ -291,11 +282,8 @@ html, body {
 <div id="stage">
   <canvas id="canvas"></canvas>
 
-  <!-- Editorial corner labels -->
-  <div class="corner" id="c-tl">SMASH</div>
-  <div class="corner" id="c-tr">gesture ui</div>
-  <div class="corner" id="c-bl" id="c-count"></div>
-  <div id="rule"></div>
+  <!-- Bottom-left gesture counter -->
+  <div class="corner" id="c-bl"></div>
 
   <!-- Ghost background typography -->
   <div id="ghost">STRESS</div>
