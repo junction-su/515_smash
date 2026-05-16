@@ -82,10 +82,25 @@ html, body {
   background: linear-gradient(to bottom, #B0ACA4, #989088);
 }
 #bag-img {
-  display: block; width: 148px; height: auto; margin: 0 auto;
-  filter: drop-shadow(0 20px 40px rgba(17,17,16,0.12));
+  display: block; width: 220px; height: auto; margin: 0 auto;
+  filter: drop-shadow(0 24px 48px rgba(17,17,16,0.14));
 }
 #bag-svg { display: block; margin: 0 auto; }
+
+/* ── BOXING GLOVE ────────────────────────────────────────── */
+#glove-wrap {
+  position: absolute;
+  /* anchor at sandbag hit zone: cord(80px) + ~60% of bag body */
+  top: 196px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 4; pointer-events: none;
+  will-change: transform, opacity;
+  display: none; opacity: 0;
+}
+#glove-img {
+  display: block; width: 140px; height: auto;
+  filter: drop-shadow(0 8px 20px rgba(17,17,16,0.18));
+}
 
 /* ── STRESS OBJECT ───────────────────────────────────────── */
 #obj-wrap {
@@ -300,7 +315,7 @@ html, body {
     <img id="bag-img" src="assets/sandbag.png" alt=""
          onerror="this.style.display='none';document.getElementById('bag-svg-wrap').style.display='block'">
     <div id="bag-svg-wrap" style="display:none">
-      <svg id="bag-svg" width="148" height="210" viewBox="0 0 148 210" fill="none">
+      <svg id="bag-svg" width="220" height="312" viewBox="0 0 148 210" fill="none">
         <ellipse cx="74" cy="26" rx="11" ry="7" fill="#CEC5B0" stroke="#B0A490" stroke-width="1.5"/>
         <rect x="20" y="32" width="108" height="154" rx="6" fill="#EDE8DF" stroke="#BDB5A4" stroke-width="1.5"/>
         <line x1="20" y1="84"  x2="128" y2="84"  stroke="#BDB5A4" stroke-width="0.75" stroke-dasharray="5 4"/>
@@ -309,6 +324,11 @@ html, body {
         <ellipse cx="74" cy="185" rx="52" ry="9" fill="#DDD6C8" stroke="#BDB5A4" stroke-width="1"/>
       </svg>
     </div>
+  </div>
+
+  <!-- Boxing glove -->
+  <div id="glove-wrap">
+    <img id="glove-img" src="assets/glove.png" alt="">
   </div>
 
   <!-- Stress object -->
@@ -691,6 +711,52 @@ function showCleared() {
   }, 2200);
 }
 
+// ── GLOVE ANIMATION ──────────────────────────────────────────────────────────
+// Taste-skill MOTION_INTENSITY:7 — spring easing, transform/opacity only
+
+function animateGlove() {
+  const glove = document.getElementById('glove-wrap');
+  if (!glove) return;
+
+  // Randomise left or right punch
+  const dir   = Math.random() < 0.5 ? 1 : -1;
+  const offX  = dir * 110;   // horizontal offset of starting position
+  const rot   = dir * -38;   // rotation at rest (below)
+  const hitRot= dir * 8;     // slight angle at contact
+
+  // Flip image for left-side punch
+  const img = document.getElementById('glove-img');
+  if (img) img.style.transform = dir === -1 ? 'scaleX(-1)' : '';
+
+  // Park below, invisible
+  glove.style.transition = 'none';
+  glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(280px) rotate(${rot}deg)`;
+  glove.style.opacity    = '0';
+  glove.style.display    = 'block';
+
+  // Spring upswing — cubic-bezier(0.16, 1, 0.3, 1) for overshoot feel
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      glove.style.transition = 'transform 0.30s cubic-bezier(0.16,1,0.3,1), opacity 0.08s ease';
+      glove.style.transform  = `translateX(calc(-50% + ${dir * 12}px)) translateY(0px) rotate(${hitRot}deg)`;
+      glove.style.opacity    = '1';
+
+      // Trigger bag + particles at contact (t=260ms)
+      setTimeout(() => {
+        punchBag(16);
+      }, 240);
+
+      // Retreat — ease-in, quick pull-back
+      setTimeout(() => {
+        glove.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.8,1), opacity 0.18s ease 0.2s';
+        glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(280px) rotate(${rot}deg)`;
+        glove.style.opacity    = '0';
+        setTimeout(() => { glove.style.display = 'none'; }, 420);
+      }, 300);
+    });
+  });
+}
+
 // ── EFFECTS ──────────────────────────────────────────────────────────────────
 
 function animImpact() {
@@ -766,7 +832,7 @@ function gesture(raw) {
   $cBl.textContent = g !== 'idle' ? `${g} #${S.counts[g]}` : '';
 
   if (g === 'shake') {
-    punchBag(14); doShake();
+    animateGlove(); doShake();
     if (S.phase === 'OBJECT_ACTIVE') destroyObj('shake');
     else if (S.phase === 'IDLE' && S.connected) startGame();
   } else if (g === 'wave') {
