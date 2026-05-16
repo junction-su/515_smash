@@ -6,19 +6,19 @@
 <title>SMASH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,400;1,700&family=Geist:wght@400;500;900&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:        #E8ECF0;
-    --surface:   #FFFFFF;
-    --text:      #1a1a18;
-    --muted:     #8a8880;
-    --border:    rgba(0,0,0,0.08);
-    --red:       #E53935;
-    --blue:      #1565C0;
-    --green:     #52c41a;
+    --bg:      #F6F4F0;
+    --white:   #FFFFFF;
+    --text:    #1A1A18;
+    --muted:   #9A9690;
+    --border:  rgba(0,0,0,0.07);
+    --red:     #E53935;
+    --blue:    #1565C0;
+    --green:   #52c41a;
   }
 
   html, body {
@@ -36,7 +36,7 @@
     min-height: 100dvh;
   }
 
-  /* ── LEFT PANEL ─────────────────────────────────────── */
+  /* ── LEFT PANEL ─────────────────────────────────────────── */
   #panel {
     width: 260px;
     flex-shrink: 0;
@@ -44,52 +44,67 @@
     padding: 2.5rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    background: var(--surface);
+    background: var(--white);
     position: relative;
     z-index: 10;
   }
 
   #wordmark {
     font-family: 'Geist Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 400;
-    letter-spacing: 0.25em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 0;
+    margin-bottom: 2.5rem;
   }
 
-  #gesture-area {
+  #title-block {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 2rem 0;
   }
 
-  #gesture-label {
+  #title-script {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 3.2rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--text);
+    transition: color 0.2s ease;
+    margin-bottom: 0.1rem;
+  }
+  #title-script.shake-mode { color: var(--red); }
+  #title-script.wave-mode  { color: var(--blue); }
+
+  #title-bold {
     font-family: 'Geist', sans-serif;
-    font-size: clamp(4rem, 10vw, 8rem);
+    font-size: clamp(3.2rem, 5.5vw, 5rem);
     font-weight: 900;
     letter-spacing: -0.04em;
     line-height: 0.85;
     color: var(--text);
-    transition: color 0.15s ease;
-    min-height: 1em;
-    word-break: break-all;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
   }
-
-  #gesture-label.shake { color: var(--red); }
-  #gesture-label.wave  { color: var(--blue); }
+  #title-bold.shake-mode { color: var(--red); }
+  #title-bold.wave-mode  { color: var(--blue); }
 
   #gesture-sub {
     font-family: 'Geist Mono', monospace;
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.05em;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--muted);
-    margin-top: 0.75rem;
+    margin-top: 1.1rem;
+  }
+
+  #divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
   }
 
   #controls {
@@ -126,8 +141,9 @@
 
   #status-text {
     font-family: 'Geist Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.05em;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
     color: var(--muted);
   }
 
@@ -138,8 +154,8 @@
     width: 100%;
     padding: 0.7rem 1rem;
     font-family: 'Geist Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
+    font-size: 9px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     cursor: pointer;
     border-radius: 2px;
@@ -154,7 +170,7 @@
     border: none;
   }
   .btn-primary:disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: not-allowed;
   }
   .btn-primary:disabled:active { transform: none; }
@@ -173,7 +189,7 @@
     height: 16px;
     background: rgba(255,255,255,0.15);
     border-radius: 2px;
-    font-size: 9px;
+    font-size: 8px;
   }
   .btn-outline kbd {
     background: rgba(0,0,0,0.06);
@@ -181,19 +197,19 @@
 
   #shortcut-hint {
     font-family: 'Geist Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.05em;
+    font-size: 9px;
+    letter-spacing: 0.08em;
     color: var(--muted);
     margin-top: 0.75rem;
-    opacity: 0.7;
-    line-height: 1.6;
+    opacity: 0.6;
+    line-height: 1.7;
   }
 
-  /* ── STAGE ──────────────────────────────────────────── */
+  /* ── STAGE ──────────────────────────────────────────────── */
   #stage {
     flex: 1;
     position: relative;
-    background: var(--bg);
+    background: var(--white);
     overflow: hidden;
   }
 
@@ -204,7 +220,23 @@
     pointer-events: none;
   }
 
-  /* Sandbag */
+  /* Stage corner label */
+  #stage-label {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.75rem;
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    z-index: 5;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    pointer-events: none;
+  }
+
+  /* ── SANDBAG ────────────────────────────────────────────── */
   #sandbag-wrap {
     position: absolute;
     top: 0;
@@ -216,77 +248,134 @@
     will-change: transform;
   }
 
-  #sandbag-chain {
+  #sandbag-string {
     display: block;
     margin: 0 auto;
-    width: 4px;
-    height: 80px;
-    background: repeating-linear-gradient(
-      to bottom,
-      #aaa 0px, #aaa 6px,
-      #888 6px, #888 10px
-    );
-    border-radius: 2px;
+    width: 1px;
+    height: 90px;
+    background: linear-gradient(to bottom, #C0BAB2, #A8A09A);
   }
 
   #sandbag-img {
     display: block;
-    width: 180px;
+    width: 160px;
     height: auto;
     margin: 0 auto;
+    filter: drop-shadow(0 16px 32px rgba(0,0,0,0.14));
   }
 
-  /* SVG fallback for sandbag */
   #sandbag-svg {
     display: block;
     margin: 0 auto;
+    filter: drop-shadow(0 16px 32px rgba(0,0,0,0.10));
   }
 
-  /* Stress object */
+  /* ── STRESS OBJECT ──────────────────────────────────────── */
   #object-wrap {
     position: absolute;
     z-index: 3;
     pointer-events: none;
     will-change: transform, opacity;
-    transform-origin: center center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #object-content {
+    position: relative;
+    display: inline-block;
   }
 
   #object-img {
     display: block;
-    width: 120px;
+    width: 150px;
     height: auto;
+    filter: drop-shadow(0 14px 28px rgba(0,0,0,0.13));
   }
 
-  /* Impact word */
+  #object-svg-wrap {
+    filter: drop-shadow(0 14px 28px rgba(0,0,0,0.10));
+  }
+
+  /* Red count badge (1X, 3X style from reference) */
+  #object-badge {
+    position: absolute;
+    top: -14px;
+    right: -16px;
+    min-width: 46px;
+    height: 46px;
+    background: var(--red);
+    color: #fff;
+    border-radius: 23px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 0 10px;
+    z-index: 4;
+  }
+
+  #object-annotation {
+    margin-top: 14px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ── IMPACT WORD ────────────────────────────────────────── */
   #impact-word {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 20;
-    font-family: 'Geist', sans-serif;
-    font-size: clamp(4rem, 12vw, 10rem);
-    font-weight: 900;
-    letter-spacing: -0.04em;
-    color: var(--red);
-    opacity: 0;
     pointer-events: none;
+    text-align: center;
+    opacity: 0;
     white-space: nowrap;
   }
-  #impact-word.wave-word { color: var(--blue); }
 
-  /* Flash overlay */
+  #impact-script {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 400;
+    color: var(--red);
+    line-height: 1.1;
+  }
+  #impact-script.wave-mode { color: var(--blue); }
+
+  #impact-bold {
+    display: block;
+    font-family: 'Geist', sans-serif;
+    font-size: clamp(4rem, 11vw, 9rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    line-height: 0.82;
+    text-transform: uppercase;
+  }
+
+  /* ── FLASH ──────────────────────────────────────────────── */
   #flash {
     position: absolute;
     inset: 0;
     z-index: 15;
     pointer-events: none;
     opacity: 0;
-    background: rgba(229,57,53,0.06);
+    background: rgba(229,57,53,0.05);
   }
-  #flash.wave-flash { background: rgba(21,101,192,0.05); }
+  #flash.wave-flash { background: rgba(21,101,192,0.04); }
 
-  /* Screen shake applied to stage */
+  /* ── SCREEN SHAKE ───────────────────────────────────────── */
   #stage.shake-anim {
     animation: screen-shake 0.18s ease;
   }
@@ -301,7 +390,7 @@
     100% { transform: translate(0, 0); }
   }
 
-  /* Cleared banner */
+  /* ── CLEARED BANNER ─────────────────────────────────────── */
   #cleared-banner {
     position: absolute;
     top: 50%;
@@ -312,21 +401,71 @@
     opacity: 0;
     pointer-events: none;
   }
-  #cleared-banner .cleared-title {
+  #cleared-banner .script-line {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.1;
+  }
+  #cleared-banner .bold-line {
+    display: block;
     font-family: 'Geist', sans-serif;
-    font-size: clamp(3rem, 8vw, 6rem);
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
     font-weight: 900;
     letter-spacing: -0.04em;
+    line-height: 0.85;
     color: var(--text);
-    line-height: 0.9;
+    text-transform: uppercase;
   }
   #cleared-banner .cleared-sub {
     font-family: 'Geist Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 0.15em;
+    font-size: 9px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-top: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  /* ── TICKER STRIP ───────────────────────────────────────── */
+  #ticker {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 34px;
+    background: var(--text);
+    overflow: hidden;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+  }
+  #ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: ticker-scroll 22s linear infinite;
+  }
+  .t-item {
+    font-family: 'Geist Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 0 1.2rem;
+    user-select: none;
+  }
+  .t-dot {
+    color: rgba(229,57,53,0.55);
+    padding: 0 0.2rem;
+    font-size: 9px;
+    font-family: 'Geist Mono', monospace;
+    letter-spacing: 0;
+  }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
   }
 </style>
 </head>
@@ -337,10 +476,13 @@
   <aside id="panel">
     <div id="wordmark">SMASH · Gesture UI</div>
 
-    <div id="gesture-area">
-      <div id="gesture-label"></div>
+    <div id="title-block">
+      <div id="title-script">Stress</div>
+      <div id="title-bold">SMASH</div>
       <div id="gesture-sub">awaiting connection</div>
     </div>
+
+    <hr id="divider">
 
     <div id="controls">
       <div id="status-row">
@@ -363,42 +505,72 @@
   <main id="stage">
     <canvas id="canvas"></canvas>
 
+    <div id="stage-label">10-minute break</div>
+
     <!-- Sandbag -->
     <div id="sandbag-wrap">
-      <div id="sandbag-chain"></div>
-      <img id="sandbag-img" src="assets/sandbag.png" alt="" onerror="this.style.display='none';document.getElementById('sandbag-svg-wrap').style.display='block'">
+      <div id="sandbag-string"></div>
+      <img id="sandbag-img" src="assets/sandbag.png" alt=""
+           onerror="this.style.display='none';document.getElementById('sandbag-svg-wrap').style.display='block'">
       <div id="sandbag-svg-wrap" style="display:none">
-        <svg id="sandbag-svg" width="160" height="220" viewBox="0 0 160 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Knot at top -->
-          <ellipse cx="80" cy="28" rx="12" ry="8" fill="#d4c5a9" stroke="#b8a88a" stroke-width="1.5"/>
-          <!-- Bag body -->
-          <rect x="24" y="34" width="112" height="160" rx="8" fill="#f5f0e8" stroke="#c8b89a" stroke-width="1.5"/>
-          <!-- Horizontal stitch lines -->
-          <line x1="24" y1="90" x2="136" y2="90" stroke="#c8b89a" stroke-width="1" stroke-dasharray="6 4"/>
-          <line x1="24" y1="130" x2="136" y2="130" stroke="#c8b89a" stroke-width="1" stroke-dasharray="6 4"/>
-          <line x1="24" y1="170" x2="136" y2="170" stroke="#c8b89a" stroke-width="1" stroke-dasharray="6 4"/>
-          <!-- Bottom seam -->
-          <ellipse cx="80" cy="194" rx="56" ry="10" fill="#e8dece" stroke="#c8b89a" stroke-width="1"/>
+        <svg id="sandbag-svg" width="160" height="220" viewBox="0 0 160 220" fill="none">
+          <ellipse cx="80" cy="28" rx="12" ry="8" fill="#D4C5A9" stroke="#B8A88A" stroke-width="1.5"/>
+          <rect x="24" y="34" width="112" height="160" rx="6" fill="#F2EDE3" stroke="#C8B89A" stroke-width="1.5"/>
+          <line x1="24" y1="88" x2="136" y2="88" stroke="#C8B89A" stroke-width="1" stroke-dasharray="6 4"/>
+          <line x1="24" y1="128" x2="136" y2="128" stroke="#C8B89A" stroke-width="1" stroke-dasharray="6 4"/>
+          <line x1="24" y1="168" x2="136" y2="168" stroke="#C8B89A" stroke-width="1" stroke-dasharray="6 4"/>
+          <ellipse cx="80" cy="192" rx="56" ry="10" fill="#E8DECE" stroke="#C8B89A" stroke-width="1"/>
         </svg>
       </div>
     </div>
 
     <!-- Stress object -->
     <div id="object-wrap" style="display:none; opacity:0">
-      <img id="object-img" src="" alt="" style="display:none">
-      <div id="object-svg-wrap"></div>
+      <div id="object-content">
+        <img id="object-img" src="" alt="" style="display:none">
+        <div id="object-svg-wrap"></div>
+        <div id="object-badge"></div>
+      </div>
+      <div id="object-annotation"></div>
     </div>
 
     <!-- Impact word -->
-    <div id="impact-word"></div>
+    <div id="impact-word">
+      <span id="impact-script"></span>
+      <span id="impact-bold"></span>
+    </div>
 
     <!-- Flash overlay -->
     <div id="flash"></div>
 
     <!-- Cleared banner -->
     <div id="cleared-banner">
-      <div class="cleared-title">All clear</div>
-      <div class="cleared-sub">Restarting cycle</div>
+      <span class="script-line">All</span>
+      <span class="bold-line">CLEAR</span>
+      <div class="cleared-sub">restarting cycle</div>
+    </div>
+
+    <!-- Ticker strip -->
+    <div id="ticker">
+      <div id="ticker-track">
+        <span class="t-item">shake</span><span class="t-dot">·</span>
+        <span class="t-item">wave</span><span class="t-dot">·</span>
+        <span class="t-item">smash</span><span class="t-dot">·</span>
+        <span class="t-item">punch</span><span class="t-dot">·</span>
+        <span class="t-item">stress relief</span><span class="t-dot">·</span>
+        <span class="t-item">clear</span><span class="t-dot">·</span>
+        <span class="t-item">slice</span><span class="t-dot">·</span>
+        <span class="t-item">feel better</span><span class="t-dot">·</span>
+        <!-- duplicate for seamless loop -->
+        <span class="t-item">shake</span><span class="t-dot">·</span>
+        <span class="t-item">wave</span><span class="t-dot">·</span>
+        <span class="t-item">smash</span><span class="t-dot">·</span>
+        <span class="t-item">punch</span><span class="t-dot">·</span>
+        <span class="t-item">stress relief</span><span class="t-dot">·</span>
+        <span class="t-item">clear</span><span class="t-dot">·</span>
+        <span class="t-item">slice</span><span class="t-dot">·</span>
+        <span class="t-item">feel better</span><span class="t-dot">·</span>
+      </div>
     </div>
   </main>
 </div>
@@ -408,149 +580,141 @@
 
 const OBJECT_QUEUE = ['alarm', 'email', 'slack', 'invoice'];
 
+const OBJECT_COUNTS = {
+  alarm:   '5×',
+  email:   '12×',
+  slack:   '47×',
+  invoice: '3×',
+};
+
+const OBJECT_LABELS = {
+  alarm:   'missed alarms',
+  email:   'unread emails',
+  slack:   'slack messages',
+  invoice: 'overdue invoices',
+};
+
 const IMPACT_WORDS_SHAKE = ['SMASH!', 'POW!', 'CRUSH!', 'BAM!', 'WHAM!'];
 const IMPACT_WORDS_WAVE  = ['SLICE!', 'SWEEP!', 'GONE!'];
+const SCRIPT_IMPACT_SHAKE = ['yeah!', 'take that', 'yes!', 'nice.'];
+const SCRIPT_IMPACT_WAVE  = ['gone.', 'done.', 'away!'];
+
+const SCRIPT_WORDS = {
+  shake: 'Impact',
+  wave:  'Ripple',
+  idle:  'Stress',
+};
 
 const FALLBACK_SVGS = {
   alarm: `<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Clock body -->
-    <circle cx="60" cy="64" r="44" fill="#f5f5f0" stroke="#d0cdc8" stroke-width="2"/>
-    <!-- Bell legs -->
+    <circle cx="60" cy="64" r="44" fill="#F5F5F0" stroke="#D0CDC8" stroke-width="2"/>
     <line x1="30" y1="28" x2="18" y2="16" stroke="#888" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="15" cy="13" r="6" fill="#aaa"/>
+    <circle cx="15" cy="13" r="6" fill="#AAA"/>
     <line x1="90" y1="28" x2="102" y2="16" stroke="#888" stroke-width="3" stroke-linecap="round"/>
-    <circle cx="105" cy="13" r="6" fill="#aaa"/>
-    <!-- Face -->
-    <circle cx="60" cy="64" r="36" fill="white" stroke="#e0ddd8" stroke-width="1"/>
-    <!-- Hour marks -->
+    <circle cx="105" cy="13" r="6" fill="#AAA"/>
+    <circle cx="60" cy="64" r="36" fill="white" stroke="#E0DDD8" stroke-width="1"/>
     <line x1="60" y1="32" x2="60" y2="38" stroke="#333" stroke-width="2" stroke-linecap="round"/>
     <line x1="60" y1="90" x2="60" y2="96" stroke="#333" stroke-width="2" stroke-linecap="round"/>
     <line x1="28" y1="64" x2="34" y2="64" stroke="#333" stroke-width="2" stroke-linecap="round"/>
     <line x1="86" y1="64" x2="92" y2="64" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-    <!-- Hands -->
-    <line x1="60" y1="64" x2="60" y2="46" stroke="#1a1a18" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="60" y1="64" x2="76" y2="64" stroke="#1a1a18" stroke-width="2" stroke-linecap="round"/>
+    <line x1="60" y1="64" x2="60" y2="46" stroke="#1A1A18" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="60" y1="64" x2="76" y2="64" stroke="#1A1A18" stroke-width="2" stroke-linecap="round"/>
     <circle cx="60" cy="64" r="3" fill="#E53935"/>
-    <!-- Feet -->
-    <rect x="42" y="106" width="14" height="6" rx="3" fill="#ccc"/>
-    <rect x="64" y="106" width="14" height="6" rx="3" fill="#ccc"/>
+    <rect x="42" y="106" width="14" height="6" rx="3" fill="#CCC"/>
+    <rect x="64" y="106" width="14" height="6" rx="3" fill="#CCC"/>
   </svg>`,
 
-  email: `<svg width="120" height="90" viewBox="0 0 120 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Envelope body -->
-    <rect x="4" y="12" width="112" height="72" rx="4" fill="white" stroke="#d0cdc8" stroke-width="2"/>
-    <!-- Envelope flap lines -->
-    <polyline points="4,12 60,52 116,12" stroke="#d0cdc8" stroke-width="2" fill="none"/>
-    <line x1="4" y1="84" x2="44" y2="50" stroke="#d0cdc8" stroke-width="1.5"/>
-    <line x1="116" y1="84" x2="76" y2="50" stroke="#d0cdc8" stroke-width="1.5"/>
-    <!-- Badge -->
-    <circle cx="96" cy="18" r="14" fill="#E53935"/>
-    <text x="96" y="23" text-anchor="middle" font-family="Geist Mono, monospace" font-size="12" font-weight="700" fill="white">3</text>
+  email: `<svg width="130" height="100" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="10" width="122" height="78" rx="4" fill="white" stroke="#D0CDC8" stroke-width="2"/>
+    <polyline points="4,10 65,56 126,10" stroke="#D0CDC8" stroke-width="2" fill="none"/>
+    <line x1="4" y1="88" x2="48" y2="52" stroke="#D0CDC8" stroke-width="1.5"/>
+    <line x1="126" y1="88" x2="82" y2="52" stroke="#D0CDC8" stroke-width="1.5"/>
   </svg>`,
 
   slack: `<svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Notification card -->
-    <rect x="4" y="4" width="102" height="102" rx="16" fill="white" stroke="#d0cdc8" stroke-width="1.5"/>
-    <!-- Slack hash icon (simplified) -->
+    <rect x="4" y="4" width="102" height="102" rx="16" fill="white" stroke="#D0CDC8" stroke-width="1.5"/>
     <rect x="20" y="20" width="30" height="30" rx="6" fill="#4A154B"/>
-    <text x="35" y="41" text-anchor="middle" font-family="Geist Mono, monospace" font-size="18" font-weight="900" fill="white">#</text>
-    <!-- Text lines -->
-    <rect x="58" y="24" width="36" height="5" rx="2" fill="#1a1a18"/>
-    <rect x="58" y="33" width="28" height="4" rx="2" fill="#8a8880"/>
-    <rect x="20" y="60" width="70" height="4" rx="2" fill="#d0cdc8"/>
-    <rect x="20" y="70" width="55" height="4" rx="2" fill="#d0cdc8"/>
-    <rect x="20" y="80" width="62" height="4" rx="2" fill="#d0cdc8"/>
-    <!-- Badge -->
-    <circle cx="90" cy="20" r="12" fill="#E53935"/>
-    <text x="90" y="25" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" font-weight="700" fill="white">12</text>
+    <text x="35" y="41" text-anchor="middle" font-family="monospace" font-size="18" font-weight="900" fill="white">#</text>
+    <rect x="58" y="24" width="36" height="5" rx="2" fill="#1A1A18"/>
+    <rect x="58" y="33" width="28" height="4" rx="2" fill="#8A8880"/>
+    <rect x="20" y="60" width="70" height="4" rx="2" fill="#D0CDC8"/>
+    <rect x="20" y="70" width="55" height="4" rx="2" fill="#D0CDC8"/>
+    <rect x="20" y="80" width="62" height="4" rx="2" fill="#D0CDC8"/>
   </svg>`,
 
   invoice: `<svg width="90" height="120" viewBox="0 0 90 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Paper -->
-    <rect x="4" y="4" width="82" height="112" rx="3" fill="white" stroke="#d0cdc8" stroke-width="1.5"/>
-    <!-- Fold corner -->
-    <polygon points="66,4 82,4 82,20" fill="#e8e5e0" stroke="#d0cdc8" stroke-width="1"/>
-    <!-- Header bar -->
-    <rect x="4" y="4" width="62" height="22" rx="3" fill="#1a1a18"/>
+    <rect x="4" y="4" width="82" height="112" rx="3" fill="white" stroke="#D0CDC8" stroke-width="1.5"/>
+    <polygon points="66,4 82,4 82,20" fill="#E8E5E0" stroke="#D0CDC8" stroke-width="1"/>
+    <rect x="4" y="4" width="62" height="22" rx="3" fill="#1A1A18"/>
     <rect x="12" y="12" width="30" height="5" rx="2" fill="white" opacity="0.8"/>
-    <!-- Line items -->
-    <rect x="12" y="36" width="48" height="4" rx="2" fill="#d0cdc8"/>
-    <rect x="12" y="44" width="36" height="4" rx="2" fill="#d0cdc8"/>
-    <rect x="12" y="56" width="48" height="4" rx="2" fill="#e0ddd8"/>
-    <rect x="12" y="64" width="40" height="4" rx="2" fill="#e0ddd8"/>
-    <rect x="12" y="72" width="44" height="4" rx="2" fill="#e0ddd8"/>
-    <!-- Total line -->
-    <line x1="12" y1="86" x2="78" y2="86" stroke="#d0cdc8" stroke-width="1"/>
-    <rect x="12" y="92" width="28" height="5" rx="2" fill="#1a1a18"/>
+    <rect x="12" y="36" width="48" height="4" rx="2" fill="#D0CDC8"/>
+    <rect x="12" y="44" width="36" height="4" rx="2" fill="#D0CDC8"/>
+    <rect x="12" y="56" width="48" height="4" rx="2" fill="#E0DDD8"/>
+    <rect x="12" y="64" width="40" height="4" rx="2" fill="#E0DDD8"/>
+    <rect x="12" y="72" width="44" height="4" rx="2" fill="#E0DDD8"/>
+    <line x1="12" y1="86" x2="78" y2="86" stroke="#D0CDC8" stroke-width="1"/>
+    <rect x="12" y="92" width="28" height="5" rx="2" fill="#1A1A18"/>
     <rect x="50" y="92" width="20" height="5" rx="2" fill="#E53935"/>
-    <!-- OVERDUE stamp -->
     <rect x="16" y="104" width="58" height="8" rx="1" fill="none" stroke="#E53935" stroke-width="1.5"/>
-    <text x="45" y="111" text-anchor="middle" font-family="Geist Mono, monospace" font-size="7" font-weight="700" fill="#E53935" letter-spacing="0.1em">OVERDUE</text>
+    <text x="45" y="111" text-anchor="middle" font-family="monospace" font-size="7" font-weight="700" fill="#E53935" letter-spacing="0.1em">OVERDUE</text>
   </svg>`,
 };
 
 // ── STATE ────────────────────────────────────────────────────────────────────
 
 const state = {
-  // Game
-  gameState: 'IDLE', // IDLE | WAITING | OBJECT_ACTIVE | DESTROYING | PAUSE
+  gameState: 'IDLE',
   objectQueue: [],
   currentObjectKey: null,
   cycleCount: 0,
 
-  // Gesture counts
   counts: { shake: 0, wave: 0, idle: 0 },
   lastGesture: null,
 
-  // Serial
   port: null,
   reader: null,
   writer: null,
   connected: false,
 
-  // Sandbag physics
   bagAngle: 0,
   bagVelocity: 0,
   bagDamping: 0.93,
   bagIdlePhase: 0,
 
-  // Object position & animation
   objectX: 0,
   objectY: 0,
+  objectTilt: 0,
   objectPhase: 0,
   objectVisible: false,
-
-  // Object destruction animation
-  destroyProgress: 0,
-  destroyDir: { x: 1, y: -1 },
-  destroyRotation: 0,
-  destroyRotV: 0,
-  destroyScale: 1,
-
-  // Halves for wave (slice)
-  sliceHalves: null, // {top: {x,y,alpha}, bottom: {x,y,alpha}}
 };
 
 // ── DOM REFS ─────────────────────────────────────────────────────────────────
 
-const $canvas       = document.getElementById('canvas');
-const $stage        = document.getElementById('stage');
-const $sandbagWrap  = document.getElementById('sandbag-wrap');
-const $objectWrap   = document.getElementById('object-wrap');
-const $objectImg    = document.getElementById('object-img');
-const $objectSvgWrap= document.getElementById('object-svg-wrap');
-const $impactWord   = document.getElementById('impact-word');
-const $flash        = document.getElementById('flash');
-const $clearedBanner= document.getElementById('cleared-banner');
+const $canvas        = document.getElementById('canvas');
+const $stage         = document.getElementById('stage');
+const $sandbagWrap   = document.getElementById('sandbag-wrap');
+const $objectWrap    = document.getElementById('object-wrap');
+const $objectContent = document.getElementById('object-content');
+const $objectBadge   = document.getElementById('object-badge');
+const $objectAnnotation = document.getElementById('object-annotation');
+const $impactWord    = document.getElementById('impact-word');
+const $impactScript  = document.getElementById('impact-script');
+const $impactBold    = document.getElementById('impact-bold');
+const $flash         = document.getElementById('flash');
+const $clearedBanner = document.getElementById('cleared-banner');
 
-const $gestureLabel = document.getElementById('gesture-label');
-const $gestureSub   = document.getElementById('gesture-sub');
-const $statusDot    = document.getElementById('status-dot');
-const $statusText   = document.getElementById('status-text');
-const $btnRecord    = document.getElementById('btn-record');
-const $btnConnect   = document.getElementById('btn-connect');
+const $titleScript   = document.getElementById('title-script');
+const $titleBold     = document.getElementById('title-bold');
+const $gestureSub    = document.getElementById('gesture-sub');
+const $statusDot     = document.getElementById('status-dot');
+const $statusText    = document.getElementById('status-text');
+const $btnRecord     = document.getElementById('btn-record');
+const $btnConnect    = document.getElementById('btn-connect');
 
 const ctx = $canvas.getContext('2d');
+
+function getObjectImg()    { return document.getElementById('object-img'); }
+function getObjectSvgWrap(){ return document.getElementById('object-svg-wrap'); }
 
 // ── CANVAS RESIZE ─────────────────────────────────────────────────────────────
 
@@ -572,28 +736,23 @@ class Particle {
     this.y = y;
     this.shape = Math.random() < 0.5 ? 'rect' : 'circle';
     this.size  = 4 + Math.random() * 8;
-
     const speed = 4 + Math.random() * 10;
     const angle = Math.random() * Math.PI * 2;
     this.vx = Math.cos(angle) * speed;
     this.vy = Math.sin(angle) * speed - (type === 'shake' ? 4 : 2);
-
     this.gravity  = 0.5;
     this.decay    = type === 'shake' ? 0.016 + Math.random() * 0.012 : 0.018 + Math.random() * 0.010;
     this.alpha    = 1;
     this.rot      = Math.random() * Math.PI * 2;
     this.rotV     = (Math.random() - 0.5) * 0.3;
-
-    // Color from palette
     if (type === 'shake') {
-      const shakeColors = ['#E53935', '#1a1a18', '#8a8880', '#c8c5c0', '#ffffff'];
-      this.color = shakeColors[Math.floor(Math.random() * shakeColors.length)];
+      const cols = ['#E53935', '#1A1A18', '#9A9690', '#C8C5C0', '#ffffff'];
+      this.color = cols[Math.floor(Math.random() * cols.length)];
     } else {
-      const waveColors = ['#1565C0', '#1a73e8', '#8a8880', '#c8d8f0', '#ffffff'];
-      this.color = waveColors[Math.floor(Math.random() * waveColors.length)];
+      const cols = ['#1565C0', '#1a73e8', '#9A9690', '#C8D8F0', '#ffffff'];
+      this.color = cols[Math.floor(Math.random() * cols.length)];
     }
   }
-
   update() {
     this.vy += this.gravity;
     this.vx *= 0.97;
@@ -602,7 +761,6 @@ class Particle {
     this.rot += this.rotV;
     this.alpha = Math.max(0, this.alpha - this.decay);
   }
-
   draw(ctx) {
     if (this.alpha <= 0) return;
     ctx.save();
@@ -623,24 +781,15 @@ class Particle {
 
 class Ripple {
   constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.r = 0;
-    this.alpha = 0.7;
-    this.speed = 9;
+    this.x = x; this.y = y; this.r = 0; this.alpha = 0.6; this.speed = 9;
   }
-
-  update() {
-    this.r     += this.speed;
-    this.alpha -= 0.012;
-  }
-
+  update() { this.r += this.speed; this.alpha -= 0.012; }
   draw(ctx) {
     if (this.alpha <= 0) return;
     ctx.save();
     ctx.globalAlpha = this.alpha;
     ctx.strokeStyle = '#1565C0';
-    ctx.lineWidth   = 2;
+    ctx.lineWidth   = 1.5;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
     ctx.stroke();
@@ -650,27 +799,21 @@ class Ripple {
 
 function spawnParticles(x, y, type) {
   const count = type === 'shake' ? 100 : 40;
-  for (let i = 0; i < count; i++) {
-    particles.push(new Particle(x, y, type));
-  }
+  for (let i = 0; i < count; i++) particles.push(new Particle(x, y, type));
 }
 
 function spawnRipples(x, y) {
-  for (let i = 0; i < 5; i++) {
-    setTimeout(() => ripples.push(new Ripple(x, y)), i * 80);
-  }
+  for (let i = 0; i < 5; i++) setTimeout(() => ripples.push(new Ripple(x, y)), i * 80);
 }
 
 // ── SANDBAG PHYSICS ──────────────────────────────────────────────────────────
 
 function punchBag(force) {
-  const dir = Math.random() < 0.5 ? 1 : -1;
-  state.bagVelocity = force * dir;
+  state.bagVelocity = force * (Math.random() < 0.5 ? 1 : -1);
 }
 
 function updateBag() {
   if (state.gameState === 'IDLE' || !state.connected) {
-    // Slow idle sway
     state.bagIdlePhase += 0.012;
     state.bagAngle = Math.sin(state.bagIdlePhase) * 3;
   } else {
@@ -694,11 +837,10 @@ function shuffleQueue() {
 
 function getObjectPosition() {
   const stageW = $stage.offsetWidth;
-  const stageH = $stage.offsetHeight;
-  // Float to the side of sandbag (center-ish), offset randomly
+  const stageH = $stage.offsetHeight - 34; // account for ticker
   const side   = Math.random() < 0.5 ? -1 : 1;
-  const x      = stageW / 2 + side * (120 + Math.random() * 80);
-  const y      = stageH * 0.25 + Math.random() * stageH * 0.25;
+  const x      = stageW / 2 + side * (100 + Math.random() * 80);
+  const y      = stageH * 0.22 + Math.random() * stageH * 0.22;
   return { x, y };
 }
 
@@ -706,19 +848,19 @@ function loadObject(key) {
   state.currentObjectKey = key;
   const imgSrc = `assets/${key}.png`;
 
-  $objectImg.src = '';
-  $objectSvgWrap.innerHTML = '';
-
   const img = new Image();
   img.onload = () => {
-    $objectImg.src = imgSrc;
-    $objectImg.style.display = 'block';
-    $objectSvgWrap.innerHTML = '';
+    const objImg = getObjectImg();
+    const objSvg = getObjectSvgWrap();
+    if (objImg) { objImg.src = imgSrc; objImg.style.display = 'block'; }
+    if (objSvg) objSvg.innerHTML = '';
     showObject();
   };
   img.onerror = () => {
-    $objectImg.style.display = 'none';
-    $objectSvgWrap.innerHTML = FALLBACK_SVGS[key] || '';
+    const objImg = getObjectImg();
+    const objSvg = getObjectSvgWrap();
+    if (objImg) objImg.style.display = 'none';
+    if (objSvg) objSvg.innerHTML = FALLBACK_SVGS[key] || '';
     showObject();
   };
   img.src = imgSrc;
@@ -726,23 +868,25 @@ function loadObject(key) {
 
 function showObject() {
   const pos = getObjectPosition();
-  state.objectX = pos.x;
-  state.objectY = pos.y;
+  state.objectX     = pos.x;
+  state.objectY     = pos.y;
+  state.objectTilt  = (Math.random() - 0.5) * 18;
   state.objectPhase = Math.random() * Math.PI * 2;
   state.objectVisible = true;
-  state.sliceHalves = null;
 
-  $objectWrap.style.display = 'block';
-  $objectWrap.style.left    = '0px';
-  $objectWrap.style.top     = '0px';
-  $objectWrap.style.opacity = '0';
-  $objectWrap.style.transform = `translate(${state.objectX}px, ${state.objectY - 30}px)`;
+  // Badge
+  $objectBadge.textContent    = OBJECT_COUNTS[state.currentObjectKey] || '';
+  $objectBadge.style.display  = 'flex';
+  $objectAnnotation.textContent = OBJECT_LABELS[state.currentObjectKey] || '';
 
-  // Slide in with fade
+  $objectWrap.style.display   = 'flex';
+  $objectWrap.style.opacity   = '0';
+  $objectWrap.style.transform = `translate(${state.objectX}px, ${state.objectY - 30}px) rotate(${state.objectTilt}deg)`;
+
   requestAnimationFrame(() => {
     $objectWrap.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
     $objectWrap.style.opacity    = '1';
-    $objectWrap.style.transform  = `translate(${state.objectX}px, ${state.objectY}px)`;
+    $objectWrap.style.transform  = `translate(${state.objectX}px, ${state.objectY}px) rotate(${state.objectTilt}deg)`;
     setTimeout(() => {
       $objectWrap.style.transition = '';
       state.gameState = 'OBJECT_ACTIVE';
@@ -766,10 +910,7 @@ function startGame() {
 }
 
 function nextObject() {
-  if (state.objectQueue.length === 0) {
-    showClearedBanner();
-    return;
-  }
+  if (state.objectQueue.length === 0) { showClearedBanner(); return; }
   const key = state.objectQueue.shift();
   loadObject(key);
 }
@@ -778,118 +919,85 @@ function destroyObject(gestureType) {
   if (state.gameState !== 'OBJECT_ACTIVE') return;
   state.gameState = 'DESTROYING';
 
-  // Object center in canvas coords
-  const objEl  = $objectImg.style.display !== 'none' ? $objectImg : $objectSvgWrap.firstElementChild;
-  const objW   = objEl ? (objEl.clientWidth  || 120) : 120;
-  const objH   = objEl ? (objEl.clientHeight || 120) : 120;
+  const objImg = getObjectImg();
+  const objSvg = getObjectSvgWrap();
+  const objEl  = (objImg && objImg.style.display !== 'none') ? objImg : (objSvg ? objSvg.firstElementChild : null);
+  const objW   = objEl ? (objEl.clientWidth  || 150) : 150;
+  const objH   = objEl ? (objEl.clientHeight || 150) : 150;
   const cx     = state.objectX + objW / 2;
   const cy     = state.objectY + objH / 2;
 
   spawnParticles(cx, cy, gestureType);
   if (gestureType === 'wave') spawnRipples(cx, cy);
 
-  // Impact word
   const words = gestureType === 'shake' ? IMPACT_WORDS_SHAKE : IMPACT_WORDS_WAVE;
-  $impactWord.textContent = words[Math.floor(Math.random() * words.length)];
-  $impactWord.className   = gestureType === 'wave' ? 'wave-word' : '';
+  const scrWords = gestureType === 'shake' ? SCRIPT_IMPACT_SHAKE : SCRIPT_IMPACT_WAVE;
+  $impactScript.textContent = scrWords[Math.floor(Math.random() * scrWords.length)];
+  $impactBold.textContent   = words[Math.floor(Math.random() * words.length)];
+  $impactScript.className   = gestureType === 'wave' ? 'wave-mode' : '';
   animateImpactWord();
-
-  // Flash
   triggerFlash(gestureType);
 
   if (gestureType === 'shake') {
-    // Fly off screen
     const angle = (Math.random() * Math.PI * 0.8) - Math.PI * 0.4 - Math.PI / 2;
-    state.destroyDir    = { x: Math.cos(angle) * 22, y: Math.sin(angle) * 22 };
-    state.destroyRotV   = (Math.random() - 0.5) * 18;
-    state.destroyScale  = 1;
-    state.destroyProgress = 0;
-    animateDestroy();
+    const dir   = { x: Math.cos(angle) * 22, y: Math.sin(angle) * 22 };
+    let rot = state.objectTilt;
+    let rotV = (Math.random() - 0.5) * 18;
+    let scale = 1;
+    let frame = 0;
+    const totalFrames = 35;
+    const startX = state.objectX;
+    const startY = state.objectY;
+
+    function step() {
+      frame++;
+      rot   += rotV;
+      scale  = Math.max(0, 1 - frame / totalFrames);
+      const nx = startX + dir.x * frame;
+      const ny = startY + dir.y * frame;
+      $objectWrap.style.transform = `translate(${nx}px, ${ny}px) rotate(${rot}deg) scale(${scale})`;
+      $objectWrap.style.opacity   = String(Math.max(0, 1 - (frame / totalFrames) * 1.2));
+      if (frame < totalFrames) requestAnimationFrame(step);
+      else { hideObject(); schedulePause(); }
+    }
+    requestAnimationFrame(step);
   } else {
-    // Slice: split into halves, slide apart
-    animateSlice();
-  }
-}
+    // Wave: sweep off to the side with rotation
+    let frame = 0;
+    const totalFrames = 28;
+    const startX = state.objectX;
+    const startY = state.objectY;
+    const sweepDir = Math.random() < 0.5 ? 1 : -1;
 
-function animateDestroy() {
-  const startX = state.objectX;
-  const startY = state.objectY;
-  let rot = 0;
-  let scale = 1;
-  let frame = 0;
-  const totalFrames = 35;
-
-  function step() {
-    frame++;
-    rot   += state.destroyRotV;
-    scale  = Math.max(0, 1 - frame / totalFrames);
-    const nx = startX + state.destroyDir.x * frame;
-    const ny = startY + state.destroyDir.y * frame;
-    $objectWrap.style.transform  = `translate(${nx}px, ${ny}px) rotate(${rot}deg) scale(${scale})`;
-    $objectWrap.style.opacity    = String(Math.max(0, 1 - frame / totalFrames * 1.2));
-    if (frame < totalFrames) {
-      requestAnimationFrame(step);
-    } else {
-      hideObject();
-      schedulePause();
+    function step() {
+      frame++;
+      const t     = frame / totalFrames;
+      const sweep = t * 260 * sweepDir;
+      const tilt  = state.objectTilt + t * 30 * sweepDir;
+      const alpha = Math.max(0, 1 - t * 1.2);
+      $objectWrap.style.transform = `translate(${startX + sweep}px, ${startY}px) rotate(${tilt}deg)`;
+      $objectWrap.style.opacity   = String(alpha);
+      if (frame < totalFrames) requestAnimationFrame(step);
+      else { hideObject(); schedulePause(); }
     }
+    requestAnimationFrame(step);
   }
-  requestAnimationFrame(step);
-}
-
-function animateSlice() {
-  // Clone via canvas drawing — simpler approach: clip top/bottom halves via wrapper transforms
-  const objEl = $objectImg.style.display !== 'none' ? $objectImg : $objectSvgWrap.firstElementChild;
-  const h = objEl ? (objEl.clientHeight || 120) : 120;
-
-  // Wrap in two clipped divs drawn via CSS overflow clip
-  $objectWrap.innerHTML = `
-    <div style="position:relative; overflow:visible;">
-      <div id="slice-top" style="overflow:hidden; height:${h/2}px;">
-        ${$objectSvgWrap.innerHTML || `<img src="${$objectImg.src}" style="width:${$objectImg.clientWidth||120}px; display:block">`}
-      </div>
-      <div id="slice-bot" style="overflow:hidden; height:${h/2}px; margin-top:-${h/2}px; clip-path:inset(${h/2}px 0 0 0);">
-        ${$objectSvgWrap.innerHTML || `<img src="${$objectImg.src}" style="width:${$objectImg.clientWidth||120}px; display:block">`}
-      </div>
-    </div>
-  `;
-
-  const sliceTop = document.getElementById('slice-top');
-  const sliceBot = document.getElementById('slice-bot');
-
-  let frame = 0;
-  const totalFrames = 30;
-  function step() {
-    frame++;
-    const t = frame / totalFrames;
-    const spread = t * 80;
-    const alpha  = Math.max(0, 1 - t * 1.2);
-    if (sliceTop) { sliceTop.style.transform = `translateY(-${spread}px)`; sliceTop.style.opacity = alpha; }
-    if (sliceBot) { sliceBot.style.transform = `translateY(${spread}px)`;  sliceBot.style.opacity = alpha; }
-    if (frame < totalFrames) {
-      requestAnimationFrame(step);
-    } else {
-      hideObject();
-      // Restore object wrap markup
-      $objectWrap.innerHTML = `
-        <img id="object-img-restored" src="" alt="" style="display:none">
-        <div id="object-svg-wrap-restored"></div>
-      `;
-      schedulePause();
-    }
-  }
-  requestAnimationFrame(step);
 }
 
 function schedulePause() {
   state.gameState = 'PAUSE';
+  // Restore object-wrap inner structure for next use
+  $objectContent.innerHTML = `
+    <img id="object-img" src="" alt="" style="display:none">
+    <div id="object-svg-wrap"></div>
+    <div id="object-badge"></div>
+  `;
+  // Re-bind badge ref (annotation stays)
+  const newBadge = document.getElementById('object-badge');
+  // use closure reference for annotation; badge is looked up fresh in showObject via getElementById
   setTimeout(() => {
-    if (state.objectQueue.length === 0) {
-      showClearedBanner();
-    } else {
-      state.gameState = 'WAITING';
-      nextObject();
-    }
+    if (state.objectQueue.length === 0) showClearedBanner();
+    else { state.gameState = 'WAITING'; nextObject(); }
   }, 600);
 }
 
@@ -913,15 +1021,15 @@ function showClearedBanner() {
 function animateImpactWord() {
   $impactWord.style.transition = 'none';
   $impactWord.style.opacity    = '0';
-  $impactWord.style.transform  = 'translate(-50%, -50%) scale(1.2)';
+  $impactWord.style.transform  = 'translate(-50%, -50%) scale(1.15)';
   requestAnimationFrame(() => {
-    $impactWord.style.transition = 'opacity 0.08s ease, transform 0.08s ease';
+    $impactWord.style.transition = 'opacity 0.08s ease, transform 0.1s ease';
     $impactWord.style.opacity    = '1';
     $impactWord.style.transform  = 'translate(-50%, -50%) scale(1)';
     setTimeout(() => {
-      $impactWord.style.transition = 'opacity 0.4s ease';
+      $impactWord.style.transition = 'opacity 0.5s ease';
       $impactWord.style.opacity    = '0';
-    }, 120);
+    }, 140);
   });
 }
 
@@ -932,58 +1040,40 @@ function triggerFlash(type) {
   setTimeout(() => {
     $flash.style.transition = 'opacity 0.15s ease';
     $flash.style.opacity    = '0';
-  }, 100);
+  }, 80);
 }
 
 function triggerScreenShake() {
   $stage.classList.remove('shake-anim');
-  void $stage.offsetWidth; // reflow
+  void $stage.offsetWidth;
   $stage.classList.add('shake-anim');
   $stage.addEventListener('animationend', () => $stage.classList.remove('shake-anim'), { once: true });
 }
 
 // ── IDLE OBJECT FLOAT ────────────────────────────────────────────────────────
 
-function updateObjectFloat(dt) {
+function updateObjectFloat() {
   if (state.gameState !== 'OBJECT_ACTIVE' || !state.objectVisible) return;
-  // Only re-read img/svg if the standard ones exist (not during slice animation)
-  const imgEl = document.getElementById('object-img') || $objectImg;
-  const svgEl = document.getElementById('object-svg-wrap') || $objectSvgWrap;
-  if (!imgEl && !svgEl) return;
-
   state.objectPhase += 0.018;
-  const floatY = Math.sin(state.objectPhase) * 8;
-  const floatR = Math.sin(state.objectPhase * 0.7) * 2;
-  $objectWrap.style.transform = `translate(${state.objectX}px, ${state.objectY + floatY}px) rotate(${floatR}deg)`;
+  const floatY = Math.sin(state.objectPhase) * 7;
+  const floatR = Math.sin(state.objectPhase * 0.7) * 1.5;
+  $objectWrap.style.transform = `translate(${state.objectX}px, ${state.objectY + floatY}px) rotate(${state.objectTilt + floatR}deg)`;
 }
 
 // ── MAIN ANIMATION LOOP ──────────────────────────────────────────────────────
 
-let lastTime = 0;
-function frame(ts) {
-  const dt = ts - lastTime;
-  lastTime = ts;
-
-  // Clear canvas
+function frame() {
   ctx.clearRect(0, 0, $canvas.width, $canvas.height);
-
-  // Update & draw particles
   for (let i = particles.length - 1; i >= 0; i--) {
-    particles[i].update();
-    particles[i].draw(ctx);
+    particles[i].update(); particles[i].draw(ctx);
     if (particles[i].alpha <= 0) particles.splice(i, 1);
   }
-
-  // Update & draw ripples
   for (let i = ripples.length - 1; i >= 0; i--) {
-    ripples[i].update();
-    ripples[i].draw(ctx);
+    ripples[i].update(); ripples[i].draw(ctx);
     if (ripples[i].alpha <= 0) ripples.splice(i, 1);
   }
-
   updateBag();
-  updateObjectFloat(dt);
-
+  updateObjectFloat();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -993,26 +1083,22 @@ requestAnimationFrame(frame);
 function handleGesture(label) {
   label = label.trim().toLowerCase();
   if (!['shake', 'wave', 'idle'].includes(label)) return;
-
   state.lastGesture = label;
+  if (label !== 'idle') state.counts[label]++;
 
-  if (label !== 'idle') {
-    state.counts[label]++;
-  }
-
-  // Update panel
-  $gestureLabel.textContent = label.toUpperCase();
-  $gestureLabel.className   = label;
+  $titleScript.textContent = SCRIPT_WORDS[label] || 'Stress';
+  $titleBold.textContent   = label !== 'idle' ? label.toUpperCase() : 'SMASH';
+  $titleScript.className   = label !== 'idle' ? `${label}-mode` : '';
+  $titleBold.className     = label !== 'idle' ? `${label}-mode` : '';
 
   const countStr = label !== 'idle' ? ` · #${state.counts[label]}` : '';
-  const subMap   = {
+  const subMap = {
     shake: `impact detected${countStr}`,
     wave:  `slice detected${countStr}`,
     idle:  `no gesture`,
   };
   $gestureSub.textContent = subMap[label];
 
-  // Game events
   if (label === 'shake') {
     punchBag(14);
     triggerScreenShake();
@@ -1028,25 +1114,17 @@ function handleGesture(label) {
 // ── WEB SERIAL ───────────────────────────────────────────────────────────────
 
 async function connectSerial() {
-  if (!navigator.serial) {
-    alert('Web Serial not supported. Use Chrome/Edge.');
-    return;
-  }
+  if (!navigator.serial) { alert('Web Serial not supported. Use Chrome/Edge.'); return; }
   try {
     state.port = await navigator.serial.requestPort();
     await state.port.open({ baudRate: 115200 });
-
     state.connected = true;
     setConnectedUI(true);
-
-    const decoder  = new TextDecoderStream();
+    const decoder    = new TextDecoderStream();
     const textReader = decoder.readable.getReader();
     state.port.readable.pipeTo(decoder.writable);
-
-    const writer  = state.port.writable.getWriter();
-    state.writer  = writer;
-
-    // Read loop
+    const writer = state.port.writable.getWriter();
+    state.writer = writer;
     let buffer = '';
     (async () => {
       try {
@@ -1059,18 +1137,14 @@ async function connectSerial() {
           for (const line of lines) {
             const clean = line.trim();
             if (!clean) continue;
-            // Skip firmware status lines
             if (['READY','START','END','Recording...'].includes(clean)) continue;
             handleGesture(clean);
           }
         }
-      } catch (e) {
-        // port closed
-      }
+      } catch {}
       setConnectedUI(false);
       state.connected = false;
     })();
-
     startGame();
   } catch (e) {
     if (e.name !== 'NotFoundError') console.error(e);
@@ -1080,45 +1154,35 @@ async function connectSerial() {
 async function sendRecord() {
   if (!state.writer) return;
   try {
-    const enc = new TextEncoder();
-    await state.writer.write(enc.encode('r'));
-    $statusDot.className = 'pulse';
+    await state.writer.write(new TextEncoder().encode('r'));
+    $statusDot.className    = 'pulse';
     $statusText.textContent = 'recording…';
     setTimeout(() => {
-      $statusDot.className = 'connected';
+      $statusDot.className    = 'connected';
       $statusText.textContent = 'connected';
     }, 2500);
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) { console.error(e); }
 }
 
 function setConnectedUI(connected) {
-  $statusDot.className  = connected ? 'connected' : '';
+  $statusDot.className    = connected ? 'connected' : '';
   $statusText.textContent = connected ? 'connected' : 'disconnected';
-  $btnRecord.disabled   = !connected;
+  $btnRecord.disabled     = !connected;
   $gestureSub.textContent = connected ? 'awaiting gesture' : 'awaiting connection';
-  if (connected) {
-    $btnConnect.textContent = 'disconnect';
-  } else {
-    $btnConnect.textContent = 'connect device';
-  }
+  $btnConnect.textContent = connected ? 'disconnect' : 'connect device';
 }
 
 // ── KEYBOARD SHORTCUTS ───────────────────────────────────────────────────────
 
 document.addEventListener('keydown', e => {
-  // Ignore if typing in an input
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
   switch (e.key) {
     case '1': handleGesture('shake'); break;
     case '2': handleGesture('wave');  break;
     case '3': handleGesture('idle');  break;
-    case 'r':
-    case 'R':
+    case 'r': case 'R':
       if (state.connected) sendRecord();
-      else handleGesture('shake'); // demo fallback
+      else handleGesture('shake');
       break;
   }
 });
@@ -1127,27 +1191,19 @@ document.addEventListener('keydown', e => {
 
 $btnConnect.addEventListener('click', () => {
   if (state.connected) {
-    // Disconnect
     try { state.port?.close(); } catch {}
     setConnectedUI(false);
     state.connected = false;
-    state.port   = null;
-    state.writer = null;
+    state.port = null; state.writer = null;
   } else {
     connectSerial();
   }
 });
-
 $btnRecord.addEventListener('click', sendRecord);
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 
-// Start idle sway immediately
 state.gameState = 'IDLE';
-
-// Demo: auto-start object queue in demo mode after brief delay so UI is visible
-// (only when NOT connected — real connection triggers startGame())
-
 </script>
 </body>
 </html>
