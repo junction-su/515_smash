@@ -11,267 +11,263 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink:  #111110;
-  --dim:  #8A8880;
-  --red:  #D4351C;
-  --go:   #16A34A;
+  --ink:   #111110;
+  --dim:   #8A8880;
+  --red:   #D4351C;
+  --go:    #16A34A;
+  --paper: #FAFAF8;
 }
 
-html, body {
-  width: 100%; height: 100dvh;
-  overflow: hidden;
-  font-family: 'Geist', sans-serif;
-}
+html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',sans-serif; }
 
 /* ── STAGE ───────────────────────────────────────────────── */
 #stage {
-  width: 100%; height: 100dvh;
-  position: relative; overflow: hidden;
-  background: #FFFFFF;
+  width:100%; height:100dvh;
+  position:relative; overflow:hidden;
+  background:#FFFFFF;
 }
-#canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+#canvas     { position:absolute; inset:0; z-index:0; pointer-events:none; }
+#fog-canvas { position:absolute; inset:0; z-index:8; pointer-events:none; display:none; }
 
-/* ── GHOST BG TEXT ───────────────────────────────────────── */
+/* ── GHOST BG ────────────────────────────────────────────── */
 #ghost {
-  position: absolute; bottom: 3%; left: -1%;
-  font-family: 'Geist', sans-serif;
-  font-size: clamp(8rem, 22vw, 20rem);
-  font-weight: 900; letter-spacing: -0.06em; line-height: 1;
-  text-transform: uppercase;
-  color: rgba(17,17,16,0.032);
-  pointer-events: none; user-select: none; z-index: 0; white-space: nowrap;
+  position:absolute; bottom:3%; left:-1%;
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(8rem,22vw,20rem); letter-spacing:-0.06em; line-height:1;
+  text-transform:uppercase; color:rgba(17,17,16,0.032);
+  pointer-events:none; user-select:none; z-index:0; white-space:nowrap;
+}
+
+/* ── EDITORIAL TYPE ──────────────────────────────────────── */
+#typo-block {
+  position:absolute; top:5rem; right:2rem;
+  z-index:5; pointer-events:none; text-align:right;
+}
+#typo-script {
+  display:block; font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(2.2rem,4vw,3.4rem); font-weight:400; line-height:1; color:var(--ink);
+}
+#typo-bold {
+  display:block; font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(3.5rem,7vw,6rem); letter-spacing:-0.05em; line-height:0.85;
+  text-transform:uppercase; color:var(--ink);
 }
 
 /* ── SANDBAG ─────────────────────────────────────────────── */
 #bag-wrap {
-  position: absolute; top: 0; left: 50%;
-  transform: translateX(-50%);
-  transform-origin: top center;
-  z-index: 2; pointer-events: none; will-change: transform;
+  position:absolute; top:0; left:50%;
+  transform:translateX(-50%); transform-origin:top center;
+  z-index:2; pointer-events:none; will-change:transform;
 }
-#bag-cord {
-  display: block; margin: 0 auto;
-  width: 1px; height: 60px;
-  background: linear-gradient(to bottom, #B0ACA4, #989088);
-}
+#bag-cord { display:block; margin:0 auto; width:1px; height:60px;
+  background:linear-gradient(to bottom,#B0ACA4,#989088); }
 #bag-img {
-  display: block;
-  height: clamp(420px, 68dvh, 820px); width: auto; margin: 0 auto;
-  filter: drop-shadow(0 32px 64px rgba(17,17,16,0.16));
-  will-change: transform;
+  display:block; height:clamp(420px,68dvh,820px); width:auto; margin:0 auto;
+  filter:drop-shadow(0 32px 64px rgba(17,17,16,0.16)); will-change:transform;
 }
 
 /* ── BOXING GLOVE ────────────────────────────────────────── */
 #glove-wrap {
-  position: absolute;
-  top: calc(60px + 42dvh); left: 50%;
-  transform: translateX(-50%);
-  z-index: 4; pointer-events: none;
-  will-change: transform, opacity;
-  display: none; opacity: 0;
+  position:absolute; top:calc(60px + 42dvh); left:50%;
+  transform:translateX(-50%);
+  z-index:4; pointer-events:none; will-change:transform,opacity;
+  display:none; opacity:0;
 }
-#glove-img {
-  display: block; width: 200px; height: auto;
-  filter: drop-shadow(0 10px 24px rgba(17,17,16,0.20));
+#glove-img { display:block; width:200px; height:auto;
+  filter:drop-shadow(0 10px 24px rgba(17,17,16,0.20)); }
+
+/* ── WARIOWARE INTRO FLASH ───────────────────────────────── */
+#mg-intro {
+  position:absolute; top:46%; left:50%;
+  transform:translate(-50%,-50%) scale(0.75);
+  z-index:60; pointer-events:none;
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(5rem,13vw,10rem); letter-spacing:-0.06em;
+  text-transform:uppercase; color:var(--ink);
+  opacity:0; text-align:center; white-space:nowrap;
+  transition:opacity 0.1s ease, transform 0.15s cubic-bezier(0.16,1,0.3,1);
+}
+#mg-intro.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+/* ── BUBBLE WRAP ─────────────────────────────────────────── */
+#mg-bubble {
+  position:absolute; inset:0; display:none;
+  flex-direction:column; align-items:center; justify-content:center; gap:24px;
+  z-index:3;
+}
+#bubble-grid {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:18px;
+  width:min(520px,72vw);
+}
+.bubble {
+  width:100%; aspect-ratio:1; border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, #E8EEF8, #B8CADC);
+  box-shadow:inset 0 -4px 8px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06);
+  transition:transform 0.14s cubic-bezier(0.16,1,0.3,1), opacity 0.1s ease;
+  cursor:default; position:relative;
+}
+.bubble.popped { transform:scale(0); opacity:0; }
+#bubble-count {
+  font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
+  text-transform:uppercase; color:var(--dim);
 }
 
-/* ── STRESS OBJECT ───────────────────────────────────────── */
-#obj-wrap {
-  position: absolute; z-index: 3;
-  pointer-events: none; will-change: transform, opacity;
-  display: flex; flex-direction: column; align-items: center;
+/* ── WINDOW WIPE ─────────────────────────────────────────── */
+#mg-wipe-bg {
+  position:absolute; inset:0; display:none;
+  align-items:center; justify-content:center; z-index:6;
+  flex-direction:column; gap:16px;
 }
-#obj-inner { position: relative; display: inline-block; }
-#obj-img {
-  display: block;
-  height: clamp(220px, 42dvh, 540px); width: auto;
-  filter: drop-shadow(0 20px 44px rgba(17,17,16,0.13));
+#wipe-word {
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(4rem,12vw,9rem); letter-spacing:-0.06em;
+  text-transform:uppercase; color:rgba(17,17,16,0.12);
+  text-align:center; line-height:1;
 }
-#obj-svg-wrap { filter: drop-shadow(0 20px 44px rgba(17,17,16,0.10)); }
-
-/* Count badge */
-#obj-badge {
-  position: absolute; top: -18px; right: -22px;
-  min-width: 50px; height: 50px; padding: 0 12px;
-  display: none; align-items: center; justify-content: center;
-  background: var(--red); color: #fff; border-radius: 25px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 12px; font-weight: 500; letter-spacing: 0.04em; z-index: 4;
-}
-#obj-label {
-  margin-top: 14px;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase;
-  color: var(--dim); white-space: nowrap;
+#wipe-progress {
+  font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.22em;
+  text-transform:uppercase; color:rgba(17,17,16,0.18);
 }
 
-/* ── EDITORIAL TYPE (top-right) ──────────────────────────── */
-#typo-block {
-  position: absolute; top: 5rem; right: 2rem;
-  z-index: 5; pointer-events: none; text-align: right;
+/* ── PAPER CRUMPLE ───────────────────────────────────────── */
+#mg-crumple {
+  position:absolute; inset:0; display:none;
+  align-items:center; justify-content:center; z-index:3;
 }
-#typo-script {
-  display: block;
-  font-family: 'Playfair Display', serif; font-style: italic;
-  font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; line-height: 1;
-  color: var(--ink); transition: opacity 0.2s;
+#paper-el {
+  position:relative; will-change:transform;
+  transition:transform 0.22s cubic-bezier(0.16,1,0.3,1), border-radius 0.22s ease;
+  transform-origin:center;
+  overflow:hidden;
 }
-#typo-bold {
-  display: block;
-  font-family: 'Geist', sans-serif; font-weight: 900;
-  font-size: clamp(3.5rem, 7vw, 6rem);
-  letter-spacing: -0.05em; line-height: 0.85;
-  text-transform: uppercase; color: var(--ink);
+#paper-el svg { display:block; }
+
+/* ── FLY SWATTER ─────────────────────────────────────────── */
+#mg-swat { position:absolute; inset:0; display:none; z-index:3; }
+.fly {
+  position:absolute; width:52px; height:52px;
+  will-change:transform; pointer-events:none;
+  transition:transform 0.1s ease, opacity 0.1s ease;
+}
+.fly.dead { transform:scale(0) !important; opacity:0; }
+#swatter-el {
+  position:absolute; pointer-events:none; z-index:10;
+  width:80px; height:160px; display:none;
+  transform-origin:top center;
+}
+#swat-count {
+  position:absolute; bottom:7rem; left:50%;
+  transform:translateX(-50%);
+  font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
+  text-transform:uppercase; color:var(--dim); z-index:4;
+}
+
+/* ── WARMUP COUNTER ──────────────────────────────────────── */
+#warmup-counter {
+  position:absolute; top:40%; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:20; pointer-events:none;
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(6rem,18vw,14rem); letter-spacing:-0.08em; line-height:1;
+  color:rgba(17,17,16,0.06); opacity:0; text-align:center;
 }
 
 /* ── IMPACT WORD ─────────────────────────────────────────── */
 #impact {
-  position: absolute; top: 46%; left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 20; pointer-events: none;
-  text-align: center; opacity: 0; white-space: nowrap;
+  position:absolute; top:46%; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:20; pointer-events:none; text-align:center; opacity:0; white-space:nowrap;
 }
 #impact-word {
-  display: block;
-  font-family: 'Geist', sans-serif; font-weight: 900;
-  font-size: clamp(5rem, 15vw, 12rem);
-  letter-spacing: -0.05em; line-height: 0.85;
-  text-transform: uppercase; color: var(--ink);
+  display:block; font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(5rem,15vw,12rem); letter-spacing:-0.05em; line-height:0.85;
+  text-transform:uppercase; color:var(--ink);
 }
 
-/* ── SHAKE SCREEN ────────────────────────────────────────── */
-#stage.shake { animation: shk 0.18s ease; }
+/* ── SHAKE ───────────────────────────────────────────────── */
+#stage.shake { animation:shk 0.18s ease; }
 @keyframes shk {
-  0%  { transform: translate(0,0); }
-  14% { transform: translate(-5px,2px); }
-  28% { transform: translate(5px,-2px); }
-  43% { transform: translate(-4px,3px); }
-  57% { transform: translate(4px,-2px); }
-  71% { transform: translate(-2px,2px); }
-  86% { transform: translate(2px,-1px); }
-  100%{ transform: translate(0,0); }
+  0%  { transform:translate(0,0); }  14% { transform:translate(-5px,2px); }
+  28% { transform:translate(5px,-2px); } 43% { transform:translate(-4px,3px); }
+  57% { transform:translate(4px,-2px); } 71% { transform:translate(-2px,2px); }
+  86% { transform:translate(2px,-1px); } 100%{ transform:translate(0,0); }
 }
 
-/* ── WIPE STREAK ─────────────────────────────────────────── */
-.wipe-streak {
-  position: absolute; top: 0; bottom: 0; width: 50%;
-  pointer-events: none; z-index: 18;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0.6) 55%, transparent);
-  transition: left 0.38s cubic-bezier(0.4,0,0.2,1);
-}
-
-/* ── COUNTER (sandbag warm-up) ───────────────────────────── */
-#warmup-counter {
-  position: absolute; top: 40%; left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 20; pointer-events: none;
-  font-family: 'Geist', sans-serif; font-weight: 900;
-  font-size: clamp(6rem, 18vw, 14rem);
-  letter-spacing: -0.08em; line-height: 1;
-  color: rgba(17,17,16,0.07);
-  opacity: 0; text-align: center;
-  transition: opacity 0.1s ease;
-}
-
-/* ── CLEARED ─────────────────────────────────────────────── */
+/* ── ROUND CLEAR ─────────────────────────────────────────── */
 #cleared {
-  position: absolute; top: 44%; left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 25; text-align: left; opacity: 0; pointer-events: none;
+  position:absolute; top:44%; left:50%;
+  transform:translate(-50%,-50%);
+  z-index:25; text-align:left; opacity:0; pointer-events:none;
 }
 #cleared-script {
-  display: block;
-  font-family: 'Playfair Display', serif; font-style: italic;
-  font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400;
-  color: var(--ink); line-height: 1.1;
+  display:block; font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(2.5rem,5vw,4.5rem); color:var(--ink); line-height:1.1;
 }
 #cleared-bold {
-  display: block;
-  font-family: 'Geist', sans-serif; font-weight: 900;
-  font-size: clamp(4rem, 9vw, 7.5rem);
-  letter-spacing: -0.05em; line-height: 0.85;
-  text-transform: uppercase; color: var(--ink);
+  display:block; font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(4rem,9vw,7.5rem); letter-spacing:-0.05em; line-height:0.85;
+  text-transform:uppercase; color:var(--ink);
 }
 #cleared-sub {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase;
-  color: var(--dim); margin-top: 1.25rem;
+  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.26em;
+  text-transform:uppercase; color:var(--dim); margin-top:1.25rem;
 }
 
 /* ── FLOATING HUD ────────────────────────────────────────── */
 #hud-container {
-  position: absolute; bottom: 1.75rem; left: 50%;
-  transform: translateX(-50%);
-  z-index: 30;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  position:absolute; bottom:1.75rem; left:50%;
+  transform:translateX(-50%); z-index:30;
+  display:flex; flex-direction:column; align-items:center; gap:8px;
 }
 #hud {
-  display: flex; align-items: center; gap: 10px;
-  background: rgba(226, 231, 238, 0.65);
-  color: rgba(30, 42, 60, 0.8);
-  padding: 6px 6px 6px 16px;
-  border-radius: 100px;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  white-space: nowrap;
+  display:flex; align-items:center; gap:10px;
+  background:rgba(226,231,238,0.65); color:rgba(30,42,60,0.8);
+  padding:6px 6px 6px 16px; border-radius:100px;
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  white-space:nowrap;
 }
 #hud-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: rgba(30,42,60,0.3); flex-shrink: 0;
-  transition: background 0.3s;
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(30,42,60,0.3); flex-shrink:0; transition:background 0.3s;
 }
-#hud-dot.on    { background: var(--go); }
-#hud-dot.blink { background: var(--go); animation: blink 0.7s ease-in-out infinite; }
+#hud-dot.on    { background:var(--go); }
+#hud-dot.blink { background:var(--go); animation:blink 0.7s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
-
-#hud-status {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(30,42,60,0.7);
-}
-#hud-sep { width: 1px; height: 14px; background: rgba(30,42,60,0.12); }
+#hud-status { font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(30,42,60,0.7); }
+#hud-sep { width:1px; height:14px; background:rgba(30,42,60,0.12); }
 #hud-btn {
-  font-family: 'Geist Mono', monospace;
-  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: rgba(30,42,60,0.85);
-  background: #FFFFFF;
-  border: none; border-radius: 100px;
-  padding: 6px 14px; cursor: pointer;
-  transition: background 0.1s, transform 0.08s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase;
+  color:rgba(30,42,60,0.85); background:#FFFFFF; border:none; border-radius:100px;
+  padding:6px 14px; cursor:pointer;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  transition:background 0.1s, transform 0.08s;
 }
-#hud-btn:hover   { background: #F4F6F8; }
-#hud-btn:active  { transform: scale(0.97); }
+#hud-btn:hover { background:#F4F6F8; }
+#hud-btn:active { transform:scale(0.97); }
 #hud-hint {
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.1em;
-  color: rgba(30,42,60,0.38); text-align: center;
+  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.1em;
+  color:rgba(30,42,60,0.38); text-align:center;
 }
-
-/* ── BOTTOM CORNER ───────────────────────────────────────── */
 #c-bl {
-  position: absolute; bottom: 5.5rem; left: 2rem;
-  z-index: 5; pointer-events: none;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
-  color: var(--dim);
+  position:absolute; bottom:5.5rem; left:2rem; z-index:5; pointer-events:none;
+  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.24em;
+  text-transform:uppercase; color:var(--dim);
 }
 </style>
 </head>
 <body>
 <div id="stage">
   <canvas id="canvas"></canvas>
+  <canvas id="fog-canvas"></canvas>
 
   <div id="c-bl"></div>
   <div id="ghost">STRESS</div>
-
-  <!-- Editorial type block -->
   <div id="typo-block">
     <span id="typo-script">Stress</span>
     <span id="typo-bold">SMASH</span>
   </div>
 
-  <!-- Sandbag -->
+  <!-- Sandbag (warmup) -->
   <div id="bag-wrap">
     <div id="bag-cord"></div>
     <img id="bag-img" src="asset/sandbag.png" alt=""
@@ -288,19 +284,63 @@ html, body {
     </div>
   </div>
 
-  <!-- Boxing glove -->
+  <!-- Glove -->
   <div id="glove-wrap">
     <img id="glove-img" src="asset/glove_right.png" alt="">
   </div>
 
-  <!-- Stress object -->
-  <div id="obj-wrap" style="display:none; opacity:0">
-    <div id="obj-inner">
-      <img id="obj-img" src="" alt="" style="display:none">
-      <div id="obj-svg-wrap"></div>
-      <div id="obj-badge"></div>
+  <!-- WarioWare intro flash -->
+  <div id="mg-intro"></div>
+
+  <!-- MG: Bubble Wrap -->
+  <div id="mg-bubble">
+    <div id="bubble-grid"></div>
+    <div id="bubble-count"></div>
+  </div>
+
+  <!-- MG: Window Wipe (fog on fog-canvas, text behind) -->
+  <div id="mg-wipe-bg">
+    <div id="wipe-word">EMAILS</div>
+    <div id="wipe-progress">wave to wipe</div>
+  </div>
+
+  <!-- MG: Paper Crumple -->
+  <div id="mg-crumple">
+    <div id="paper-el">
+      <svg width="340" height="460" viewBox="0 0 92 122" fill="none">
+        <rect x="4" y="4" width="84" height="114" rx="3" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
+        <polygon points="68,4 84,4 84,20" fill="#E0DDD6" stroke="#C8C3BC" stroke-width="1"/>
+        <rect x="4" y="4" width="64" height="21" rx="3" fill="#111110"/>
+        <rect x="13" y="11" width="30" height="4" rx="2" fill="white" opacity="0.7"/>
+        <rect x="13" y="35" width="48" height="3.5" rx="1.75" fill="#DDD9D2"/>
+        <rect x="13" y="43" width="36" height="3.5" rx="1.75" fill="#DDD9D2"/>
+        <rect x="13" y="54" width="48" height="3.5" rx="1.75" fill="#E8E4DE"/>
+        <rect x="13" y="62" width="40" height="3.5" rx="1.75" fill="#E8E4DE"/>
+        <rect x="13" y="70" width="44" height="3.5" rx="1.75" fill="#E8E4DE"/>
+        <line x1="13" y1="84" x2="79" y2="84" stroke="#DDD9D2" stroke-width="1"/>
+        <rect x="13" y="89" width="28" height="4.5" rx="2" fill="#111110"/>
+        <rect x="50" y="89" width="20" height="4.5" rx="2" fill="#D4351C"/>
+        <rect x="15" y="101" width="58" height="8" rx="1" fill="none" stroke="#D4351C" stroke-width="1.2"/>
+        <text x="44" y="108" text-anchor="middle" font-family="monospace" font-size="6.5" font-weight="700" fill="#D4351C" letter-spacing="0.12em">OVERDUE</text>
+      </svg>
     </div>
-    <div id="obj-label"></div>
+  </div>
+
+  <!-- MG: Fly Swatter -->
+  <div id="mg-swat">
+    <div id="swatter-el">
+      <svg viewBox="0 0 50 110" fill="none" width="80" height="160">
+        <rect x="2" y="2" width="46" height="55" rx="8" fill="#C8D8A0" stroke="#7A9B50" stroke-width="1.5"/>
+        <line x1="14" y1="2" x2="14" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <line x1="26" y1="2" x2="26" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <line x1="38" y1="2" x2="38" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <line x1="2" y1="18" x2="48" y2="18" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <line x1="2" y1="34" x2="48" y2="34" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <line x1="2" y1="50" x2="48" y2="50" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
+        <rect x="21" y="57" width="8" height="50" rx="4" fill="#8A8070" stroke="#6A6058" stroke-width="1"/>
+      </svg>
+    </div>
+    <div id="swat-count"></div>
   </div>
 
   <!-- Warmup counter -->
@@ -309,14 +349,14 @@ html, body {
   <!-- Impact word -->
   <div id="impact"><span id="impact-word"></span></div>
 
-  <!-- Cleared -->
+  <!-- Round clear -->
   <div id="cleared">
     <span id="cleared-script">All</span>
     <span id="cleared-bold">CLEAR</span>
-    <div id="cleared-sub">restarting cycle</div>
+    <div id="cleared-sub">another round starting</div>
   </div>
 
-  <!-- Floating HUD -->
+  <!-- HUD -->
   <div id="hud-container">
     <div id="hud">
       <div id="hud-dot"></div>
@@ -331,139 +371,94 @@ html, body {
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 
-const STRESS_ITEMS = ['alarm', 'email', 'slack', 'invoice'];
+const MINIGAME_TYPES = ['bubble', 'wipe', 'crumple', 'swat'];
 
-const COUNTS = { alarm:'5×', email:'12×', slack:'47×', invoice:'3×' };
-const LABELS = { alarm:'missed alarms', email:'unread emails', slack:'slack messages', invoice:'overdue invoices' };
+const MG_INTRO_LABELS = {
+  bubble:  'POP IT!',
+  wipe:    'WIPE IT!',
+  crumple: 'CRUMPLE!',
+  swat:    'SWAT IT!',
+};
 
 const WORDS_SHAKE = ['SMASH', 'POW', 'CRUSH', 'BAM', 'WHAM'];
-const WORDS_WIPE  = ['WIPED', 'GONE', 'CLEAR', 'DONE'];
+const WORDS_POP   = ['POP!', 'BANG!', 'YES!'];
+const WORDS_WIPE  = ['WIPED!', 'CLEAR!', 'FRESH!'];
+const WORDS_SWAT  = ['SWAT!', 'GOT IT!', 'ZAP!'];
+const WORDS_CRUMPLE = ['CRUNCH!', 'DONE!', 'GONE!'];
 
-// SVG fallbacks — scaled large to match PNG sizing
-const SVG = {
-  alarm: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 124 124" fill="none">
-    <circle cx="62" cy="66" r="46" fill="#F0EDE8" stroke="#C8C3BC" stroke-width="1.5"/>
-    <line x1="31" y1="29" x2="18" y2="16" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="15" cy="13" r="5.5" fill="#A8A098"/>
-    <line x1="93" y1="29" x2="106" y2="16" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
-    <circle cx="109" cy="13" r="5.5" fill="#A8A098"/>
-    <circle cx="62" cy="66" r="36" fill="#FAFAF8" stroke="#DDD9D2" stroke-width="1"/>
-    <line x1="62" y1="35" x2="62" y2="41" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"/>
-    <line x1="62" y1="91" x2="62" y2="97" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"/>
-    <line x1="31" y1="66" x2="37" y2="66" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"/>
-    <line x1="87" y1="66" x2="93" y2="66" stroke="#2A2A28" stroke-width="2" stroke-linecap="round"/>
-    <line x1="62" y1="66" x2="62" y2="49" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="62" y1="66" x2="77" y2="66" stroke="#111110" stroke-width="2" stroke-linecap="round"/>
-    <circle cx="62" cy="66" r="3.5" fill="#D4351C"/>
-    <rect x="44" y="109" width="13" height="5" rx="2.5" fill="#C0BAB0"/>
-    <rect x="67" y="109" width="13" height="5" rx="2.5" fill="#C0BAB0"/>
-  </svg>`,
-
-  email: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 140 104" fill="none">
-    <rect x="4" y="8" width="132" height="84" rx="4" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.5"/>
-    <polyline points="4,8 70,58 136,8" stroke="#C8C3BC" stroke-width="1.5" fill="none"/>
-    <line x1="4" y1="92" x2="54" y2="54" stroke="#C8C3BC" stroke-width="1.2"/>
-    <line x1="136" y1="92" x2="86" y2="54" stroke="#C8C3BC" stroke-width="1.2"/>
-  </svg>`,
-
-  slack: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 114 114" fill="none">
-    <rect x="4" y="4" width="106" height="106" rx="14" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
-    <rect x="19" y="19" width="30" height="30" rx="6" fill="#3A0F3C"/>
-    <text x="34" y="40" text-anchor="middle" font-family="monospace" font-size="17" font-weight="900" fill="#FAFAF8">#</text>
-    <rect x="57" y="23" width="36" height="4" rx="2" fill="#111110"/>
-    <rect x="57" y="31" width="26" height="3.5" rx="1.75" fill="#A8A098"/>
-    <rect x="19" y="59" width="72" height="3.5" rx="1.75" fill="#DDD9D2"/>
-    <rect x="19" y="68" width="56" height="3.5" rx="1.75" fill="#DDD9D2"/>
-    <rect x="19" y="77" width="64" height="3.5" rx="1.75" fill="#DDD9D2"/>
-  </svg>`,
-
-  invoice: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 92 122" fill="none">
-    <rect x="4" y="4" width="84" height="114" rx="3" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
-    <polygon points="68,4 84,4 84,20" fill="#E0DDD6" stroke="#C8C3BC" stroke-width="1"/>
-    <rect x="4" y="4" width="64" height="21" rx="3" fill="#111110"/>
-    <rect x="13" y="11" width="30" height="4" rx="2" fill="white" opacity="0.7"/>
-    <rect x="13" y="35" width="48" height="3.5" rx="1.75" fill="#DDD9D2"/>
-    <rect x="13" y="43" width="36" height="3.5" rx="1.75" fill="#DDD9D2"/>
-    <rect x="13" y="54" width="48" height="3.5" rx="1.75" fill="#E8E4DE"/>
-    <rect x="13" y="62" width="40" height="3.5" rx="1.75" fill="#E8E4DE"/>
-    <rect x="13" y="70" width="44" height="3.5" rx="1.75" fill="#E8E4DE"/>
-    <line x1="13" y1="84" x2="79" y2="84" stroke="#DDD9D2" stroke-width="1"/>
-    <rect x="13" y="89" width="28" height="4.5" rx="2" fill="#111110"/>
-    <rect x="50" y="89" width="20" height="4.5" rx="2" fill="#D4351C"/>
-    <rect x="15" y="101" width="58" height="8" rx="1" fill="none" stroke="#D4351C" stroke-width="1.2"/>
-    <text x="44" y="108" text-anchor="middle" font-family="monospace" font-size="6.5" font-weight="700" fill="#D4351C" letter-spacing="0.12em">OVERDUE</text>
-  </svg>`,
-};
+// Paper crumple stages (transform + border-radius)
+const CRUMPLE_STAGES = [
+  { t: 'none',                                              r: '4px' },
+  { t: 'rotate(4deg) skewX(2deg) scale(0.95)',             r: '6px' },
+  { t: 'rotate(-9deg) skewX(-5deg) scale(0.80)',           r: '12px' },
+  { t: 'rotate(20deg) scale(0.58) skewX(8deg)',            r: '42%' },
+];
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 
 const S = {
-  // 'WARMUP' → punch sandbag N times first
-  // 'OBJECT_WAITING' → next object loading
-  // 'OBJECT_ACTIVE'  → object visible, waiting for gesture
-  // 'DESTROYING'     → mid-animation
-  // 'PAUSE'          → brief gap between objects
   phase: 'WARMUP',
   warmupHits: 0,
-  warmupTarget: 4 + Math.floor(Math.random() * 2), // 4 or 5
-  queue: [],
-  objKey: null,
+  warmupTarget: 4 + Math.floor(Math.random() * 2),
+  mgQueue: [],
+  currentMG: null,
   counts: { shake: 0, wave: 0 },
-  port: null, writer: null, connected: false,
+  connected: false, port: null, writer: null,
   bagAngle: 0, bagV: 0, bagDamp: 0.95, bagPhase: 0,
-  ox: 0, oy: 0, otilt: 0, ophase: 0, ovis: false,
+};
+
+// Per-minigame state
+const MG = {
+  bubble: { bubbles: [], remaining: 0 },
+  wipe:   { done: 0, needed: 4, animating: false },
+  crumple:{ stage: 0 },
+  swat:   { flies: [], remaining: 0 },
 };
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
 
 const $stage    = document.getElementById('stage');
 const $canvas   = document.getElementById('canvas');
+const $fogCanvas= document.getElementById('fog-canvas');
 const $bagWrap  = document.getElementById('bag-wrap');
-const $objWrap  = document.getElementById('obj-wrap');
-const $objInner = document.getElementById('obj-inner');
-const $objLabel = document.getElementById('obj-label');
+const $ghost    = document.getElementById('ghost');
+const $typoScript = document.getElementById('typo-script');
+const $typoBold   = document.getElementById('typo-bold');
+const $mgIntro  = document.getElementById('mg-intro');
 const $impact   = document.getElementById('impact');
 const $impWord  = document.getElementById('impact-word');
 const $cleared  = document.getElementById('cleared');
-const $ghost    = document.getElementById('ghost');
 const $warmupN  = document.getElementById('warmup-counter');
-const $typoScript = document.getElementById('typo-script');
-const $typoBold   = document.getElementById('typo-bold');
 const $hudDot   = document.getElementById('hud-dot');
 const $hudStatus= document.getElementById('hud-status');
 const $hudBtn   = document.getElementById('hud-btn');
 const $cBl      = document.getElementById('c-bl');
-const ctx       = $canvas.getContext('2d');
+const ctx = $canvas.getContext('2d');
 
-const getImg   = () => document.getElementById('obj-img');
-const getSvg   = () => document.getElementById('obj-svg-wrap');
-const getBadge = () => document.getElementById('obj-badge');
-
-new ResizeObserver(() => {
-  $canvas.width  = $stage.offsetWidth;
-  $canvas.height = $stage.offsetHeight;
-}).observe($stage);
-$canvas.width  = $stage.offsetWidth;
-$canvas.height = $stage.offsetHeight;
+const resize = () => {
+  $canvas.width = $fogCanvas.width = $stage.offsetWidth;
+  $canvas.height= $fogCanvas.height= $stage.offsetHeight;
+};
+new ResizeObserver(resize).observe($stage);
+resize();
 
 // ── PARTICLES ─────────────────────────────────────────────────────────────────
 
 const particles = [];
 
 class Particle {
-  constructor(x, y) {
+  constructor(x, y, dir = 0) {
     this.x = x; this.y = y;
     this.shape = Math.random() < 0.5 ? 'rect' : 'circle';
     this.size  = 4 + Math.random() * 8;
     const spd  = 4 + Math.random() * 13;
     const ang  = Math.random() * Math.PI * 2;
-    this.vx = Math.cos(ang) * spd;
+    this.vx = Math.cos(ang) * spd + dir * 3;
     this.vy = Math.sin(ang) * spd - 5;
     this.g = 0.48; this.alpha = 1;
     this.decay = 0.013 + Math.random() * 0.01;
     this.rot = Math.random() * Math.PI * 2;
     this.rotV = (Math.random() - 0.5) * 0.3;
-    // Neutral palette — no red/blue
     const pal = ['#111110','#8A8880','#C8C4BE','#E8E4DE','#FAFAF8','#D4351C'];
     this.color = pal[Math.floor(Math.random() * pal.length)];
   }
@@ -477,243 +472,63 @@ class Particle {
     if (this.alpha <= 0) return;
     c.save(); c.globalAlpha = this.alpha; c.fillStyle = this.color;
     c.translate(this.x, this.y); c.rotate(this.rot);
-    if (this.shape === 'rect') c.fillRect(-this.size/2, -this.size/2, this.size, this.size * 0.55);
-    else { c.beginPath(); c.arc(0, 0, this.size/2, 0, Math.PI*2); c.fill(); }
+    if (this.shape === 'rect') c.fillRect(-this.size/2, -this.size/2, this.size, this.size*0.55);
+    else { c.beginPath(); c.arc(0,0,this.size/2,0,Math.PI*2); c.fill(); }
     c.restore();
   }
 }
-
-function spawnParts(x, y, n = 80) {
-  for (let i = 0; i < n; i++) particles.push(new Particle(x, y));
+function spawnParts(x, y, n=60, dir=0) {
+  for (let i=0; i<n; i++) particles.push(new Particle(x, y, dir));
 }
 
 // ── BAG PHYSICS ───────────────────────────────────────────────────────────────
 
-function punchBag(f) {
-  S.bagV = f * (Math.random() < 0.5 ? 1 : -1);
-}
+function punchBag(f) { S.bagV = f * (Math.random() < 0.5 ? 1 : -1); }
 
 function updateBag() {
-  // Pendulum physics always on
-  S.bagV -= S.bagAngle * 0.065;
-  S.bagV *= S.bagDamp;
-  S.bagAngle += S.bagV;
-  // Ambient micro-sway when near rest
+  S.bagV -= S.bagAngle * 0.065; S.bagV *= S.bagDamp; S.bagAngle += S.bagV;
   if (Math.abs(S.bagAngle) < 1 && Math.abs(S.bagV) < 0.06) {
-    S.bagPhase += 0.009;
-    S.bagV += Math.sin(S.bagPhase) * 0.007;
+    S.bagPhase += 0.009; S.bagV += Math.sin(S.bagPhase) * 0.007;
   }
   $bagWrap.style.transform = `translateX(-50%) rotate(${S.bagAngle}deg)`;
 }
 
+// ── MAIN LOOP ─────────────────────────────────────────────────────────────────
+
+(function loop() {
+  ctx.clearRect(0, 0, $canvas.width, $canvas.height);
+  for (let i = particles.length-1; i>=0; i--) {
+    particles[i].update(); particles[i].draw(ctx);
+    if (particles[i].alpha <= 0) particles.splice(i,1);
+  }
+  updateBag();
+  animateFlies();
+  requestAnimationFrame(loop);
+})();
+
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 
 function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
   return a;
 }
 
-function getObjPos() {
-  const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  // Appear at varied horizontal positions — off-center like Fruit Ninja
-  const zones = [0.15, 0.28, 0.5, 0.72, 0.85];
-  const xFrac = zones[Math.floor(Math.random() * zones.length)];
-  const x = W * xFrac;
-  const y = H * (0.1 + Math.random() * 0.22);
-  return { x, y };
-}
-
-const tf = (x, y, r, sc) =>
-  sc != null ? `translate(${x}px,${y}px) rotate(${r}deg) scale(${sc})`
-             : `translate(${x}px,${y}px) rotate(${r}deg)`;
-
-// ── WARMUP DISPLAY ────────────────────────────────────────────────────────────
-
-function showWarmupCount() {
-  const remaining = S.warmupTarget - S.warmupHits;
-  $warmupN.textContent = remaining;
-  $warmupN.style.opacity = '1';
-  clearTimeout(S._wt);
-  S._wt = setTimeout(() => { $warmupN.style.opacity = '0'; }, 600);
-}
-
-// ── GAME FLOW ─────────────────────────────────────────────────────────────────
-
-function startObjectPhase() {
-  // Hide sandbag
-  const bagWrap = document.getElementById('bag-wrap');
-  bagWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.4,0,1,1)';
-  bagWrap.style.opacity    = '0';
-  bagWrap.style.transform  = 'translateX(-50%) translateY(-40px)';
-  setTimeout(() => { bagWrap.style.display = 'none'; }, 420);
-
-  S.queue = shuffle(STRESS_ITEMS);
-  S.phase = 'OBJECT_WAITING';
-  $ghost.textContent = 'DESTROY';
-  $typoScript.textContent = 'Destroy';
-  $typoBold.textContent   = 'THEM';
-  setTimeout(nextObj, 700);
-}
-
-function nextObj() {
-  if (!S.queue.length) { showCleared(); return; }
-  loadObj(S.queue.shift());
-}
-
-function loadObj(key) {
-  S.objKey = key;
-  const img = new Image();
-  img.onload = () => {
-    const el = getImg(); const sv = getSvg();
-    if (el) { el.src = `asset/${key}.png`; el.style.display = 'block'; }
-    if (sv) sv.innerHTML = '';
-    showObj();
-  };
-  img.onerror = () => {
-    const el = getImg(); const sv = getSvg();
-    if (el) el.style.display = 'none';
-    if (sv) sv.innerHTML = SVG[key] || '';
-    showObj();
-  };
-  img.src = `asset/${key}.png`;
-}
-
-function showObj() {
-  const p = getObjPos();
-  S.ox = p.x; S.oy = p.y;
-  S.otilt  = (Math.random() - 0.5) * 24;
-  S.ophase = Math.random() * Math.PI * 2;
-  S.ovis   = true;
-
-  const badge = getBadge();
-  if (badge) { badge.textContent = COUNTS[S.objKey] || ''; badge.style.display = 'flex'; }
-  $objLabel.textContent = LABELS[S.objKey] || '';
-
-  $ghost.textContent = LABELS[S.objKey]?.split(' ').pop().toUpperCase() || 'STRESS';
-
-  $objWrap.style.display   = 'flex';
-  $objWrap.style.opacity   = '0';
-  $objWrap.style.transform = tf(S.ox, S.oy - 40, S.otilt);
-
+function animImpact(word) {
+  $impWord.textContent = word;
+  $impact.style.transition = 'none'; $impact.style.opacity = '0';
+  $impact.style.transform = 'translate(-50%,-50%) scale(1.12)';
   requestAnimationFrame(() => {
-    $objWrap.style.transition = 'opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)';
-    $objWrap.style.opacity    = '1';
-    $objWrap.style.transform  = tf(S.ox, S.oy, S.otilt);
-    setTimeout(() => { $objWrap.style.transition = ''; S.phase = 'OBJECT_ACTIVE'; }, 380);
+    $impact.style.transition = 'opacity 0.07s ease, transform 0.1s cubic-bezier(0.16,1,0.3,1)';
+    $impact.style.opacity = '1'; $impact.style.transform = 'translate(-50%,-50%) scale(1)';
+    setTimeout(() => { $impact.style.transition = 'opacity 0.5s ease'; $impact.style.opacity = '0'; }, 130);
   });
 }
 
-function hideObj() {
-  S.ovis = false;
-  $objWrap.style.display = 'none';
-  $objWrap.style.opacity = '0';
-}
-
-function restoreMarkup() {
-  $objInner.innerHTML = `
-    <img id="obj-img" src="" alt="" style="display:none">
-    <div id="obj-svg-wrap"></div>
-    <div id="obj-badge"></div>
-  `;
-}
-
-function pauseThenNext() {
-  S.phase = 'PAUSE';
-  setTimeout(() => {
-    if (!S.queue.length) showCleared();
-    else { S.phase = 'OBJECT_WAITING'; nextObj(); }
-  }, 550);
-}
-
-function showCleared() {
-  S.phase = 'PAUSE';
-  $ghost.textContent = 'CLEAR';
-  $cleared.style.transition = 'opacity 0.35s ease';
-  $cleared.style.opacity    = '1';
-  setTimeout(() => {
-    $cleared.style.opacity = '0';
-    setTimeout(() => {
-      // Reset warmup for next cycle
-      S.warmupHits   = 0;
-      S.warmupTarget = 4 + Math.floor(Math.random() * 2);
-      S.phase        = 'WARMUP';
-      $ghost.textContent = 'STRESS';
-      $typoScript.textContent = 'Stress';
-      $typoBold.textContent   = 'SMASH';
-      // Bring sandbag back
-      const bagWrap = document.getElementById('bag-wrap');
-      bagWrap.style.display    = 'block';
-      bagWrap.style.transition = 'none';
-      bagWrap.style.opacity    = '0';
-      bagWrap.style.transform  = 'translateX(-50%) translateY(-40px)';
-      requestAnimationFrame(() => {
-        bagWrap.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
-        bagWrap.style.opacity    = '1';
-        bagWrap.style.transform  = 'translateX(-50%)';
-      });
-    }, 420);
-  }, 2200);
-}
-
-// ── DESTROY ANIMATIONS ────────────────────────────────────────────────────────
-
-function destroyShake() {
-  if (S.phase !== 'OBJECT_ACTIVE') return;
-  S.phase = 'DESTROYING';
-
-  const el  = getImg(); const sv = getSvg();
-  const ref = (el && el.style.display !== 'none') ? el : (sv ? sv.firstElementChild : null);
-  const w   = ref ? (ref.clientWidth  || 200) : 200;
-  const h   = ref ? (ref.clientHeight || 200) : 200;
-  spawnParts(S.ox + w/2, S.oy + h/2, 90);
-
-  $impWord.textContent = WORDS_SHAKE[Math.floor(Math.random() * WORDS_SHAKE.length)];
-  animImpact();
-
-  const ang = (Math.random() * Math.PI * 0.8) - Math.PI * 0.4 - Math.PI / 2;
-  const dir = { x: Math.cos(ang) * 24, y: Math.sin(ang) * 24 };
-  let rot = S.otilt, rotV = (Math.random() - 0.5) * 18;
-  let f = 0; const T = 32; const sx = S.ox, sy = S.oy;
-
-  const step = () => {
-    f++; rot += rotV;
-    $objWrap.style.transform = tf(sx + dir.x*f, sy + dir.y*f, rot, Math.max(0, 1-f/T));
-    $objWrap.style.opacity   = String(Math.max(0, 1-(f/T)*1.3));
-    if (f < T) requestAnimationFrame(step);
-    else { hideObj(); restoreMarkup(); pauseThenNext(); }
-  };
-  requestAnimationFrame(step);
-}
-
-function destroyWipe() {
-  if (S.phase !== 'OBJECT_ACTIVE') return;
-  S.phase = 'DESTROYING';
-
-  // Light wipe streak across screen
-  doWipeStreak();
-
-  $impWord.textContent = WORDS_WIPE[Math.floor(Math.random() * WORDS_WIPE.length)];
-  animImpact();
-
-  const dir = Math.random() < 0.5 ? 1 : -1;
-  const W   = $stage.offsetWidth;
-  let f = 0; const T = 28; const sx = S.ox, sy = S.oy;
-
-  const step = () => {
-    f++;
-    const t = f / T;
-    // Smooth ease-out wipe
-    const ease = 1 - Math.pow(1 - t, 3);
-    $objWrap.style.transform = tf(sx + dir * ease * W * 0.85, sy + ease * -30, S.otilt + dir * ease * 20);
-    $objWrap.style.opacity   = String(Math.max(0, 1 - t * 1.4));
-    if (f < T) requestAnimationFrame(step);
-    else { hideObj(); restoreMarkup(); pauseThenNext(); }
-  };
-  requestAnimationFrame(step);
+function doScreenShake() {
+  $stage.classList.remove('shake'); void $stage.offsetWidth;
+  $stage.classList.add('shake');
+  $stage.addEventListener('animationend', () => $stage.classList.remove('shake'), {once:true});
 }
 
 // ── GLOVE ANIMATION ──────────────────────────────────────────────────────────
@@ -721,136 +536,421 @@ function destroyWipe() {
 function animateGlove() {
   const glove = document.getElementById('glove-wrap');
   if (!glove) return;
-
-  const dir    = Math.random() < 0.5 ? 1 : -1;
-  const offX   = dir * 130;
-  const rot    = dir * -40;
-  const hitRot = dir * 8;
-
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const offX = dir*130, rot = dir*-40, hitRot = dir*8;
   const img = document.getElementById('glove-img');
-  if (img) img.src = dir === 1 ? 'asset/glove_right.png' : 'asset/glove_left.png';
-
-  glove.style.transition = 'none';
-  glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
-  glove.style.opacity    = '0';
-  glove.style.display    = 'block';
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      glove.style.transition = 'transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.07s ease';
-      glove.style.transform  = `translateX(calc(-50% + ${dir * 14}px)) translateY(0px) rotate(${hitRot}deg)`;
-      glove.style.opacity    = '1';
-
-      // Contact: squish bag
-      setTimeout(() => {
-        punchBag(22);
-        const bagImg = document.getElementById('bag-img');
-        if (bagImg) {
-          bagImg.style.transition = 'transform 0.07s ease';
-          bagImg.style.transform  = `scaleX(${1 + dir * 0.07}) scaleY(0.90)`;
-          setTimeout(() => {
-            bagImg.style.transition = 'transform 0.4s cubic-bezier(0.16,1,0.3,1)';
-            bagImg.style.transform  = '';
-          }, 70);
-        }
-      }, 230);
-
-      // Retreat
-      setTimeout(() => {
-        glove.style.transition = 'transform 0.36s cubic-bezier(0.4,0,0.8,1), opacity 0.16s ease 0.18s';
-        glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
-        glove.style.opacity    = '0';
-        setTimeout(() => { glove.style.display = 'none'; }, 400);
-      }, 290);
-    });
-  });
-}
-
-// ── EFFECTS ──────────────────────────────────────────────────────────────────
-
-function animImpact() {
-  $impact.style.transition = 'none';
-  $impact.style.opacity    = '0';
-  $impact.style.transform  = 'translate(-50%,-50%) scale(1.12)';
-  requestAnimationFrame(() => {
-    $impact.style.transition = 'opacity 0.07s ease, transform 0.1s cubic-bezier(0.16,1,0.3,1)';
-    $impact.style.opacity    = '1';
-    $impact.style.transform  = 'translate(-50%,-50%) scale(1)';
+  if (img) img.src = dir===1 ? 'asset/glove_right.png' : 'asset/glove_left.png';
+  glove.style.transition='none';
+  glove.style.transform=`translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
+  glove.style.opacity='0'; glove.style.display='block';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    glove.style.transition='transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.07s ease';
+    glove.style.transform=`translateX(calc(-50% + ${dir*14}px)) translateY(0px) rotate(${hitRot}deg)`;
+    glove.style.opacity='1';
     setTimeout(() => {
-      $impact.style.transition = 'opacity 0.5s ease';
-      $impact.style.opacity    = '0';
-    }, 130);
-  });
+      punchBag(22);
+      const bagImg = document.getElementById('bag-img');
+      if (bagImg) {
+        bagImg.style.transition='transform 0.07s ease';
+        bagImg.style.transform=`scaleX(${1+dir*0.07}) scaleY(0.90)`;
+        setTimeout(()=>{
+          bagImg.style.transition='transform 0.4s cubic-bezier(0.16,1,0.3,1)';
+          bagImg.style.transform='';
+        }, 70);
+      }
+    }, 230);
+    setTimeout(() => {
+      glove.style.transition='transform 0.36s cubic-bezier(0.4,0,0.8,1), opacity 0.16s ease 0.18s';
+      glove.style.transform=`translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
+      glove.style.opacity='0';
+      setTimeout(()=>{ glove.style.display='none'; }, 400);
+    }, 290);
+  }));
 }
 
-function doWipeStreak() {
-  const fromLeft = Math.random() < 0.5;
-  const el = document.createElement('div');
-  el.className = 'wipe-streak';
-  el.style.left = fromLeft ? '-50%' : '100%';
-  $stage.appendChild(el);
+// ── WARMUP ────────────────────────────────────────────────────────────────────
+
+function showWarmupCount() {
+  const rem = S.warmupTarget - S.warmupHits;
+  $warmupN.textContent = rem;
+  $warmupN.style.opacity = '1';
+  clearTimeout(S._wt);
+  S._wt = setTimeout(() => { $warmupN.style.opacity = '0'; }, 600);
+}
+
+// ── GAME FLOW ─────────────────────────────────────────────────────────────────
+
+function hideBag(cb) {
+  $bagWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.4,0,1,1)';
+  $bagWrap.style.opacity = '0';
+  $bagWrap.style.transform = 'translateX(-50%) translateY(-40px)';
+  setTimeout(() => { $bagWrap.style.display = 'none'; if(cb) cb(); }, 420);
+}
+
+function showBag() {
+  $bagWrap.style.display = 'block';
+  $bagWrap.style.transition = 'none';
+  $bagWrap.style.opacity = '0';
+  $bagWrap.style.transform = 'translateX(-50%) translateY(-30px)';
   requestAnimationFrame(() => {
-    el.style.left = fromLeft ? '130%' : '-50%';
-    setTimeout(() => el.remove(), 420);
+    $bagWrap.style.transition = 'opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+    $bagWrap.style.opacity = '1';
+    $bagWrap.style.transform = 'translateX(-50%)';
   });
 }
 
-function doShakeScreen() {
-  $stage.classList.remove('shake'); void $stage.offsetWidth;
-  $stage.classList.add('shake');
-  $stage.addEventListener('animationend', () => $stage.classList.remove('shake'), { once: true });
+function launchMinigameRound() {
+  S.mgQueue = shuffle(MINIGAME_TYPES);
+  startNextMinigame();
 }
 
-// ── FLOAT ─────────────────────────────────────────────────────────────────────
+function startNextMinigame() {
+  if (!S.mgQueue.length) { showRoundClear(); return; }
+  const type = S.mgQueue.shift();
+  S.currentMG = type;
+  S.phase = 'MG_INTRO';
 
-function floatObj() {
-  if (S.phase !== 'OBJECT_ACTIVE' || !S.ovis) return;
-  S.ophase += 0.016;
-  const fy = Math.sin(S.ophase) * 7;
-  const fr = Math.sin(S.ophase * 0.7) * 1.5;
-  $objWrap.style.transform = tf(S.ox, S.oy + fy, S.otilt + fr);
+  // WarioWare flash
+  $mgIntro.textContent = MG_INTRO_LABELS[type];
+  $mgIntro.classList.add('show');
+  setTimeout(() => {
+    $mgIntro.classList.remove('show');
+    setTimeout(() => initMinigame(type), 150);
+  }, 900);
 }
 
-// ── MAIN LOOP ─────────────────────────────────────────────────────────────────
+function initMinigame(type) {
+  S.phase = 'MG_ACTIVE';
+  $ghost.textContent = MG_INTRO_LABELS[type].replace('!','');
+  $typoScript.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+  $typoBold.textContent   = 'TIME';
 
-function loop() {
-  ctx.clearRect(0, 0, $canvas.width, $canvas.height);
-  for (let i = particles.length - 1; i >= 0; i--) {
-    particles[i].update(); particles[i].draw(ctx);
-    if (particles[i].alpha <= 0) particles.splice(i, 1);
+  if (type === 'bubble') initBubble();
+  else if (type === 'wipe') initWipe();
+  else if (type === 'crumple') initCrumple();
+  else if (type === 'swat') initSwat();
+}
+
+function mgClear(type) {
+  S.phase = 'MG_CLEAR';
+  hideMinigameUI(type);
+  const words = { bubble:'ALL CLEAR!', wipe:'SPOTLESS!', crumple:'TRASHED!', swat:'GOT EM!' };
+  animImpact(words[type] || 'CLEAR!');
+  $ghost.textContent = 'YES';
+  setTimeout(startNextMinigame, 900);
+}
+
+function hideMinigameUI(type) {
+  const ids = { bubble:'mg-bubble', wipe:'mg-wipe-bg', crumple:'mg-crumple', swat:'mg-swat' };
+  const el = document.getElementById(ids[type]);
+  if (el) { el.style.opacity='0'; setTimeout(()=>{ el.style.display='none'; el.style.opacity=''; }, 350); }
+  if (type === 'wipe') {
+    $fogCanvas.style.display='none';
+    const fCtx = $fogCanvas.getContext('2d');
+    fCtx.clearRect(0,0,$fogCanvas.width,$fogCanvas.height);
   }
-  updateBag();
-  floatObj();
-  requestAnimationFrame(loop);
 }
-requestAnimationFrame(loop);
 
-// ── GESTURE ───────────────────────────────────────────────────────────────────
+function showRoundClear() {
+  S.phase = 'ROUND_CLEAR';
+  $ghost.textContent = 'CLEAR';
+  $cleared.style.transition = 'opacity 0.35s ease';
+  $cleared.style.opacity = '1';
+  setTimeout(() => {
+    $cleared.style.opacity = '0';
+    setTimeout(() => {
+      S.warmupHits = 0;
+      S.warmupTarget = 4 + Math.floor(Math.random() * 2);
+      S.phase = 'WARMUP';
+      $ghost.textContent = 'STRESS';
+      $typoScript.textContent = 'Stress';
+      $typoBold.textContent = 'SMASH';
+      showBag();
+    }, 420);
+  }, 2200);
+}
+
+// ── MINIGAME: BUBBLE WRAP ─────────────────────────────────────────────────────
+
+function initBubble() {
+  const grid = document.getElementById('bubble-grid');
+  grid.innerHTML = '';
+  MG.bubble.bubbles = [];
+  MG.bubble.remaining = 20;
+
+  for (let i=0; i<20; i++) {
+    const b = document.createElement('div');
+    b.className = 'bubble'; b.dataset.id = i;
+    grid.appendChild(b);
+    MG.bubble.bubbles.push({ el: b, popped: false });
+  }
+  document.getElementById('bubble-count').textContent = '20 bubbles left';
+
+  const wrap = document.getElementById('mg-bubble');
+  wrap.style.display = 'flex'; wrap.style.opacity = '0';
+  wrap.style.transition = 'opacity 0.3s ease';
+  requestAnimationFrame(() => { wrap.style.opacity = '1'; });
+}
+
+function handleBubbleShake() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'bubble') return;
+  const unpopped = MG.bubble.bubbles.filter(b => !b.popped);
+  if (!unpopped.length) return;
+  const toPop = Math.min(3 + Math.floor(Math.random()*3), unpopped.length);
+  const chosen = shuffle(unpopped).slice(0, toPop);
+  chosen.forEach(b => {
+    b.popped = true; b.el.classList.add('popped');
+    const rect = b.el.getBoundingClientRect();
+    const stageRect = $stage.getBoundingClientRect();
+    spawnParts(rect.left - stageRect.left + rect.width/2, rect.top - stageRect.top + rect.height/2, 8);
+  });
+  MG.bubble.remaining -= chosen.length;
+  document.getElementById('bubble-count').textContent =
+    MG.bubble.remaining > 0 ? `${MG.bubble.remaining} left` : 'DONE!';
+  animImpact(WORDS_POP[Math.floor(Math.random()*WORDS_POP.length)]);
+  if (MG.bubble.remaining <= 0) setTimeout(() => mgClear('bubble'), 400);
+}
+
+// ── MINIGAME: WINDOW WIPE ─────────────────────────────────────────────────────
+
+const WIPE_WORDS = ['EMAILS', 'DEADLINES', 'MEETINGS', 'INVOICES'];
+
+function initWipe() {
+  MG.wipe.done = 0; MG.wipe.animating = false;
+  document.getElementById('wipe-word').textContent =
+    WIPE_WORDS[Math.floor(Math.random()*WIPE_WORDS.length)];
+  document.getElementById('wipe-progress').textContent = 'wave to wipe';
+
+  const bgEl = document.getElementById('mg-wipe-bg');
+  bgEl.style.display = 'flex'; bgEl.style.opacity = '0';
+  bgEl.style.transition = 'opacity 0.3s ease';
+
+  // Draw initial fog on fog-canvas
+  $fogCanvas.style.display = 'block';
+  const fCtx = $fogCanvas.getContext('2d');
+  fCtx.globalCompositeOperation = 'source-over';
+  fCtx.clearRect(0,0,$fogCanvas.width,$fogCanvas.height);
+  fCtx.fillStyle = 'rgba(200, 208, 220, 0.90)';
+  fCtx.fillRect(0,0,$fogCanvas.width,$fogCanvas.height);
+
+  requestAnimationFrame(() => { bgEl.style.opacity = '1'; });
+}
+
+function handleWipeWave() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'wipe') return;
+  if (MG.wipe.animating || MG.wipe.done >= MG.wipe.needed) return;
+  MG.wipe.animating = true;
+
+  const H = $fogCanvas.height, W = $fogCanvas.width;
+  const stripH = H / MG.wipe.needed;
+  const y0 = MG.wipe.done * stripH;
+  const fCtx = $fogCanvas.getContext('2d');
+  const SPEED = W / 22; // sweeps in ~22 frames
+  let x = 0;
+
+  const step = () => {
+    fCtx.globalCompositeOperation = 'destination-out';
+    fCtx.fillStyle = 'rgba(0,0,0,1)';
+    fCtx.fillRect(x, y0, SPEED + 2, stripH);
+    x += SPEED;
+    if (x < W) requestAnimationFrame(step);
+    else {
+      fCtx.fillRect(0, y0, W, stripH); // ensure full clear
+      fCtx.globalCompositeOperation = 'source-over';
+      MG.wipe.done++;
+      MG.wipe.animating = false;
+      const rem = MG.wipe.needed - MG.wipe.done;
+      document.getElementById('wipe-progress').textContent =
+        rem > 0 ? `${rem} more ${rem===1?'wipe':'wipes'}` : 'done!';
+      animImpact(WORDS_WIPE[Math.floor(Math.random()*WORDS_WIPE.length)]);
+      if (MG.wipe.done >= MG.wipe.needed) setTimeout(() => mgClear('wipe'), 450);
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+// ── MINIGAME: PAPER CRUMPLE ───────────────────────────────────────────────────
+
+function initCrumple() {
+  MG.crumple.stage = 0;
+  const el = document.getElementById('paper-el');
+  el.style.transition = 'none';
+  el.style.transform = CRUMPLE_STAGES[0].t;
+  el.style.borderRadius = CRUMPLE_STAGES[0].r;
+
+  const wrap = document.getElementById('mg-crumple');
+  wrap.style.display = 'flex'; wrap.style.opacity = '0';
+  wrap.style.transition = 'opacity 0.3s ease';
+  requestAnimationFrame(() => { wrap.style.opacity = '1'; });
+}
+
+function handleCrumpleShake() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'crumple') return;
+  MG.crumple.stage++;
+  const el = document.getElementById('paper-el');
+  animImpact(WORDS_CRUMPLE[Math.floor(Math.random()*WORDS_CRUMPLE.length)]);
+
+  if (MG.crumple.stage < CRUMPLE_STAGES.length) {
+    const st = CRUMPLE_STAGES[MG.crumple.stage];
+    el.style.transition = 'transform 0.2s cubic-bezier(0.16,1,0.3,1), border-radius 0.2s ease';
+    el.style.transform = st.t;
+    el.style.borderRadius = st.r;
+  } else {
+    // Final: fly off
+    const W = $stage.offsetWidth, H = $stage.offsetHeight;
+    const tx = (Math.random() - 0.5) * W * 1.4;
+    const ty = -(H * 0.8 + Math.random() * H * 0.4);
+    el.style.transition = 'transform 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease 0.15s';
+    el.style.transform = `${CRUMPLE_STAGES[CRUMPLE_STAGES.length-1].t} translate(${tx}px,${ty}px) rotate(${(Math.random()-0.5)*540}deg) scale(0.05)`;
+    el.style.opacity = '0';
+    const rect = el.getBoundingClientRect();
+    const sr = $stage.getBoundingClientRect();
+    spawnParts(rect.left - sr.left + rect.width/2, rect.top - sr.top + rect.height/2, 70);
+    setTimeout(() => mgClear('crumple'), 600);
+  }
+}
+
+// ── MINIGAME: FLY SWATTER ─────────────────────────────────────────────────────
+
+const FLY_SVG = `<svg viewBox="0 0 32 32" fill="none" width="52" height="52">
+  <ellipse cx="10" cy="13" rx="9" ry="5" fill="#C8D4DC" opacity="0.75" transform="rotate(-20 10 13)"/>
+  <ellipse cx="22" cy="13" rx="9" ry="5" fill="#C8D4DC" opacity="0.75" transform="rotate(20 22 13)"/>
+  <ellipse cx="16" cy="19" rx="5.5" ry="7" fill="#1E1C18"/>
+  <circle cx="16" cy="11" r="4.5" fill="#1E1C18"/>
+  <circle cx="13.5" cy="10" r="1.4" fill="#C8201C"/>
+  <circle cx="18.5" cy="10" r="1.4" fill="#C8201C"/>
+</svg>`;
+
+let flyAnimFrame = null;
+
+function initSwat() {
+  const wrap = document.getElementById('mg-swat');
+  // Clear old flies
+  wrap.querySelectorAll('.fly').forEach(f => f.remove());
+  MG.swat.flies = [];
+  MG.swat.remaining = 5;
+
+  const W = $stage.offsetWidth, H = $stage.offsetHeight;
+  for (let i=0; i<5; i++) {
+    const el = document.createElement('div');
+    el.className = 'fly';
+    el.innerHTML = FLY_SVG;
+    el.dataset.x = 100 + Math.random() * (W - 200);
+    el.dataset.y = 100 + Math.random() * (H - 300);
+    el.dataset.vx = (Math.random()-0.5)*1.2;
+    el.dataset.vy = (Math.random()-0.5)*1.2;
+    el.dataset.phase = Math.random()*Math.PI*2;
+    el.dataset.alive = 'true';
+    el.style.left = el.dataset.x + 'px';
+    el.style.top  = el.dataset.y + 'px';
+    wrap.appendChild(el);
+    MG.swat.flies.push(el);
+  }
+  document.getElementById('swat-count').textContent = '5 flies left';
+
+  wrap.style.display='block'; wrap.style.opacity='0';
+  wrap.style.transition='opacity 0.3s ease';
+  requestAnimationFrame(()=>{ wrap.style.opacity='1'; });
+}
+
+let flyTick = 0;
+function animateFlies() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'swat') return;
+  flyTick++;
+  const W = $stage.offsetWidth, H = $stage.offsetHeight;
+  MG.swat.flies.forEach(el => {
+    if (el.dataset.alive !== 'true') return;
+    let x = parseFloat(el.dataset.x), y = parseFloat(el.dataset.y);
+    let vx = parseFloat(el.dataset.vx), vy = parseFloat(el.dataset.vy);
+    const phase = parseFloat(el.dataset.phase) + 0.04;
+    x += vx + Math.sin(phase) * 0.6;
+    y += vy + Math.cos(phase * 1.3) * 0.5;
+    if (x < 30 || x > W-80) { vx *= -1; x = Math.max(30, Math.min(W-80, x)); }
+    if (y < 60 || y > H-220){ vy *= -1; y = Math.max(60, Math.min(H-220, y)); }
+    el.dataset.x = x; el.dataset.y = y;
+    el.dataset.vx = vx; el.dataset.vy = vy; el.dataset.phase = phase;
+    el.style.transform = `translate(${x}px,${y}px)`;
+  });
+}
+
+function handleSwatShake() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'swat') return;
+  const W = $stage.offsetWidth, H = $stage.offsetHeight;
+  const sx = 80 + Math.random() * (W - 160);
+  const sy = 80 + Math.random() * (H - 280);
+  const RADIUS = 130;
+
+  // Show swatter
+  const swEl = document.getElementById('swatter-el');
+  swEl.style.left = (sx - 40) + 'px';
+  swEl.style.top  = (sy - 10) + 'px';
+  swEl.style.display='block'; swEl.style.opacity='1';
+  swEl.style.transform='rotate(-30deg) scale(0.6)';
+  swEl.style.transition='transform 0.12s cubic-bezier(0.16,1,0.3,1), opacity 0.1s ease';
+  requestAnimationFrame(()=>{
+    swEl.style.transform='rotate(0deg) scale(1)';
+    setTimeout(()=>{
+      swEl.style.opacity='0';
+      setTimeout(()=>{ swEl.style.display='none'; }, 200);
+    }, 200);
+  });
+
+  // Hit check
+  let hit = false;
+  MG.swat.flies.forEach(el => {
+    if (el.dataset.alive !== 'true') return;
+    const fx = parseFloat(el.dataset.x) + 26;
+    const fy = parseFloat(el.dataset.y) + 26;
+    const dx = sx - fx, dy = sy - fy;
+    if (Math.sqrt(dx*dx+dy*dy) < RADIUS) {
+      el.dataset.alive = 'false';
+      el.classList.add('dead');
+      spawnParts(fx, fy, 12);
+      MG.swat.remaining--;
+      hit = true;
+    }
+  });
+
+  const cnt = document.getElementById('swat-count');
+  cnt.textContent = MG.swat.remaining > 0
+    ? `${MG.swat.remaining} ${MG.swat.remaining===1?'fly':'flies'} left`
+    : 'DONE!';
+
+  animImpact(hit
+    ? WORDS_SWAT[Math.floor(Math.random()*WORDS_SWAT.length)]
+    : 'MISSED!');
+
+  doScreenShake();
+  if (MG.swat.remaining <= 0) setTimeout(()=>mgClear('swat'), 400);
+}
+
+// ── GESTURE HANDLER ───────────────────────────────────────────────────────────
 
 function gesture(raw) {
   const g = raw.trim().toLowerCase();
-  if (!['shake', 'wave', 'idle'].includes(g)) return;
+  if (!['shake','wave','idle'].includes(g)) return;
   if (g !== 'idle') S.counts[g]++;
-
   $cBl.textContent = g !== 'idle' ? `${g} ×${S.counts[g]}` : '';
 
   if (g === 'shake') {
-    animateGlove(); doShakeScreen();
+    doScreenShake();
 
     if (S.phase === 'WARMUP') {
+      animateGlove();
       S.warmupHits++;
       showWarmupCount();
       if (S.warmupHits >= S.warmupTarget) {
-        // Brief delay then launch objects
-        setTimeout(startObjectPhase, 500);
+        setTimeout(() => hideBag(launchMinigameRound), 300);
       }
-    } else if (S.phase === 'OBJECT_ACTIVE') {
-      destroyShake();
+    } else if (S.phase === 'MG_ACTIVE') {
+      if (S.currentMG === 'bubble')  { animateGlove(); handleBubbleShake(); }
+      if (S.currentMG === 'crumple') { animateGlove(); handleCrumpleShake(); }
+      if (S.currentMG === 'swat')    handleSwatShake();
     }
 
   } else if (g === 'wave') {
-    if (S.phase === 'OBJECT_ACTIVE') {
-      destroyWipe();
+    if (S.phase === 'MG_ACTIVE' && S.currentMG === 'wipe') {
+      handleWipeWave();
     }
   }
 }
@@ -884,15 +984,15 @@ async function connectSerial() {
       } catch {}
       setConnUI(false); S.connected = false;
     })();
-  } catch (e) { if (e.name !== 'NotFoundError') console.error(e); }
+  } catch(e) { if (e.name !== 'NotFoundError') console.error(e); }
 }
 
 async function sendRecord() {
   if (!S.writer) return;
   try {
     await S.writer.write(new TextEncoder().encode('r'));
-    $hudDot.className = 'blink'; $hudStatus.textContent = 'recording…';
-    setTimeout(() => { $hudDot.className = 'on'; $hudStatus.textContent = 'connected'; }, 2500);
+    $hudDot.className='blink'; $hudStatus.textContent='recording…';
+    setTimeout(()=>{ $hudDot.className='on'; $hudStatus.textContent='connected'; }, 2500);
   } catch {}
 }
 
@@ -905,17 +1005,17 @@ function setConnUI(on) {
 // ── KEYBOARD ─────────────────────────────────────────────────────────────────
 
 document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === '1') gesture('shake');
-  else if (e.key === '2') gesture('wave');
-  else if (e.key === '3') gesture('idle');
-  else if ((e.key === 'r' || e.key === 'R') && S.connected) sendRecord();
+  if (e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if (e.key==='1') gesture('shake');
+  else if (e.key==='2') gesture('wave');
+  else if (e.key==='3') gesture('idle');
+  else if ((e.key==='r'||e.key==='R') && S.connected) sendRecord();
 });
 
 $hudBtn.addEventListener('click', () => {
   if (S.connected) {
     try { S.port?.close(); } catch {}
-    setConnUI(false); S.connected = false; S.port = null; S.writer = null;
+    setConnUI(false); S.connected=false; S.port=null; S.writer=null;
   } else connectSerial();
 });
 </script>
