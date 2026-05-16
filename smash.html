@@ -11,70 +11,43 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink:   #111110;
-  --paper: #FAFAF8;
-  --dim:   #8A8880;
-  --line:  rgba(17,17,16,0.07);
-  --red:   #D4351C;
-  --blue:  #1A4FDB;
-  --go:    #16A34A;
+  --ink:  #111110;
+  --dim:  #8A8880;
+  --red:  #D4351C;
+  --go:   #16A34A;
 }
 
 html, body {
   width: 100%; height: 100dvh;
   overflow: hidden;
-  background: var(--paper);
-  color: var(--ink);
   font-family: 'Geist', sans-serif;
 }
 
 /* ── STAGE ───────────────────────────────────────────────── */
 #stage {
   width: 100%; height: 100dvh;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
   background: #FFFFFF;
 }
-
 #canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
-
-/* ── CORNER LABEL ───────────────────────────────────────── */
-.corner {
-  position: absolute; z-index: 5; pointer-events: none;
-  font-family: 'Geist Mono', monospace;
-  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
-  color: var(--dim);
-}
-#c-bl { bottom: 5.5rem; left: 2rem; }
 
 /* ── GHOST BG TEXT ───────────────────────────────────────── */
 #ghost {
-  position: absolute;
-  bottom: 3%;
-  left: -1%;
+  position: absolute; bottom: 3%; left: -1%;
   font-family: 'Geist', sans-serif;
   font-size: clamp(8rem, 22vw, 20rem);
-  font-weight: 900;
-  letter-spacing: -0.06em;
-  line-height: 1;
+  font-weight: 900; letter-spacing: -0.06em; line-height: 1;
   text-transform: uppercase;
-  color: rgba(17,17,16,0.035);
-  pointer-events: none;
-  user-select: none;
-  z-index: 0;
-  white-space: nowrap;
-  transition: color 0.4s ease;
+  color: rgba(17,17,16,0.032);
+  pointer-events: none; user-select: none; z-index: 0; white-space: nowrap;
 }
-#ghost.is-shake { color: rgba(212,53,28,0.04); }
-#ghost.is-wave  { color: rgba(26,79,219,0.04); }
 
 /* ── SANDBAG ─────────────────────────────────────────────── */
 #bag-wrap {
   position: absolute; top: 0; left: 50%;
   transform: translateX(-50%);
   transform-origin: top center;
-  z-index: 2; pointer-events: none;
-  will-change: transform;
+  z-index: 2; pointer-events: none; will-change: transform;
 }
 #bag-cord {
   display: block; margin: 0 auto;
@@ -85,14 +58,12 @@ html, body {
   display: block;
   height: clamp(420px, 68dvh, 820px); width: auto; margin: 0 auto;
   filter: drop-shadow(0 32px 64px rgba(17,17,16,0.16));
-  transition: transform 0.08s ease;
+  will-change: transform;
 }
-#bag-svg { display: block; margin: 0 auto; }
 
 /* ── BOXING GLOVE ────────────────────────────────────────── */
 #glove-wrap {
   position: absolute;
-  /* anchor at sandbag hit zone — scales with bag height */
   top: calc(60px + 42dvh); left: 50%;
   transform: translateX(-50%);
   z-index: 4; pointer-events: none;
@@ -100,80 +71,58 @@ html, body {
   display: none; opacity: 0;
 }
 #glove-img {
-  display: block; width: 140px; height: auto;
-  filter: drop-shadow(0 8px 20px rgba(17,17,16,0.18));
+  display: block; width: 200px; height: auto;
+  filter: drop-shadow(0 10px 24px rgba(17,17,16,0.20));
 }
 
 /* ── STRESS OBJECT ───────────────────────────────────────── */
 #obj-wrap {
   position: absolute; z-index: 3;
   pointer-events: none; will-change: transform, opacity;
-  display: flex; flex-direction: column; align-items: flex-start;
+  display: flex; flex-direction: column; align-items: center;
 }
-
 #obj-inner { position: relative; display: inline-block; }
-
 #obj-img {
-  display: block; width: 156px; height: auto;
-  filter: drop-shadow(0 16px 32px rgba(17,17,16,0.12));
+  display: block;
+  height: clamp(220px, 42dvh, 540px); width: auto;
+  filter: drop-shadow(0 20px 44px rgba(17,17,16,0.13));
 }
-#obj-svg-wrap {
-  filter: drop-shadow(0 16px 32px rgba(17,17,16,0.09));
-}
+#obj-svg-wrap { filter: drop-shadow(0 20px 44px rgba(17,17,16,0.10)); }
 
-/* Badge — red pill with count */
+/* Count badge */
 #obj-badge {
-  position: absolute; top: -14px; right: -18px;
-  min-width: 44px; height: 44px; padding: 0 10px;
+  position: absolute; top: -18px; right: -22px;
+  min-width: 50px; height: 50px; padding: 0 12px;
   display: none; align-items: center; justify-content: center;
-  background: var(--red); color: #fff;
-  border-radius: 22px;
+  background: var(--red); color: #fff; border-radius: 25px;
   font-family: 'Geist Mono', monospace;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.04em;
-  z-index: 4;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.04em; z-index: 4;
 }
-
-/* Annotation */
 #obj-label {
-  margin-top: 13px;
+  margin-top: 14px;
   font-family: 'Geist Mono', monospace;
   font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase;
   color: var(--dim); white-space: nowrap;
 }
 
-/* ── EDITORIAL TYPESET (gesture display, top-right) ─────── */
+/* ── EDITORIAL TYPE (top-right) ──────────────────────────── */
 #typo-block {
-  position: absolute;
-  top: 5rem; right: 2rem;
-  z-index: 5; pointer-events: none;
-  text-align: right;
+  position: absolute; top: 5rem; right: 2rem;
+  z-index: 5; pointer-events: none; text-align: right;
 }
 #typo-script {
   display: block;
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  font-weight: 400;
-  line-height: 1;
-  color: var(--ink);
-  transition: color 0.15s ease;
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: clamp(2.2rem, 4vw, 3.4rem); font-weight: 400; line-height: 1;
+  color: var(--ink); transition: opacity 0.2s;
 }
-#typo-script.is-shake { color: var(--red); }
-#typo-script.is-wave  { color: var(--blue); }
-
 #typo-bold {
   display: block;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', sans-serif; font-weight: 900;
   font-size: clamp(3.5rem, 7vw, 6rem);
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.85;
-  text-transform: uppercase;
-  color: var(--ink);
-  transition: color 0.15s ease;
+  letter-spacing: -0.05em; line-height: 0.85;
+  text-transform: uppercase; color: var(--ink);
 }
-#typo-bold.is-shake { color: var(--red); }
-#typo-bold.is-wave  { color: var(--blue); }
 
 /* ── IMPACT WORD ─────────────────────────────────────────── */
 #impact {
@@ -184,24 +133,13 @@ html, body {
 }
 #impact-word {
   display: block;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', sans-serif; font-weight: 900;
   font-size: clamp(5rem, 15vw, 12rem);
-  font-weight: 900;
-  letter-spacing: -0.05em;
-  line-height: 0.85;
-  text-transform: uppercase;
-  color: var(--ink);
+  letter-spacing: -0.05em; line-height: 0.85;
+  text-transform: uppercase; color: var(--ink);
 }
 
-/* ── FLASH ───────────────────────────────────────────────── */
-#flash {
-  position: absolute; inset: 0; z-index: 15;
-  pointer-events: none; opacity: 0;
-  background: rgba(212,53,28,0.04);
-}
-#flash.sw { background: rgba(26,79,219,0.04); }
-
-/* ── SHAKE ───────────────────────────────────────────────── */
+/* ── SHAKE SCREEN ────────────────────────────────────────── */
 #stage.shake { animation: shk 0.18s ease; }
 @keyframes shk {
   0%  { transform: translate(0,0); }
@@ -214,26 +152,43 @@ html, body {
   100%{ transform: translate(0,0); }
 }
 
+/* ── WIPE STREAK ─────────────────────────────────────────── */
+.wipe-streak {
+  position: absolute; top: 0; bottom: 0; width: 50%;
+  pointer-events: none; z-index: 18;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6) 45%, rgba(255,255,255,0.6) 55%, transparent);
+  transition: left 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── COUNTER (sandbag warm-up) ───────────────────────────── */
+#warmup-counter {
+  position: absolute; top: 40%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20; pointer-events: none;
+  font-family: 'Geist', sans-serif; font-weight: 900;
+  font-size: clamp(6rem, 18vw, 14rem);
+  letter-spacing: -0.08em; line-height: 1;
+  color: rgba(17,17,16,0.07);
+  opacity: 0; text-align: center;
+  transition: opacity 0.1s ease;
+}
+
 /* ── CLEARED ─────────────────────────────────────────────── */
 #cleared {
   position: absolute; top: 44%; left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 25; text-align: left;
-  opacity: 0; pointer-events: none;
+  z-index: 25; text-align: left; opacity: 0; pointer-events: none;
 }
 #cleared-script {
   display: block;
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 400;
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400;
   color: var(--ink); line-height: 1.1;
 }
 #cleared-bold {
   display: block;
-  font-family: 'Geist', sans-serif;
+  font-family: 'Geist', sans-serif; font-weight: 900;
   font-size: clamp(4rem, 9vw, 7.5rem);
-  font-weight: 900;
   letter-spacing: -0.05em; line-height: 0.85;
   text-transform: uppercase; color: var(--ink);
 }
@@ -245,26 +200,24 @@ html, body {
 
 /* ── FLOATING HUD ────────────────────────────────────────── */
 #hud-container {
-  position: absolute;
-  bottom: 1.75rem; left: 50%;
+  position: absolute; bottom: 1.75rem; left: 50%;
   transform: translateX(-50%);
   z-index: 30;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
 }
 #hud {
-  display: flex; align-items: center; gap: 14px;
-  background: rgba(188, 207, 230, 0.55);
-  color: rgba(30, 42, 60, 0.85);
-  padding: 9px 18px;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(210, 216, 224, 0.72);
+  color: rgba(30, 42, 60, 0.8);
+  padding: 6px 6px 6px 16px;
   border-radius: 100px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   white-space: nowrap;
 }
-
 #hud-dot {
   width: 5px; height: 5px; border-radius: 50%;
-  background: #555450; flex-shrink: 0;
+  background: rgba(30,42,60,0.3); flex-shrink: 0;
   transition: background 0.3s;
 }
 #hud-dot.on    { background: var(--go); }
@@ -274,28 +227,34 @@ html, body {
 #hud-status {
   font-family: 'Geist Mono', monospace;
   font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(30,42,60,0.7);
 }
-
-#hud-sep {
-  width: 1px; height: 14px;
-  background: rgba(30,42,60,0.15);
-}
-
+#hud-sep { width: 1px; height: 14px; background: rgba(30,42,60,0.12); }
 #hud-btn {
   font-family: 'Geist Mono', monospace;
-  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: rgba(30,42,60,0.9);
-  background: none; border: none;
-  cursor: pointer; padding: 0;
-  transition: color 0.1s;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(30,42,60,0.85);
+  background: #FFFFFF;
+  border: none; border-radius: 100px;
+  padding: 6px 14px; cursor: pointer;
+  transition: background 0.1s, transform 0.08s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
-#hud-btn:hover { color: rgba(30,42,60,1); }
-
+#hud-btn:hover   { background: #F4F6F8; }
+#hud-btn:active  { transform: scale(0.97); }
 #hud-hint {
   font-family: 'Geist Mono', monospace;
   font-size: 9px; letter-spacing: 0.1em;
-  color: rgba(30,42,60,0.4);
-  text-align: center;
+  color: rgba(30,42,60,0.38); text-align: center;
+}
+
+/* ── BOTTOM CORNER ───────────────────────────────────────── */
+#c-bl {
+  position: absolute; bottom: 5.5rem; left: 2rem;
+  z-index: 5; pointer-events: none;
+  font-family: 'Geist Mono', monospace;
+  font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase;
+  color: var(--dim);
 }
 </style>
 </head>
@@ -303,13 +262,10 @@ html, body {
 <div id="stage">
   <canvas id="canvas"></canvas>
 
-  <!-- Bottom-left gesture counter -->
-  <div class="corner" id="c-bl"></div>
-
-  <!-- Ghost background typography -->
+  <div id="c-bl"></div>
   <div id="ghost">STRESS</div>
 
-  <!-- Editorial type block (top-right) -->
+  <!-- Editorial type block -->
   <div id="typo-block">
     <span id="typo-script">Stress</span>
     <span id="typo-bold">SMASH</span>
@@ -347,11 +303,11 @@ html, body {
     <div id="obj-label"></div>
   </div>
 
-  <!-- Impact -->
-  <div id="impact"><span id="impact-word"></span></div>
+  <!-- Warmup counter -->
+  <div id="warmup-counter"></div>
 
-  <!-- Flash -->
-  <div id="flash"></div>
+  <!-- Impact word -->
+  <div id="impact"><span id="impact-word"></span></div>
 
   <!-- Cleared -->
   <div id="cleared">
@@ -375,18 +331,17 @@ html, body {
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 
-const QUEUE = ['alarm', 'email', 'slack', 'invoice'];
+const STRESS_ITEMS = ['alarm', 'email', 'slack', 'invoice'];
 
-const COUNTS  = { alarm:'5×', email:'12×', slack:'47×', invoice:'3×' };
-const LABELS  = { alarm:'missed alarms', email:'unread emails', slack:'slack messages', invoice:'overdue invoices' };
-
-const SCRIPT_MAP = { shake:'Impact', wave:'Ripple', idle:'Stress' };
+const COUNTS = { alarm:'5×', email:'12×', slack:'47×', invoice:'3×' };
+const LABELS = { alarm:'missed alarms', email:'unread emails', slack:'slack messages', invoice:'overdue invoices' };
 
 const WORDS_SHAKE = ['SMASH', 'POW', 'CRUSH', 'BAM', 'WHAM'];
-const WORDS_WAVE  = ['SLICE', 'SWEEP', 'GONE'];
+const WORDS_WIPE  = ['WIPED', 'GONE', 'CLEAR', 'DONE'];
 
+// SVG fallbacks — scaled large to match PNG sizing
 const SVG = {
-  alarm: `<svg width="124" height="124" viewBox="0 0 124 124" fill="none">
+  alarm: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 124 124" fill="none">
     <circle cx="62" cy="66" r="46" fill="#F0EDE8" stroke="#C8C3BC" stroke-width="1.5"/>
     <line x1="31" y1="29" x2="18" y2="16" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
     <circle cx="15" cy="13" r="5.5" fill="#A8A098"/>
@@ -404,14 +359,14 @@ const SVG = {
     <rect x="67" y="109" width="13" height="5" rx="2.5" fill="#C0BAB0"/>
   </svg>`,
 
-  email: `<svg width="140" height="104" viewBox="0 0 140 104" fill="none">
+  email: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 140 104" fill="none">
     <rect x="4" y="8" width="132" height="84" rx="4" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.5"/>
     <polyline points="4,8 70,58 136,8" stroke="#C8C3BC" stroke-width="1.5" fill="none"/>
     <line x1="4" y1="92" x2="54" y2="54" stroke="#C8C3BC" stroke-width="1.2"/>
     <line x1="136" y1="92" x2="86" y2="54" stroke="#C8C3BC" stroke-width="1.2"/>
   </svg>`,
 
-  slack: `<svg width="114" height="114" viewBox="0 0 114 114" fill="none">
+  slack: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 114 114" fill="none">
     <rect x="4" y="4" width="106" height="106" rx="14" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
     <rect x="19" y="19" width="30" height="30" rx="6" fill="#3A0F3C"/>
     <text x="34" y="40" text-anchor="middle" font-family="monospace" font-size="17" font-weight="900" fill="#FAFAF8">#</text>
@@ -422,7 +377,7 @@ const SVG = {
     <rect x="19" y="77" width="64" height="3.5" rx="1.75" fill="#DDD9D2"/>
   </svg>`,
 
-  invoice: `<svg width="92" height="122" viewBox="0 0 92 122" fill="none">
+  invoice: `<svg style="height:clamp(220px,42dvh,540px);width:auto" viewBox="0 0 92 122" fill="none">
     <rect x="4" y="4" width="84" height="114" rx="3" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
     <polygon points="68,4 84,4 84,20" fill="#E0DDD6" stroke="#C8C3BC" stroke-width="1"/>
     <rect x="4" y="4" width="64" height="21" rx="3" fill="#111110"/>
@@ -443,38 +398,45 @@ const SVG = {
 // ── STATE ─────────────────────────────────────────────────────────────────────
 
 const S = {
-  phase: 'IDLE',
-  queue: [], objKey: null, cycle: 0,
-  counts: { shake:0, wave:0, idle:0 },
+  // 'WARMUP' → punch sandbag N times first
+  // 'OBJECT_WAITING' → next object loading
+  // 'OBJECT_ACTIVE'  → object visible, waiting for gesture
+  // 'DESTROYING'     → mid-animation
+  // 'PAUSE'          → brief gap between objects
+  phase: 'WARMUP',
+  warmupHits: 0,
+  warmupTarget: 4 + Math.floor(Math.random() * 2), // 4 or 5
+  queue: [],
+  objKey: null,
+  counts: { shake: 0, wave: 0 },
   port: null, writer: null, connected: false,
-  bagAngle: 0, bagV: 0, bagDamp: 0.93, bagPhase: 0,
+  bagAngle: 0, bagV: 0, bagDamp: 0.95, bagPhase: 0,
   ox: 0, oy: 0, otilt: 0, ophase: 0, ovis: false,
 };
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
 
-const $stage     = document.getElementById('stage');
-const $canvas    = document.getElementById('canvas');
-const $bagWrap   = document.getElementById('bag-wrap');
-const $objWrap   = document.getElementById('obj-wrap');
-const $objInner  = document.getElementById('obj-inner');
-const $objLabel  = document.getElementById('obj-label');
-const $impact    = document.getElementById('impact');
-const $impWord   = document.getElementById('impact-word');
-const $flash     = document.getElementById('flash');
-const $cleared   = document.getElementById('cleared');
-const $ghost     = document.getElementById('ghost');
-const $typoScript= document.getElementById('typo-script');
-const $typoBold  = document.getElementById('typo-bold');
-const $hudDot    = document.getElementById('hud-dot');
-const $hudStatus = document.getElementById('hud-status');
-const $hudBtn    = document.getElementById('hud-btn');
-const $cBl       = document.getElementById('c-bl');
+const $stage    = document.getElementById('stage');
+const $canvas   = document.getElementById('canvas');
+const $bagWrap  = document.getElementById('bag-wrap');
+const $objWrap  = document.getElementById('obj-wrap');
+const $objInner = document.getElementById('obj-inner');
+const $objLabel = document.getElementById('obj-label');
+const $impact   = document.getElementById('impact');
+const $impWord  = document.getElementById('impact-word');
+const $cleared  = document.getElementById('cleared');
+const $ghost    = document.getElementById('ghost');
+const $warmupN  = document.getElementById('warmup-counter');
+const $typoScript = document.getElementById('typo-script');
+const $typoBold   = document.getElementById('typo-bold');
+const $hudDot   = document.getElementById('hud-dot');
+const $hudStatus= document.getElementById('hud-status');
+const $hudBtn   = document.getElementById('hud-btn');
+const $cBl      = document.getElementById('c-bl');
+const ctx       = $canvas.getContext('2d');
 
-const ctx = $canvas.getContext('2d');
-
-const getImg = () => document.getElementById('obj-img');
-const getSvg = () => document.getElementById('obj-svg-wrap');
+const getImg   = () => document.getElementById('obj-img');
+const getSvg   = () => document.getElementById('obj-svg-wrap');
 const getBadge = () => document.getElementById('obj-badge');
 
 new ResizeObserver(() => {
@@ -486,25 +448,24 @@ $canvas.height = $stage.offsetHeight;
 
 // ── PARTICLES ─────────────────────────────────────────────────────────────────
 
-const particles = [], ripples = [];
+const particles = [];
 
 class Particle {
-  constructor(x, y, type) {
+  constructor(x, y) {
     this.x = x; this.y = y;
     this.shape = Math.random() < 0.5 ? 'rect' : 'circle';
-    this.size  = 3 + Math.random() * 7;
-    const spd  = 3 + Math.random() * 11;
+    this.size  = 4 + Math.random() * 8;
+    const spd  = 4 + Math.random() * 13;
     const ang  = Math.random() * Math.PI * 2;
     this.vx = Math.cos(ang) * spd;
-    this.vy = Math.sin(ang) * spd - (type === 'shake' ? 4 : 2);
-    this.g = 0.45; this.alpha = 1;
-    this.decay = 0.015 + Math.random() * 0.011;
+    this.vy = Math.sin(ang) * spd - 5;
+    this.g = 0.48; this.alpha = 1;
+    this.decay = 0.013 + Math.random() * 0.01;
     this.rot = Math.random() * Math.PI * 2;
-    this.rotV = (Math.random() - 0.5) * 0.28;
-    const ps = type === 'shake'
-      ? ['#D4351C','#111110','#8A8880','#C8C4BE','#FAFAF8']
-      : ['#1A4FDB','#3B82F6','#8A8880','#BFCEF8','#FAFAF8'];
-    this.color = ps[Math.floor(Math.random() * ps.length)];
+    this.rotV = (Math.random() - 0.5) * 0.3;
+    // Neutral palette — no red/blue
+    const pal = ['#111110','#8A8880','#C8C4BE','#E8E4DE','#FAFAF8','#D4351C'];
+    this.color = pal[Math.floor(Math.random() * pal.length)];
   }
   update() {
     this.vy += this.g; this.vx *= 0.97;
@@ -522,43 +483,30 @@ class Particle {
   }
 }
 
-class Ripple {
-  constructor(x, y) { this.x=x; this.y=y; this.r=0; this.alpha=0.5; }
-  update() { this.r += 8; this.alpha -= 0.01; }
-  draw(c) {
-    if (this.alpha <= 0) return;
-    c.save(); c.globalAlpha = this.alpha;
-    c.strokeStyle = '#1A4FDB'; c.lineWidth = 1.2;
-    c.beginPath(); c.arc(this.x, this.y, this.r, 0, Math.PI*2); c.stroke();
-    c.restore();
-  }
+function spawnParts(x, y, n = 80) {
+  for (let i = 0; i < n; i++) particles.push(new Particle(x, y));
 }
 
-function spawnParts(x, y, type) {
-  for (let i = 0; i < (type === 'shake' ? 90 : 36); i++)
-    particles.push(new Particle(x, y, type));
-}
-function spawnRipples(x, y) {
-  for (let i = 0; i < 4; i++) setTimeout(() => ripples.push(new Ripple(x, y)), i * 85);
-}
+// ── BAG PHYSICS ───────────────────────────────────────────────────────────────
 
-// ── BAG ───────────────────────────────────────────────────────────────────────
-
-function punchBag(f) { S.bagV = f * (Math.random() < 0.5 ? 1 : -1); }
+function punchBag(f) {
+  S.bagV = f * (Math.random() < 0.5 ? 1 : -1);
+}
 
 function updateBag() {
-  if (S.phase === 'IDLE' || !S.connected) {
-    S.bagPhase += 0.011;
-    S.bagAngle = Math.sin(S.bagPhase) * 2.6;
-  } else {
-    S.bagV -= S.bagAngle * 0.08;
-    S.bagV *= S.bagDamp;
-    S.bagAngle += S.bagV;
+  // Pendulum physics always on
+  S.bagV -= S.bagAngle * 0.065;
+  S.bagV *= S.bagDamp;
+  S.bagAngle += S.bagV;
+  // Ambient micro-sway when near rest
+  if (Math.abs(S.bagAngle) < 1 && Math.abs(S.bagV) < 0.06) {
+    S.bagPhase += 0.009;
+    S.bagV += Math.sin(S.bagPhase) * 0.007;
   }
   $bagWrap.style.transform = `translateX(-50%) rotate(${S.bagAngle}deg)`;
 }
 
-// ── OBJECTS ───────────────────────────────────────────────────────────────────
+// ── HELPERS ───────────────────────────────────────────────────────────────────
 
 function shuffle(arr) {
   const a = [...arr];
@@ -569,12 +517,44 @@ function shuffle(arr) {
   return a;
 }
 
-function getPos() {
+function getObjPos() {
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  const side = Math.random() < 0.5 ? -1 : 1;
-  const x = W / 2 + side * (100 + Math.random() * 100);
-  const y = H * 0.2 + Math.random() * H * 0.2;
+  // Appear at varied horizontal positions — off-center like Fruit Ninja
+  const zones = [0.15, 0.28, 0.5, 0.72, 0.85];
+  const xFrac = zones[Math.floor(Math.random() * zones.length)];
+  const x = W * xFrac;
+  const y = H * (0.1 + Math.random() * 0.22);
   return { x, y };
+}
+
+const tf = (x, y, r, sc) =>
+  sc != null ? `translate(${x}px,${y}px) rotate(${r}deg) scale(${sc})`
+             : `translate(${x}px,${y}px) rotate(${r}deg)`;
+
+// ── WARMUP DISPLAY ────────────────────────────────────────────────────────────
+
+function showWarmupCount() {
+  const remaining = S.warmupTarget - S.warmupHits;
+  $warmupN.textContent = remaining;
+  $warmupN.style.opacity = '1';
+  clearTimeout(S._wt);
+  S._wt = setTimeout(() => { $warmupN.style.opacity = '0'; }, 600);
+}
+
+// ── GAME FLOW ─────────────────────────────────────────────────────────────────
+
+function startObjectPhase() {
+  S.queue = shuffle(STRESS_ITEMS);
+  S.phase = 'OBJECT_WAITING';
+  $ghost.textContent = 'DESTROY';
+  $typoScript.textContent = 'Destroy';
+  $typoBold.textContent   = 'THEM';
+  setTimeout(nextObj, 700);
+}
+
+function nextObj() {
+  if (!S.queue.length) { showCleared(); return; }
+  loadObj(S.queue.shift());
 }
 
 function loadObj(key) {
@@ -596,9 +576,9 @@ function loadObj(key) {
 }
 
 function showObj() {
-  const p = getPos();
+  const p = getObjPos();
   S.ox = p.x; S.oy = p.y;
-  S.otilt  = (Math.random() - 0.5) * 22;
+  S.otilt  = (Math.random() - 0.5) * 24;
   S.ophase = Math.random() * Math.PI * 2;
   S.ovis   = true;
 
@@ -606,15 +586,17 @@ function showObj() {
   if (badge) { badge.textContent = COUNTS[S.objKey] || ''; badge.style.display = 'flex'; }
   $objLabel.textContent = LABELS[S.objKey] || '';
 
+  $ghost.textContent = LABELS[S.objKey]?.split(' ').pop().toUpperCase() || 'STRESS';
+
   $objWrap.style.display   = 'flex';
   $objWrap.style.opacity   = '0';
-  $objWrap.style.transform = tf(S.ox, S.oy - 30, S.otilt);
+  $objWrap.style.transform = tf(S.ox, S.oy - 40, S.otilt);
 
   requestAnimationFrame(() => {
-    $objWrap.style.transition = 'opacity 0.4s cubic-bezier(0.16,1,0.3,1), transform 0.4s cubic-bezier(0.16,1,0.3,1)';
+    $objWrap.style.transition = 'opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)';
     $objWrap.style.opacity    = '1';
     $objWrap.style.transform  = tf(S.ox, S.oy, S.otilt);
-    setTimeout(() => { $objWrap.style.transition = ''; S.phase = 'OBJECT_ACTIVE'; }, 420);
+    setTimeout(() => { $objWrap.style.transition = ''; S.phase = 'OBJECT_ACTIVE'; }, 380);
   });
 }
 
@@ -622,69 +604,6 @@ function hideObj() {
   S.ovis = false;
   $objWrap.style.display = 'none';
   $objWrap.style.opacity = '0';
-}
-
-const tf = (x, y, r, sc) =>
-  sc != null ? `translate(${x}px,${y}px) rotate(${r}deg) scale(${sc})`
-             : `translate(${x}px,${y}px) rotate(${r}deg)`;
-
-// ── GAME ──────────────────────────────────────────────────────────────────────
-
-function startGame() {
-  if (S.phase !== 'IDLE') return;
-  S.queue = shuffle(QUEUE);
-  S.phase = 'WAITING';
-  setTimeout(nextObj, 500);
-}
-
-function nextObj() {
-  if (!S.queue.length) { showCleared(); return; }
-  loadObj(S.queue.shift());
-}
-
-function destroyObj(type) {
-  if (S.phase !== 'OBJECT_ACTIVE') return;
-  S.phase = 'DESTROYING';
-
-  const el  = getImg(); const sv = getSvg();
-  const ref = (el && el.style.display !== 'none') ? el : (sv ? sv.firstElementChild : null);
-  const w   = ref ? (ref.clientWidth  || 156) : 156;
-  const h   = ref ? (ref.clientHeight || 156) : 156;
-  spawnParts(S.ox + w/2, S.oy + h/2, type);
-  if (type === 'wave') spawnRipples(S.ox + w/2, S.oy + h/2);
-
-  $impWord.textContent = (type === 'shake' ? WORDS_SHAKE : WORDS_WAVE)[
-    Math.floor(Math.random() * (type === 'shake' ? WORDS_SHAKE : WORDS_WAVE).length)
-  ];
-  animImpact();
-  doFlash(type);
-
-  if (type === 'shake') {
-    const ang = (Math.random() * Math.PI * 0.8) - Math.PI * 0.4 - Math.PI / 2;
-    const dir = { x: Math.cos(ang) * 22, y: Math.sin(ang) * 22 };
-    let rot = S.otilt, rotV = (Math.random() - 0.5) * 16;
-    let f = 0; const T = 34; const sx = S.ox, sy = S.oy;
-    const step = () => {
-      f++; rot += rotV;
-      $objWrap.style.transform = tf(sx + dir.x*f, sy + dir.y*f, rot, Math.max(0, 1-f/T));
-      $objWrap.style.opacity   = String(Math.max(0, 1-(f/T)*1.2));
-      if (f < T) requestAnimationFrame(step);
-      else { hideObj(); restoreMarkup(); pause(); }
-    };
-    requestAnimationFrame(step);
-  } else {
-    let f = 0; const T = 26; const sx = S.ox, sy = S.oy;
-    const dir = Math.random() < 0.5 ? 1 : -1;
-    const step = () => {
-      f++;
-      const t = f / T;
-      $objWrap.style.transform = tf(sx + dir*t*300, sy, S.otilt + dir*t*30);
-      $objWrap.style.opacity   = String(Math.max(0, 1-t*1.2));
-      if (f < T) requestAnimationFrame(step);
-      else { hideObj(); restoreMarkup(); pause(); }
-    };
-    requestAnimationFrame(step);
-  }
 }
 
 function restoreMarkup() {
@@ -695,81 +614,136 @@ function restoreMarkup() {
   `;
 }
 
-function pause() {
+function pauseThenNext() {
   S.phase = 'PAUSE';
   setTimeout(() => {
     if (!S.queue.length) showCleared();
-    else { S.phase = 'WAITING'; nextObj(); }
-  }, 600);
+    else { S.phase = 'OBJECT_WAITING'; nextObj(); }
+  }, 550);
 }
 
 function showCleared() {
   S.phase = 'PAUSE';
+  $ghost.textContent = 'CLEAR';
   $cleared.style.transition = 'opacity 0.35s ease';
   $cleared.style.opacity    = '1';
   setTimeout(() => {
     $cleared.style.opacity = '0';
     setTimeout(() => {
-      S.cycle++;
-      S.queue = shuffle(QUEUE);
-      S.phase = 'WAITING';
-      nextObj();
-    }, 450);
+      // Reset warmup for next cycle
+      S.warmupHits   = 0;
+      S.warmupTarget = 4 + Math.floor(Math.random() * 2);
+      S.phase        = 'WARMUP';
+      $ghost.textContent = 'STRESS';
+      $typoScript.textContent = 'Stress';
+      $typoBold.textContent   = 'SMASH';
+    }, 420);
   }, 2200);
 }
 
+// ── DESTROY ANIMATIONS ────────────────────────────────────────────────────────
+
+function destroyShake() {
+  if (S.phase !== 'OBJECT_ACTIVE') return;
+  S.phase = 'DESTROYING';
+
+  const el  = getImg(); const sv = getSvg();
+  const ref = (el && el.style.display !== 'none') ? el : (sv ? sv.firstElementChild : null);
+  const w   = ref ? (ref.clientWidth  || 200) : 200;
+  const h   = ref ? (ref.clientHeight || 200) : 200;
+  spawnParts(S.ox + w/2, S.oy + h/2, 90);
+
+  $impWord.textContent = WORDS_SHAKE[Math.floor(Math.random() * WORDS_SHAKE.length)];
+  animImpact();
+
+  const ang = (Math.random() * Math.PI * 0.8) - Math.PI * 0.4 - Math.PI / 2;
+  const dir = { x: Math.cos(ang) * 24, y: Math.sin(ang) * 24 };
+  let rot = S.otilt, rotV = (Math.random() - 0.5) * 18;
+  let f = 0; const T = 32; const sx = S.ox, sy = S.oy;
+
+  const step = () => {
+    f++; rot += rotV;
+    $objWrap.style.transform = tf(sx + dir.x*f, sy + dir.y*f, rot, Math.max(0, 1-f/T));
+    $objWrap.style.opacity   = String(Math.max(0, 1-(f/T)*1.3));
+    if (f < T) requestAnimationFrame(step);
+    else { hideObj(); restoreMarkup(); pauseThenNext(); }
+  };
+  requestAnimationFrame(step);
+}
+
+function destroyWipe() {
+  if (S.phase !== 'OBJECT_ACTIVE') return;
+  S.phase = 'DESTROYING';
+
+  // Light wipe streak across screen
+  doWipeStreak();
+
+  $impWord.textContent = WORDS_WIPE[Math.floor(Math.random() * WORDS_WIPE.length)];
+  animImpact();
+
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const W   = $stage.offsetWidth;
+  let f = 0; const T = 28; const sx = S.ox, sy = S.oy;
+
+  const step = () => {
+    f++;
+    const t = f / T;
+    // Smooth ease-out wipe
+    const ease = 1 - Math.pow(1 - t, 3);
+    $objWrap.style.transform = tf(sx + dir * ease * W * 0.85, sy + ease * -30, S.otilt + dir * ease * 20);
+    $objWrap.style.opacity   = String(Math.max(0, 1 - t * 1.4));
+    if (f < T) requestAnimationFrame(step);
+    else { hideObj(); restoreMarkup(); pauseThenNext(); }
+  };
+  requestAnimationFrame(step);
+}
+
 // ── GLOVE ANIMATION ──────────────────────────────────────────────────────────
-// Taste-skill MOTION_INTENSITY:7 — spring easing, transform/opacity only
 
 function animateGlove() {
   const glove = document.getElementById('glove-wrap');
   if (!glove) return;
 
-  // Randomise left or right punch
-  const dir   = Math.random() < 0.5 ? 1 : -1;
-  const offX  = dir * 110;   // horizontal offset of starting position
-  const rot   = dir * -38;   // rotation at rest (below)
-  const hitRot= dir * 8;     // slight angle at contact
+  const dir    = Math.random() < 0.5 ? 1 : -1;
+  const offX   = dir * 130;
+  const rot    = dir * -40;
+  const hitRot = dir * 8;
 
-  // Use correct directional glove image
   const img = document.getElementById('glove-img');
   if (img) img.src = dir === 1 ? 'asset/glove_right.png' : 'asset/glove_left.png';
 
-  // Park below, invisible
   glove.style.transition = 'none';
-  glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(280px) rotate(${rot}deg)`;
+  glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
   glove.style.opacity    = '0';
   glove.style.display    = 'block';
 
-  // Spring upswing — cubic-bezier(0.16, 1, 0.3, 1) for overshoot feel
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      glove.style.transition = 'transform 0.30s cubic-bezier(0.16,1,0.3,1), opacity 0.08s ease';
-      glove.style.transform  = `translateX(calc(-50% + ${dir * 12}px)) translateY(0px) rotate(${hitRot}deg)`;
+      glove.style.transition = 'transform 0.28s cubic-bezier(0.16,1,0.3,1), opacity 0.07s ease';
+      glove.style.transform  = `translateX(calc(-50% + ${dir * 14}px)) translateY(0px) rotate(${hitRot}deg)`;
       glove.style.opacity    = '1';
 
-      // Trigger bag squish + swing at contact (t=240ms)
+      // Contact: squish bag
       setTimeout(() => {
-        punchBag(20);
-        // Squish impact on bag image
-        const bagImg = document.getElementById('bag-img') || document.getElementById('bag-svg');
+        punchBag(22);
+        const bagImg = document.getElementById('bag-img');
         if (bagImg) {
           bagImg.style.transition = 'transform 0.07s ease';
-          bagImg.style.transform  = `scaleX(${1 + dir * 0.06}) scaleY(0.92)`;
+          bagImg.style.transform  = `scaleX(${1 + dir * 0.07}) scaleY(0.90)`;
           setTimeout(() => {
-            bagImg.style.transition = 'transform 0.35s cubic-bezier(0.16,1,0.3,1)';
+            bagImg.style.transition = 'transform 0.4s cubic-bezier(0.16,1,0.3,1)';
             bagImg.style.transform  = '';
           }, 70);
         }
-      }, 240);
+      }, 230);
 
-      // Retreat — ease-in, quick pull-back
+      // Retreat
       setTimeout(() => {
-        glove.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.8,1), opacity 0.18s ease 0.2s';
-        glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(280px) rotate(${rot}deg)`;
+        glove.style.transition = 'transform 0.36s cubic-bezier(0.4,0,0.8,1), opacity 0.16s ease 0.18s';
+        glove.style.transform  = `translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
         glove.style.opacity    = '0';
-        setTimeout(() => { glove.style.display = 'none'; }, 420);
-      }, 300);
+        setTimeout(() => { glove.style.display = 'none'; }, 400);
+      }, 290);
     });
   });
 }
@@ -779,7 +753,7 @@ function animateGlove() {
 function animImpact() {
   $impact.style.transition = 'none';
   $impact.style.opacity    = '0';
-  $impact.style.transform  = 'translate(-50%,-50%) scale(1.1)';
+  $impact.style.transform  = 'translate(-50%,-50%) scale(1.12)';
   requestAnimationFrame(() => {
     $impact.style.transition = 'opacity 0.07s ease, transform 0.1s cubic-bezier(0.16,1,0.3,1)';
     $impact.style.opacity    = '1';
@@ -791,13 +765,19 @@ function animImpact() {
   });
 }
 
-function doFlash(type) {
-  $flash.className = type === 'wave' ? 'sw' : '';
-  $flash.style.transition = 'none'; $flash.style.opacity = '1';
-  setTimeout(() => { $flash.style.transition = 'opacity 0.14s ease'; $flash.style.opacity = '0'; }, 70);
+function doWipeStreak() {
+  const fromLeft = Math.random() < 0.5;
+  const el = document.createElement('div');
+  el.className = 'wipe-streak';
+  el.style.left = fromLeft ? '-50%' : '100%';
+  $stage.appendChild(el);
+  requestAnimationFrame(() => {
+    el.style.left = fromLeft ? '130%' : '-50%';
+    setTimeout(() => el.remove(), 420);
+  });
 }
 
-function doShake() {
+function doShakeScreen() {
   $stage.classList.remove('shake'); void $stage.offsetWidth;
   $stage.classList.add('shake');
   $stage.addEventListener('animationend', () => $stage.classList.remove('shake'), { once: true });
@@ -807,9 +787,9 @@ function doShake() {
 
 function floatObj() {
   if (S.phase !== 'OBJECT_ACTIVE' || !S.ovis) return;
-  S.ophase += 0.017;
-  const fy = Math.sin(S.ophase) * 6;
-  const fr = Math.sin(S.ophase * 0.72) * 1.3;
+  S.ophase += 0.016;
+  const fy = Math.sin(S.ophase) * 7;
+  const fr = Math.sin(S.ophase * 0.7) * 1.5;
   $objWrap.style.transform = tf(S.ox, S.oy + fy, S.otilt + fr);
 }
 
@@ -820,10 +800,6 @@ function loop() {
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update(); particles[i].draw(ctx);
     if (particles[i].alpha <= 0) particles.splice(i, 1);
-  }
-  for (let i = ripples.length - 1; i >= 0; i--) {
-    ripples[i].update(); ripples[i].draw(ctx);
-    if (ripples[i].alpha <= 0) ripples.splice(i, 1);
   }
   updateBag();
   floatObj();
@@ -836,26 +812,28 @@ requestAnimationFrame(loop);
 function gesture(raw) {
   const g = raw.trim().toLowerCase();
   if (!['shake', 'wave', 'idle'].includes(g)) return;
-  S.counts[g]++;
+  if (g !== 'idle') S.counts[g]++;
 
-  $ghost.textContent = g !== 'idle' ? g.toUpperCase() : 'STRESS';
-  $ghost.className   = g !== 'idle' ? `is-${g}` : '';
-
-  $typoScript.textContent = SCRIPT_MAP[g] || 'Stress';
-  $typoScript.className   = g !== 'idle' ? `is-${g}` : '';
-  $typoBold.textContent   = g !== 'idle' ? g.toUpperCase() : 'SMASH';
-  $typoBold.className     = g !== 'idle' ? `is-${g}` : '';
-
-  $cBl.textContent = g !== 'idle' ? `${g} #${S.counts[g]}` : '';
+  $cBl.textContent = g !== 'idle' ? `${g} ×${S.counts[g]}` : '';
 
   if (g === 'shake') {
-    animateGlove(); doShake();
-    if (S.phase === 'OBJECT_ACTIVE') destroyObj('shake');
-    else if (S.phase === 'IDLE') startGame();
+    animateGlove(); doShakeScreen();
+
+    if (S.phase === 'WARMUP') {
+      S.warmupHits++;
+      showWarmupCount();
+      if (S.warmupHits >= S.warmupTarget) {
+        // Brief delay then launch objects
+        setTimeout(startObjectPhase, 500);
+      }
+    } else if (S.phase === 'OBJECT_ACTIVE') {
+      destroyShake();
+    }
+
   } else if (g === 'wave') {
-    punchBag(6);
-    if (S.phase === 'OBJECT_ACTIVE') destroyObj('wave');
-    else if (S.phase === 'IDLE') startGame();
+    if (S.phase === 'OBJECT_ACTIVE') {
+      destroyWipe();
+    }
   }
 }
 
@@ -888,7 +866,6 @@ async function connectSerial() {
       } catch {}
       setConnUI(false); S.connected = false;
     })();
-    startGame();
   } catch (e) { if (e.name !== 'NotFoundError') console.error(e); }
 }
 
@@ -914,12 +891,8 @@ document.addEventListener('keydown', e => {
   if (e.key === '1') gesture('shake');
   else if (e.key === '2') gesture('wave');
   else if (e.key === '3') gesture('idle');
-  else if (e.key === 'r' || e.key === 'R') {
-    if (S.connected) sendRecord(); else gesture('shake');
-  }
+  else if ((e.key === 'r' || e.key === 'R') && S.connected) sendRecord();
 });
-
-// ── BUTTONS ──────────────────────────────────────────────────────────────────
 
 $hudBtn.addEventListener('click', () => {
   if (S.connected) {
@@ -927,10 +900,6 @@ $hudBtn.addEventListener('click', () => {
     setConnUI(false); S.connected = false; S.port = null; S.writer = null;
   } else connectSerial();
 });
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
-
-S.phase = 'IDLE';
 </script>
 </body>
 </html>
