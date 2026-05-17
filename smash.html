@@ -141,27 +141,29 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .cloud-el.blown { opacity:0; }
 #fan-el {
   position:absolute; pointer-events:none; z-index:10;
-  width:280px; height:auto; display:none; bottom:25%;
+  width:380px; height:auto; display:none;
+  bottom:8%; left:50%; margin-left:-190px;
+  transform-origin:bottom center;
 }
 #fan-el img { width:100%; display:block; }
 #cloud-reveal { position:absolute; inset:0; z-index:8; pointer-events:none; }
 #reveal-sky {
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  opacity:0; transition:opacity 0.8s ease;
+  opacity:0; transition:opacity 1.4s ease;
 }
 #reveal-sky.show { opacity:1; }
 #reveal-field {
   position:absolute; bottom:0; left:0; right:0;
   width:100%; object-fit:cover; display:block;
   transform:translateY(105%);
-  transition:transform 1s cubic-bezier(0.16,1,0.3,1) 0.4s;
+  transition:transform 1.4s cubic-bezier(0.16,1,0.3,1) 1s;
 }
 #reveal-field.show { transform:translateY(0); }
 #reveal-sun {
   position:absolute; left:50%;
   width:clamp(120px,18vw,220px); object-fit:contain; display:block;
   transform:translateX(-50%) translateY(-110%);
-  transition:transform 1s cubic-bezier(0.16,1,0.3,1) 0.6s;
+  transition:transform 1.4s cubic-bezier(0.16,1,0.3,1) 1.6s;
   top:5%;
 }
 #reveal-sun.show { transform:translateX(-50%) translateY(0); }
@@ -975,7 +977,8 @@ function initCloud() {
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const w = 200 + Math.random() * 200;
+    const maxW = Math.min(W * 0.85, 1400);
+    const w = maxW * (0.5 + Math.random() * 0.5);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const x = Math.random() * (W - w);
     const y = Math.random() * (H * 0.65);
@@ -994,18 +997,25 @@ function initCloud() {
 }
 
 function showFanSweep() {
-  const W = $stage.offsetWidth;
   const fanEl = document.getElementById('fan-el');
+  fanEl.style.display = 'block';
+  fanEl.style.opacity = '0';
   fanEl.style.transition = 'none';
-  fanEl.style.left = '-320px';
-  fanEl.style.transform = 'rotate(-15deg)';
-  fanEl.style.opacity = '1'; fanEl.style.display = 'block';
+  fanEl.style.transform = 'rotate(-55deg)';
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    fanEl.style.transition = 'left 0.55s cubic-bezier(0.3,0,0.7,1), transform 0.55s ease, opacity 0.2s ease 0.4s';
-    fanEl.style.left = (W + 60) + 'px';
-    fanEl.style.transform = 'rotate(15deg)';
-    fanEl.style.opacity = '0';
-    setTimeout(() => { fanEl.style.display = 'none'; }, 700);
+    // fade in + swing right
+    fanEl.style.transition = 'transform 0.18s ease-out, opacity 0.12s ease';
+    fanEl.style.opacity = '1';
+    fanEl.style.transform = 'rotate(-55deg)';
+    setTimeout(() => {
+      fanEl.style.transition = 'transform 0.36s cubic-bezier(0.4,0,0.2,1)';
+      fanEl.style.transform = 'rotate(55deg)';
+      setTimeout(() => {
+        fanEl.style.transition = 'opacity 0.2s ease';
+        fanEl.style.opacity = '0';
+        setTimeout(() => { fanEl.style.display = 'none'; }, 220);
+      }, 360);
+    }, 60);
   }));
 }
 
@@ -1036,9 +1046,9 @@ function handleCloudWave() {
 
 function showCloudReveal() {
   document.getElementById('reveal-sky').classList.add('show');
-  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 350);
-  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 550);
-  setTimeout(() => mgClear('cloud'), 2000);
+  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 1000);
+  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 1600);
+  setTimeout(() => mgClear('cloud'), 4500);
 }
 
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
