@@ -803,9 +803,28 @@ function handleWipeWave() {
       document.getElementById('wipe-progress').textContent =
         rem > 0 ? `${rem} more wipe${rem > 1 ? 's' : ''}` : 'done!';
       animImpact(WORDS_WIPE[Math.floor(Math.random() * WORDS_WIPE.length)]);
-      if (MG.wipe.done >= WIPE_TOTAL) setTimeout(() => mgClear('wipe'), 500);
+      if (MG.wipe.done >= WIPE_TOTAL) setTimeout(() => showWipeClear(), 400);
     }, 620);
   }));
+}
+
+function showWipeClear() {
+  // window_04 이미지 위에 cleared 텍스트 오버레이 (배경 유지)
+  document.getElementById('cleared-script').textContent = 'Spotless';
+  document.getElementById('cleared-bold').textContent = 'CLEARED';
+  document.getElementById('cleared-sub').textContent = 'crystal clean';
+  $cleared.style.transition = 'opacity 0.4s ease';
+  $cleared.style.opacity = '1';
+  setTimeout(() => {
+    $cleared.style.opacity = '0';
+    setTimeout(() => {
+      S.phase = 'MG_CLEAR';
+      hideMinigameUI('wipe');
+      animImpact('SPOTLESS!');
+      $ghost.textContent = 'YES';
+      setTimeout(startNextMinigame, 600);
+    }, 400);
+  }, 2200); // 2.2초 동안 보여줌
 }
 
 // ── MINIGAME: PAPER CRUMPLE ───────────────────────────────────────────────────
@@ -862,6 +881,8 @@ function initSwat() {
   wrap.querySelectorAll('.fly').forEach(f => f.remove());
   MG.swat.flies = [];
   MG.swat.remaining = 5;
+  MG.swat.misses = 0;
+  MG.swat.maxMisses = 4 + Math.floor(Math.random() * 2); // 4 or 5
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   // 화면을 5구역으로 나눠 각 구역 안에서 스폰 → 항상 흩어져서 등장
@@ -962,12 +983,14 @@ function handleSwatShake() {
     ? `${MG.swat.remaining} ${MG.swat.remaining===1?'fly':'flies'} left`
     : 'DONE!';
 
+  if (!hit) MG.swat.misses++;
   animImpact(hit
     ? WORDS_SWAT[Math.floor(Math.random()*WORDS_SWAT.length)]
     : 'MISSED!');
 
   doScreenShake();
-  if (MG.swat.remaining <= 0) setTimeout(()=>mgClear('swat'), 400);
+  const cleared = MG.swat.remaining <= 0 || MG.swat.misses >= MG.swat.maxMisses;
+  if (cleared) setTimeout(()=>mgClear('swat'), 400);
 }
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
@@ -984,17 +1007,17 @@ function initCloud() {
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   const rows = [0, 0, 0, 0, 0, 1, 1, 1, 2, 2]; // 10개: 상5 중3 하2
-  // top edge 기반: 상단은 음수 허용 → overflow:hidden이 자름 (자연스럽게 삐져나옴)
+  // top edge 기반: 상단은 음수 깊게 → 화면 위로 삐져나와야 꽉 찬 느낌
   const rowTopRange = [
-    [-0.10, 0.12],  // 상단: top -10%~12% (화면 위로 삐져나오거나 딱 맞게)
+    [-0.22, 0.05],  // 상단: top -22%~5% (대부분 위로 삐져나옴)
     [0.30, 0.48],   // 중단: top 30~48%
     [0.60, 0.76],   // 하단: top 60~76%
   ];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.55, 800);
-    const w = maxW * (0.48 + Math.random() * 0.52);
+    const maxW = Math.min(W * 0.72, 1050); // 더 크게
+    const w = maxW * (0.55 + Math.random() * 0.45); // 기본 크기 키움
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const row = rows[i];
     const [t0, t1] = rowTopRange[row];
