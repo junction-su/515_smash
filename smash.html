@@ -975,20 +975,22 @@ function initCloud() {
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   const rows = [0, 0, 0, 1, 1, 2, 2];
-  // 중심 Y를 구름 크기 고려해서 잘리지 않게 배치
-  const rowCY = [0.28, 0.55, 0.80];
+  // top edge 기반 3등분: [시작%, 끝%] — 화면을 상/중/하로 나눔
+  const rowTopRange = [
+    [0.00, 0.20],  // 상단: top이 화면 0~20%
+    [0.28, 0.48],  // 중단: top이 화면 28~48%
+    [0.58, 0.75],  // 하단: top이 화면 58~75%
+  ];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.65, 920);
+    const maxW = Math.min(W * 0.55, 800);
     const w = maxW * (0.5 + Math.random() * 0.5);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
-    const cloudH = w * 0.65;
     const row = rows[i];
-    const centerY = H * rowCY[row] + (Math.random() - 0.5) * H * 0.06;
+    const [t0, t1] = rowTopRange[row];
     const x = (Math.random() - 0.1) * (W - w * 0.7);
-    // 위/아래 최대 15% 잘림 허용, 하지만 화면 안에 중심이 오도록
-    const y = Math.max(-cloudH * 0.15, centerY - cloudH / 2);
+    const y = H * (t0 + Math.random() * (t1 - t0));
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
