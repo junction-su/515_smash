@@ -132,23 +132,39 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #paper-el svg { display:block; }
 
 /* ── CLOUD BLOW ──────────────────────────────────────────── */
-#mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
-#cloud-sky {
-  position:absolute; inset:0;
-  background:linear-gradient(to bottom,#87CEEB 0%,#C8E8F8 45%,#FFF4D8 100%);
-  opacity:0; transition:opacity 1.4s ease;
-}
-#cloud-sky.revealed { opacity:1; }
-#cloud-sun-el {
-  position:absolute; top:8%; left:50%; transform:translateX(-50%);
-  opacity:0; transition:opacity 1.2s ease 0.3s;
-}
-#cloud-sun-el.revealed { opacity:1; }
+#mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; background:#B8D4E8; }
 .cloud-el {
-  position:absolute; pointer-events:none; will-change:transform,opacity;
-  transition:transform 0.75s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
+  position:absolute; pointer-events:none;
+  transition:transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease;
 }
+.cloud-el img { display:block; }
 .cloud-el.blown { opacity:0; }
+#fan-el {
+  position:absolute; pointer-events:none; z-index:10;
+  width:280px; height:auto; display:none; bottom:25%;
+}
+#fan-el img { width:100%; display:block; }
+#cloud-reveal { position:absolute; inset:0; z-index:8; pointer-events:none; }
+#reveal-sky {
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  opacity:0; transition:opacity 0.8s ease;
+}
+#reveal-sky.show { opacity:1; }
+#reveal-field {
+  position:absolute; bottom:0; left:0; right:0;
+  width:100%; object-fit:cover; display:block;
+  transform:translateY(105%);
+  transition:transform 1s cubic-bezier(0.16,1,0.3,1) 0.4s;
+}
+#reveal-field.show { transform:translateY(0); }
+#reveal-sun {
+  position:absolute; left:50%;
+  width:clamp(120px,18vw,220px); object-fit:contain; display:block;
+  transform:translateX(-50%) translateY(-110%);
+  transition:transform 1s cubic-bezier(0.16,1,0.3,1) 0.6s;
+  top:5%;
+}
+#reveal-sun.show { transform:translateX(-50%) translateY(0); }
 #cloud-count {
   position:absolute; bottom:7rem; left:50%; transform:translateX(-50%);
   font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
@@ -344,20 +360,11 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Cloud Blow -->
   <div id="mg-cloud">
-    <div id="cloud-sky"></div>
-    <div id="cloud-sun-el">
-      <svg viewBox="0 0 100 100" width="160" height="160" fill="none">
-        <line x1="50" y1="4"  x2="50" y2="19" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="50" y1="81" x2="50" y2="96" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="4"  y1="50" x2="19" y2="50" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="81" y1="50" x2="96" y2="50" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="17" y1="17" x2="28" y2="28" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
-        <line x1="72" y1="72" x2="83" y2="83" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
-        <line x1="83" y1="17" x2="72" y2="28" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
-        <line x1="17" y1="83" x2="28" y2="72" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
-        <circle cx="50" cy="50" r="23" fill="#F8B400"/>
-        <circle cx="50" cy="50" r="18" fill="#FFD740"/>
-      </svg>
+    <div id="fan-el"><img src="asset/fan.png" alt="" draggable="false"></div>
+    <div id="cloud-reveal">
+      <img id="reveal-sky"   src="asset/sky.png"   alt="">
+      <img id="reveal-field" src="asset/field.png" alt="">
+      <img id="reveal-sun"   src="asset/sun.png"   alt="">
     </div>
     <div id="cloud-count"></div>
   </div>
@@ -681,8 +688,8 @@ function hideMinigameUI(type) {
     fCtx.clearRect(0,0,$fogCanvas.width,$fogCanvas.height);
   }
   if (type === 'cloud') {
-    document.getElementById('cloud-sky').classList.remove('revealed');
-    document.getElementById('cloud-sun-el').classList.remove('revealed');
+    ['reveal-sky','reveal-field','reveal-sun'].forEach(id =>
+      document.getElementById(id).classList.remove('show'));
   }
 }
 
@@ -954,54 +961,52 @@ function handleSwatShake() {
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
 
-const CLOUD_COLORS = ['#6A7B94', '#7A8FAA', '#8A9EBC', '#607890', '#5E7088', '#8298B4'];
-
-const CLOUD_LAYOUT = [
-  { cx: 0.12, cy: 0.06, w: 340, h: 170, color: '#5E6F88' },
-  { cx: 0.52, cy: 0.03, w: 300, h: 150, color: '#7A8FA8' },
-  { cx: 0.80, cy: 0.08, w: 360, h: 180, color: '#5A6880' },
-  { cx: 0.22, cy: 0.32, w: 260, h: 130, color: '#8898B0' },
-  { cx: 0.72, cy: 0.30, w: 290, h: 145, color: '#6A7C96' },
-  { cx: 0.50, cy: 0.50, w: 320, h: 160, color: '#788AA2' },
-];
-
-function makeCloudSVG(w, h, color) {
-  return `<svg viewBox="0 0 240 120" fill="none" width="${w}" height="${h}">
-    <ellipse cx="120" cy="92" rx="116" ry="30" fill="${color}"/>
-    <ellipse cx="72"  cy="70" rx="54"  ry="44" fill="${color}"/>
-    <ellipse cx="155" cy="58" rx="70"  ry="50" fill="${color}"/>
-    <ellipse cx="105" cy="42" rx="48"  ry="40" fill="${color}"/>
-  </svg>`;
-}
+const CLOUD_COUNT = 7;
 
 function initCloud() {
   const wrap = document.getElementById('mg-cloud');
   wrap.querySelectorAll('.cloud-el').forEach(c => c.remove());
-  document.getElementById('cloud-sky').classList.remove('revealed');
-  document.getElementById('cloud-sun-el').classList.remove('revealed');
+  ['reveal-sky','reveal-field','reveal-sun'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
   MG.cloud.clouds = [];
-  MG.cloud.remaining = CLOUD_LAYOUT.length;
+  MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  CLOUD_LAYOUT.forEach((cfg, i) => {
+  for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    el.innerHTML = makeCloudSVG(cfg.w, cfg.h, cfg.color);
-    const x = cfg.cx * W - cfg.w / 2;
-    const y = cfg.cy * H - cfg.h / 2;
+    const w = 200 + Math.random() * 200;
+    el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
+    const x = Math.random() * (W - w);
+    const y = Math.random() * (H * 0.65);
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
-    el.dataset.x  = x; el.dataset.w = cfg.w;
-    el.dataset.dir = cfg.cx < 0.5 ? '-1' : '1'; // left clouds blow left, right blow right
+    el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
+    el.dataset.w = w;
     wrap.appendChild(el);
     MG.cloud.clouds.push(el);
-  });
+  }
 
-  document.getElementById('cloud-count').textContent = `${MG.cloud.remaining} clouds left`;
-
+  document.getElementById('cloud-count').textContent = `${CLOUD_COUNT} clouds left`;
   wrap.style.display = 'block'; wrap.style.opacity = '0';
   wrap.style.transition = 'opacity 0.3s ease';
   requestAnimationFrame(() => { wrap.style.opacity = '1'; });
+}
+
+function showFanSweep() {
+  const W = $stage.offsetWidth;
+  const fanEl = document.getElementById('fan-el');
+  fanEl.style.transition = 'none';
+  fanEl.style.left = '-320px';
+  fanEl.style.transform = 'rotate(-15deg)';
+  fanEl.style.opacity = '1'; fanEl.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fanEl.style.transition = 'left 0.55s cubic-bezier(0.3,0,0.7,1), transform 0.55s ease, opacity 0.2s ease 0.4s';
+    fanEl.style.left = (W + 60) + 'px';
+    fanEl.style.transform = 'rotate(15deg)';
+    fanEl.style.opacity = '0';
+    setTimeout(() => { fanEl.style.display = 'none'; }, 700);
+  }));
 }
 
 function handleCloudWave() {
@@ -1009,13 +1014,14 @@ function handleCloudWave() {
   const alive = MG.cloud.clouds.filter(c => !c.classList.contains('blown'));
   if (!alive.length) return;
 
+  showFanSweep();
+
   const toBlow = Math.min(1 + Math.floor(Math.random() * 2), alive.length);
   shuffle(alive).slice(0, toBlow).forEach(el => {
     const dir = parseFloat(el.dataset.dir);
-    const W = $stage.offsetWidth;
-    const dist = W + parseFloat(el.dataset.w);
+    const dist = $stage.offsetWidth + parseFloat(el.dataset.w) + 100;
     el.classList.add('blown');
-    el.style.transform = `translateX(${dir * dist}px) translateY(${-40 - Math.random()*60}px)`;
+    el.style.transform = `translateX(${dir * dist}px) translateY(${-30 - Math.random() * 80}px)`;
     MG.cloud.remaining--;
   });
 
@@ -1023,14 +1029,16 @@ function handleCloudWave() {
   cnt.textContent = MG.cloud.remaining > 0
     ? `${MG.cloud.remaining} ${MG.cloud.remaining === 1 ? 'cloud' : 'clouds'} left`
     : 'DONE!';
-
   animImpact(WORDS_CLOUD[Math.floor(Math.random() * WORDS_CLOUD.length)]);
 
-  if (MG.cloud.remaining <= 0) {
-    document.getElementById('cloud-sky').classList.add('revealed');
-    document.getElementById('cloud-sun-el').classList.add('revealed');
-    setTimeout(() => mgClear('cloud'), 1400);
-  }
+  if (MG.cloud.remaining <= 0) setTimeout(showCloudReveal, 500);
+}
+
+function showCloudReveal() {
+  document.getElementById('reveal-sky').classList.add('show');
+  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 350);
+  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 550);
+  setTimeout(() => mgClear('cloud'), 2000);
 }
 
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
