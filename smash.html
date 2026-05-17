@@ -974,19 +974,21 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  // 3줄: 전부 화면 상단 45% 안에 배치
+  // 구름 중심점을 화면 상/중/하에 고르게 배치
+  // cloud.png aspect ratio ≈ 0.65 (height/width)
   const rows = [0, 0, 0, 1, 1, 2, 2];
-  const rowY = [-0.05, 0.13, 0.28]; // 위로 올림 (일부 살짝 잘려도 OK)
-  const rowH = [0.14, 0.14, 0.14];
+  const rowCY = [0.12, 0.38, 0.65]; // 각 줄 중심 Y 비율
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.85, 1400);
+    const maxW = Math.min(W * 0.75, 1100);
     const w = maxW * (0.5 + Math.random() * 0.5);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
+    const cloudH = w * 0.65;
     const row = rows[i];
+    const centerY = H * rowCY[row] + (Math.random() - 0.5) * H * 0.1;
     const x = (Math.random() - 0.1) * (W - w * 0.7);
-    const y = H * rowY[row] + Math.random() * H * rowH[row];
+    const y = centerY - cloudH / 2; // top = center - half height
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
