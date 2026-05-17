@@ -142,7 +142,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #fan-el {
   position:absolute; pointer-events:none; z-index:10;
   width:380px; height:auto; display:none;
-  bottom:8%; left:50%; margin-left:-190px;
+  bottom:22%; left:50%; margin-left:-190px;
   transform-origin:bottom center;
 }
 #fan-el img { width:100%; display:block; }
@@ -704,6 +704,9 @@ function hideMinigameUI(type) {
 function showRoundClear() {
   S.phase = 'ROUND_CLEAR';
   $ghost.textContent = 'CLEAR';
+  document.getElementById('cleared-script').textContent = 'All';
+  document.getElementById('cleared-bold').textContent = 'CLEAR';
+  document.getElementById('cleared-sub').textContent = 'another round starting';
   $cleared.style.transition = 'opacity 0.35s ease';
   $cleared.style.opacity = '1';
   setTimeout(() => {
@@ -969,7 +972,7 @@ function handleSwatShake() {
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
 
-const CLOUD_COUNT = 9;
+const CLOUD_COUNT = 10;
 
 function initCloud() {
   const wrap = document.getElementById('mg-cloud');
@@ -980,23 +983,22 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  const rows = [0, 0, 0, 0, 1, 1, 1, 2, 2]; // 9개: 상4 중3 하2
-  // top edge 기반 3등분
+  const rows = [0, 0, 0, 0, 0, 1, 1, 1, 2, 2]; // 10개: 상5 중3 하2
+  // top edge 기반: 상단은 음수 허용 → overflow:hidden이 자름 (자연스럽게 삐져나옴)
   const rowTopRange = [
-    [0.00, 0.22],  // 상단: top 0~22%
-    [0.30, 0.50],  // 중단: top 30~50%
-    [0.60, 0.75],  // 하단: top 60~75%
+    [-0.10, 0.12],  // 상단: top -10%~12% (화면 위로 삐져나오거나 딱 맞게)
+    [0.30, 0.48],   // 중단: top 30~48%
+    [0.60, 0.76],   // 하단: top 60~76%
   ];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.52, 750);
-    const w = maxW * (0.45 + Math.random() * 0.55);
+    const maxW = Math.min(W * 0.55, 800);
+    const w = maxW * (0.48 + Math.random() * 0.52);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const row = rows[i];
     const [t0, t1] = rowTopRange[row];
-    // x: 화면 전체 폭에 고르게 (0~100% - cloud width)
-    const x = Math.random() * (W - w * 0.8);
+    const x = Math.random() * (W - w * 0.75);
     const y = H * (t0 + Math.random() * (t1 - t0));
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
@@ -1064,7 +1066,24 @@ function showCloudReveal() {
   document.getElementById('reveal-sky').classList.add('show');
   setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 1000);
   setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 1600);
-  setTimeout(() => mgClear('cloud'), 4500);
+  // field 위에 텍스트 오버레이 (mg-cloud 숨기기 전에)
+  setTimeout(() => {
+    $ghost.textContent = 'YES';
+    document.getElementById('cleared-script').textContent = 'Sunshine';
+    document.getElementById('cleared-bold').textContent = 'CLEARED';
+    document.getElementById('cleared-sub').textContent = 'skies are bright';
+    $cleared.style.transition = 'opacity 0.4s ease';
+    $cleared.style.opacity = '1';
+  }, 2800);
+  // 텍스트 + field 함께 있다가 페이드아웃 후 다음 게임으로
+  setTimeout(() => {
+    $cleared.style.opacity = '0';
+    setTimeout(() => {
+      S.phase = 'MG_CLEAR';
+      hideMinigameUI('cloud');
+      setTimeout(startNextMinigame, 300);
+    }, 400);
+  }, 4800);
 }
 
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
