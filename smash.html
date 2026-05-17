@@ -940,10 +940,10 @@ function handleSwatShake() {
   // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
   const alive = MG.swat.flies.filter(el => el.dataset.alive === 'true');
   let sx, sy;
-  if (alive.length > 0 && Math.random() < 0.80) {
+  if (alive.length > 0 && Math.random() < 0.65) {
     const t = alive[Math.floor(Math.random() * alive.length)];
-    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 180;
-    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 180;
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 280;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 280;
     sx = Math.max(80, Math.min(W - 80, sx));
     sy = Math.max(80, Math.min(H - 280, sy));
   } else {
@@ -1021,11 +1021,12 @@ function initCloud() {
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.62, 900);
-    const w = maxW * (0.52 + Math.random() * 0.48);
+    // row1(가운데)은 더 크게, 나머지는 기본 크기
+    const baseMax = Math.min(W * 0.72, 1050);
+    const row = rows[i];
+    const w = baseMax * (row === 1 ? 0.65 + Math.random() * 0.35 : 0.52 + Math.random() * 0.48);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const cloudH = w * 0.65;
-    const row = rows[i];
     // 가로: 이 row의 섹터 안에서 랜덤 배치
     const nSec = rowSectors[row];
     const sec = sectorCount[row]++;
@@ -1033,11 +1034,10 @@ function initCloud() {
     const x = sec * secW + Math.random() * Math.max(0, secW - w * 0.5);
     let y;
     if (row === 0) {
-      // 이미지 상단 투명 여백 무시하고 아예 크게 음수로 배치
-      // → visible 구름 모양이 화면 최상단에서 잘려 나옴
       y = H * (-0.18 - Math.random() * 0.10);
     } else if (row === 1) {
-      y = H * (0.28 + Math.random() * 0.18);
+      // 가운데 공백(약 15~50%) 메우기
+      y = H * (0.16 + Math.random() * 0.22);
     } else {
       y = H * (0.60 + Math.random() * 0.14);
     }
