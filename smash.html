@@ -1033,12 +1033,13 @@ function initCloud() {
     const x = sec * secW + Math.random() * Math.max(0, secW - w * 0.5);
     let y;
     if (row === 0) {
-      const bottomY = H * (0.40 + Math.random() * 0.14);
-      y = bottomY - cloudH; // 상단으로 삐져나옴
+      // 이미지 상단 투명 여백 무시하고 아예 크게 음수로 배치
+      // → visible 구름 모양이 화면 최상단에서 잘려 나옴
+      y = H * (-0.18 - Math.random() * 0.10);
     } else if (row === 1) {
-      y = H * (0.30 + Math.random() * 0.20);
+      y = H * (0.28 + Math.random() * 0.18);
     } else {
-      y = H * (0.62 + Math.random() * 0.14);
+      y = H * (0.60 + Math.random() * 0.14);
     }
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
