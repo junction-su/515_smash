@@ -174,7 +174,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 #cloud-bottom-fade {
   position:absolute; bottom:0; left:0; right:0; height:220px;
-  background:linear-gradient(to top, rgba(255,255,255,0.3) 0%, transparent 100%);
+  background:linear-gradient(to top, rgba(255,255,255,0.5) 0%, transparent 100%);
   z-index:9; pointer-events:none;
 }
 
@@ -1013,26 +1013,33 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  const rows = [0, 0, 0, 0, 0, 1, 1, 1, 2, 2]; // 10개: 상5 중3 하2
+  // 상3 중4 하3 — 각 row를 가로 섹터로 나눠 겹침 방지
+  const rows = [0, 0, 0, 1, 1, 1, 1, 2, 2, 2];
+  // 각 row의 가로 섹터 (몇 칸으로 나눌지)
+  const rowSectors = [3, 4, 3];
+  const sectorCount = [0, 0, 0]; // row별 현재 섹터 인덱스
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.72, 1050);
-    const w = maxW * (0.55 + Math.random() * 0.45);
+    const maxW = Math.min(W * 0.62, 900);
+    const w = maxW * (0.52 + Math.random() * 0.48);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const cloudH = w * 0.65;
     const row = rows[i];
+    // 가로: 이 row의 섹터 안에서 랜덤 배치
+    const nSec = rowSectors[row];
+    const sec = sectorCount[row]++;
+    const secW = W / nSec;
+    const x = sec * secW + Math.random() * Math.max(0, secW - w * 0.5);
     let y;
     if (row === 0) {
-      // bottom edge를 화면 38~55% 지점에 고정 → 이미지 상단이 화면 위로 삐져나옴
-      const bottomY = H * (0.38 + Math.random() * 0.17);
-      y = bottomY - cloudH;
+      const bottomY = H * (0.40 + Math.random() * 0.14);
+      y = bottomY - cloudH; // 상단으로 삐져나옴
     } else if (row === 1) {
-      y = H * (0.30 + Math.random() * 0.18);
+      y = H * (0.30 + Math.random() * 0.20);
     } else {
-      y = H * (0.60 + Math.random() * 0.16);
+      y = H * (0.62 + Math.random() * 0.14);
     }
-    const x = Math.random() * (W - w * 0.75);
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
