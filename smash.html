@@ -820,9 +820,8 @@ function showWipeClear() {
     setTimeout(() => {
       S.phase = 'MG_CLEAR';
       hideMinigameUI('wipe');
-      animImpact('SPOTLESS!');
       $ghost.textContent = 'YES';
-      setTimeout(startNextMinigame, 600);
+      setTimeout(startNextMinigame, 300);
     }, 400);
   }, 2200); // 2.2초 동안 보여줌
 }
@@ -1015,22 +1014,25 @@ function initCloud() {
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   const rows = [0, 0, 0, 0, 0, 1, 1, 1, 2, 2]; // 10개: 상5 중3 하2
-  // top edge 기반: 상단은 음수 깊게 → 화면 위로 삐져나와야 꽉 찬 느낌
-  const rowTopRange = [
-    [-0.22, 0.05],  // 상단: top -22%~5% (대부분 위로 삐져나옴)
-    [0.30, 0.48],   // 중단: top 30~48%
-    [0.60, 0.76],   // 하단: top 60~76%
-  ];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.72, 1050); // 더 크게
-    const w = maxW * (0.55 + Math.random() * 0.45); // 기본 크기 키움
+    const maxW = Math.min(W * 0.72, 1050);
+    const w = maxW * (0.55 + Math.random() * 0.45);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
+    const cloudH = w * 0.65;
     const row = rows[i];
-    const [t0, t1] = rowTopRange[row];
+    let y;
+    if (row === 0) {
+      // bottom edge를 화면 38~55% 지점에 고정 → 이미지 상단이 화면 위로 삐져나옴
+      const bottomY = H * (0.38 + Math.random() * 0.17);
+      y = bottomY - cloudH;
+    } else if (row === 1) {
+      y = H * (0.30 + Math.random() * 0.18);
+    } else {
+      y = H * (0.60 + Math.random() * 0.16);
+    }
     const x = Math.random() * (W - w * 0.75);
-    const y = H * (t0 + Math.random() * (t1 - t0));
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
