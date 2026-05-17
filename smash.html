@@ -99,8 +99,13 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 
 /* ── WINDOW WIPE ─────────────────────────────────────────── */
-#mg-wipe-bg { position:absolute; inset:0; display:none; z-index:6; overflow:hidden; }
-#wipe-img { width:100%; height:100%; object-fit:cover; display:block; }
+#mg-wipe-bg { position:absolute; inset:0; display:none; z-index:6; }
+#wipe-img {
+  position:absolute; inset:5%;
+  width:90%; height:90%;
+  object-fit:cover; border-radius:8px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.18);
+}
 #rag-el {
   position:absolute; top:50%; left:0;
   transform:translateX(-500px) translateY(-50%);
@@ -735,7 +740,7 @@ function handleBubbleShake() {
 // ── MINIGAME: WINDOW WIPE ─────────────────────────────────────────────────────
 
 const WIPE_TOTAL = 4; // 4 waves: window_00 → 01 → 02 → 03 → 04
-const WIPE_Y = [22, 38, 56, 74]; // rag Y% per wave
+const WIPE_Y = [20, 35, 52, 68]; // rag Y% per wave (within 5%~95% image bounds)
 
 function initWipe() {
   MG.wipe.done = 0; MG.wipe.animating = false;
