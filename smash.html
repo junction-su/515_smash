@@ -881,8 +881,6 @@ function initSwat() {
   wrap.querySelectorAll('.fly').forEach(f => f.remove());
   MG.swat.flies = [];
   MG.swat.remaining = 5;
-  MG.swat.misses = 0;
-  MG.swat.maxMisses = 4 + Math.floor(Math.random() * 2); // 4 or 5
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   // 화면을 5구역으로 나눠 각 구역 안에서 스폰 → 항상 흩어져서 등장
@@ -939,8 +937,20 @@ function animateFlies() {
 function handleSwatShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'swat') return;
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  const sx = 80 + Math.random() * (W - 160);
-  const sy = 80 + Math.random() * (H - 280);
+
+  // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
+  const alive = MG.swat.flies.filter(el => el.dataset.alive === 'true');
+  let sx, sy;
+  if (alive.length > 0 && Math.random() < 0.80) {
+    const t = alive[Math.floor(Math.random() * alive.length)];
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 180;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 180;
+    sx = Math.max(80, Math.min(W - 80, sx));
+    sy = Math.max(80, Math.min(H - 280, sy));
+  } else {
+    sx = 80 + Math.random() * (W - 160);
+    sy = 80 + Math.random() * (H - 280);
+  }
   const RADIUS = 130;
 
   // Show swatter — slam in like glove
@@ -983,14 +993,12 @@ function handleSwatShake() {
     ? `${MG.swat.remaining} ${MG.swat.remaining===1?'fly':'flies'} left`
     : 'DONE!';
 
-  if (!hit) MG.swat.misses++;
   animImpact(hit
     ? WORDS_SWAT[Math.floor(Math.random()*WORDS_SWAT.length)]
     : 'MISSED!');
 
   doScreenShake();
-  const cleared = MG.swat.remaining <= 0 || MG.swat.misses >= MG.swat.maxMisses;
-  if (cleared) setTimeout(()=>mgClear('swat'), 400);
+  if (MG.swat.remaining <= 0) setTimeout(()=>mgClear('swat'), 400);
 }
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
