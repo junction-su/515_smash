@@ -132,7 +132,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #paper-el svg { display:block; }
 
 /* ── CLOUD BLOW ──────────────────────────────────────────── */
-#mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; background:#B8D4E8; }
+#mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
 .cloud-el {
   position:absolute; pointer-events:none;
   transition:transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease;
@@ -154,14 +154,14 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #reveal-sky.show { opacity:1; }
 #reveal-field {
   position:absolute; bottom:0; left:0; right:0;
-  width:100%; object-fit:cover; display:block;
+  width:100%; height:55%; object-fit:cover; display:block;
   transform:translateY(105%);
   transition:transform 1.4s cubic-bezier(0.16,1,0.3,1) 1s;
 }
 #reveal-field.show { transform:translateY(0); }
 #reveal-sun {
   position:absolute; left:50%;
-  width:clamp(120px,18vw,220px); object-fit:contain; display:block;
+  width:clamp(200px,30vw,420px); object-fit:contain; display:block;
   transform:translateX(-50%) translateY(-110%);
   transition:transform 1.4s cubic-bezier(0.16,1,0.3,1) 1.6s;
   top:5%;
@@ -974,14 +974,19 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
+  // 3줄로 나눠 고르게 배치 (상/중/하)
+  const rows = [0, 0, 0, 1, 1, 2, 2]; // 구름별 줄 배정
+  const rowY = [0, 0.28, 0.54];        // 각 줄 시작 Y 비율
+  const rowH = [0.26, 0.26, 0.26];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
     const maxW = Math.min(W * 0.85, 1400);
     const w = maxW * (0.5 + Math.random() * 0.5);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
-    const x = Math.random() * (W - w);
-    const y = Math.random() * (H * 0.65);
+    const row = rows[i];
+    const x = (Math.random() - 0.15) * (W - w * 0.6); // 좌우로 약간 화면 밖까지 허용
+    const y = H * rowY[row] + Math.random() * H * rowH[row] - w * 0.1; // 구름 높이 고려해 위로 당김
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
