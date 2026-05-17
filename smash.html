@@ -99,20 +99,19 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 
 /* ── WINDOW WIPE ─────────────────────────────────────────── */
-#mg-wipe-bg {
-  position:absolute; inset:0; display:none;
-  align-items:center; justify-content:center; z-index:6;
-  flex-direction:column; gap:16px;
+#mg-wipe-bg { position:absolute; inset:0; display:none; z-index:6; overflow:hidden; }
+#wipe-img { width:100%; height:100%; object-fit:cover; display:block; }
+#rag-el {
+  position:absolute; top:50%; left:0;
+  transform:translateX(-500px) translateY(-50%);
+  width:420px; height:auto; z-index:10; pointer-events:none;
 }
-#wipe-word {
-  font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(4rem,12vw,9rem); letter-spacing:-0.06em;
-  text-transform:uppercase; color:rgba(17,17,16,0.12);
-  text-align:center; line-height:1;
-}
+#rag-el img { width:100%; height:auto; display:block; }
 #wipe-progress {
-  font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.22em;
-  text-transform:uppercase; color:rgba(17,17,16,0.18);
+  position:absolute; bottom:7rem; left:50%; transform:translateX(-50%);
+  font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
+  text-transform:uppercase; color:rgba(255,255,255,0.8);
+  text-shadow:0 1px 4px rgba(0,0,0,0.4); z-index:11;
 }
 
 /* ── PAPER CRUMPLE ───────────────────────────────────────── */
@@ -310,9 +309,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     <div id="bubble-count"></div>
   </div>
 
-  <!-- MG: Window Wipe (fog on fog-canvas, text behind) -->
+  <!-- MG: Window Wipe -->
   <div id="mg-wipe-bg">
-    <div id="wipe-word">EMAILS</div>
+    <img id="wipe-img" src="asset/window_00.png" alt="">
+    <div id="rag-el"><img src="asset/rag.png" alt="" draggable="false"></div>
     <div id="wipe-progress">wave to wipe</div>
   </div>
 
@@ -734,60 +734,56 @@ function handleBubbleShake() {
 
 // ── MINIGAME: WINDOW WIPE ─────────────────────────────────────────────────────
 
-const WIPE_WORDS = ['EMAILS', 'DEADLINES', 'MEETINGS', 'INVOICES'];
+const WIPE_TOTAL = 4; // 4 waves: window_00 → 01 → 02 → 03 → 04
+const WIPE_Y = [22, 38, 56, 74]; // rag Y% per wave
 
 function initWipe() {
   MG.wipe.done = 0; MG.wipe.animating = false;
-  document.getElementById('wipe-word').textContent =
-    WIPE_WORDS[Math.floor(Math.random()*WIPE_WORDS.length)];
+  document.getElementById('wipe-img').src = 'asset/window_00.png';
   document.getElementById('wipe-progress').textContent = 'wave to wipe';
 
+  const ragEl = document.getElementById('rag-el');
+  ragEl.style.transition = 'none';
+  ragEl.style.transform = 'translateX(-500px) translateY(-50%)';
+  ragEl.style.top = '50%';
+
   const bgEl = document.getElementById('mg-wipe-bg');
-  bgEl.style.display = 'flex'; bgEl.style.opacity = '0';
+  bgEl.style.display = 'block'; bgEl.style.opacity = '0';
   bgEl.style.transition = 'opacity 0.3s ease';
-
-  // Draw initial fog on fog-canvas
-  $fogCanvas.style.display = 'block';
-  const fCtx = $fogCanvas.getContext('2d');
-  fCtx.globalCompositeOperation = 'source-over';
-  fCtx.clearRect(0,0,$fogCanvas.width,$fogCanvas.height);
-  fCtx.fillStyle = 'rgba(200, 208, 220, 0.90)';
-  fCtx.fillRect(0,0,$fogCanvas.width,$fogCanvas.height);
-
   requestAnimationFrame(() => { bgEl.style.opacity = '1'; });
 }
 
 function handleWipeWave() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'wipe') return;
-  if (MG.wipe.animating || MG.wipe.done >= MG.wipe.needed) return;
+  if (MG.wipe.animating || MG.wipe.done >= WIPE_TOTAL) return;
   MG.wipe.animating = true;
 
-  const H = $fogCanvas.height, W = $fogCanvas.width;
-  const stripH = H / MG.wipe.needed;
-  const y0 = MG.wipe.done * stripH;
-  const fCtx = $fogCanvas.getContext('2d');
-  const SPEED = W / 22; // sweeps in ~22 frames
-  let x = 0;
+  const W = $stage.offsetWidth;
+  const ragEl = document.getElementById('rag-el');
+  ragEl.style.transition = 'none';
+  ragEl.style.top = WIPE_Y[MG.wipe.done] + '%';
+  ragEl.style.transform = 'translateX(-450px) translateY(-50%)';
 
-  const step = () => {
-    fCtx.globalCompositeOperation = 'destination-out';
-    fCtx.fillStyle = 'rgba(0,0,0,1)';
-    fCtx.fillRect(x, y0, SPEED + 2, stripH);
-    x += SPEED;
-    if (x < W) requestAnimationFrame(step);
-    else {
-      fCtx.fillRect(0, y0, W, stripH); // ensure full clear
-      fCtx.globalCompositeOperation = 'source-over';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    ragEl.style.transition = 'transform 0.58s cubic-bezier(0.3,0,0.7,1)';
+    ragEl.style.transform = `translateX(${W + 250}px) translateY(-50%)`;
+
+    // swap image at midpoint of sweep
+    setTimeout(() => {
+      const f = String(MG.wipe.done + 1).padStart(2, '0');
+      document.getElementById('wipe-img').src = `asset/window_${f}.png`;
+    }, 260);
+
+    setTimeout(() => {
       MG.wipe.done++;
       MG.wipe.animating = false;
-      const rem = MG.wipe.needed - MG.wipe.done;
+      const rem = WIPE_TOTAL - MG.wipe.done;
       document.getElementById('wipe-progress').textContent =
-        rem > 0 ? `${rem} more ${rem===1?'wipe':'wipes'}` : 'done!';
-      animImpact(WORDS_WIPE[Math.floor(Math.random()*WORDS_WIPE.length)]);
-      if (MG.wipe.done >= MG.wipe.needed) setTimeout(() => mgClear('wipe'), 450);
-    }
-  };
-  requestAnimationFrame(step);
+        rem > 0 ? `${rem} more wipe${rem > 1 ? 's' : ''}` : 'done!';
+      animImpact(WORDS_WIPE[Math.floor(Math.random() * WORDS_WIPE.length)]);
+      if (MG.wipe.done >= WIPE_TOTAL) setTimeout(() => mgClear('wipe'), 500);
+    }, 620);
+  }));
 }
 
 // ── MINIGAME: PAPER CRUMPLE ───────────────────────────────────────────────────
