@@ -940,7 +940,7 @@ function handleSwatShake() {
   // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
   const alive = MG.swat.flies.filter(el => el.dataset.alive === 'true');
   let sx, sy;
-  if (alive.length > 0 && Math.random() < 0.65) {
+  if (alive.length > 0 && Math.random() < 0.70) {
     const t = alive[Math.floor(Math.random() * alive.length)];
     sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 280;
     sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 280;
