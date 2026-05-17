@@ -142,6 +142,30 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 #paper-el svg { display:block; }
 
+/* ── CLOUD BLOW ──────────────────────────────────────────── */
+#mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
+#cloud-sky {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom,#87CEEB 0%,#C8E8F8 45%,#FFF4D8 100%);
+  opacity:0; transition:opacity 1.4s ease;
+}
+#cloud-sky.revealed { opacity:1; }
+#cloud-sun-el {
+  position:absolute; top:8%; left:50%; transform:translateX(-50%);
+  opacity:0; transition:opacity 1.2s ease 0.3s;
+}
+#cloud-sun-el.revealed { opacity:1; }
+.cloud-el {
+  position:absolute; pointer-events:none; will-change:transform,opacity;
+  transition:transform 0.75s cubic-bezier(0.4,0,0.2,1), opacity 0.55s ease;
+}
+.cloud-el.blown { opacity:0; }
+#cloud-count {
+  position:absolute; bottom:7rem; left:50%; transform:translateX(-50%);
+  font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
+  text-transform:uppercase; color:rgba(17,17,16,0.5); z-index:4;
+}
+
 /* ── FLY SWATTER ─────────────────────────────────────────── */
 #mg-swat { position:absolute; inset:0; display:none; z-index:3; }
 .fly {
@@ -326,6 +350,26 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     </div>
   </div>
 
+  <!-- MG: Cloud Blow -->
+  <div id="mg-cloud">
+    <div id="cloud-sky"></div>
+    <div id="cloud-sun-el">
+      <svg viewBox="0 0 100 100" width="160" height="160" fill="none">
+        <line x1="50" y1="4"  x2="50" y2="19" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="50" y1="81" x2="50" y2="96" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="4"  y1="50" x2="19" y2="50" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="81" y1="50" x2="96" y2="50" stroke="#F8B400" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="17" y1="17" x2="28" y2="28" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
+        <line x1="72" y1="72" x2="83" y2="83" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
+        <line x1="83" y1="17" x2="72" y2="28" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
+        <line x1="17" y1="83" x2="28" y2="72" stroke="#F8B400" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="23" fill="#F8B400"/>
+        <circle cx="50" cy="50" r="18" fill="#FFD740"/>
+      </svg>
+    </div>
+    <div id="cloud-count"></div>
+  </div>
+
   <!-- MG: Fly Swatter -->
   <div id="mg-swat">
     <div id="swatter-el">
@@ -371,13 +415,14 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 
-const MINIGAME_TYPES = ['bubble', 'wipe', 'crumple', 'swat'];
+const MINIGAME_TYPES = ['bubble', 'wipe', 'crumple', 'swat', 'cloud'];
 
 const MG_INTRO_LABELS = {
   bubble:  'POP IT!',
   wipe:    'WIPE IT!',
   crumple: 'CRUMPLE!',
   swat:    'SWAT IT!',
+  cloud:   'BLOW IT!',
 };
 
 const WORDS_SHAKE = ['SMASH', 'POW', 'CRUSH', 'BAM', 'WHAM'];
@@ -385,6 +430,7 @@ const WORDS_POP   = ['POP!', 'BANG!', 'YES!'];
 const WORDS_WIPE  = ['WIPED!', 'CLEAR!', 'FRESH!'];
 const WORDS_SWAT  = ['SWAT!', 'GOT IT!', 'ZAP!'];
 const WORDS_CRUMPLE = ['CRUNCH!', 'DONE!', 'GONE!'];
+const WORDS_CLOUD = ['WOOSH!', 'GONE!', 'CLEAR!', 'YEAH!'];
 
 // Paper crumple stages (transform + border-radius)
 const CRUMPLE_STAGES = [
@@ -413,6 +459,7 @@ const MG = {
   wipe:   { done: 0, needed: 4, animating: false },
   crumple:{ stage: 0 },
   swat:   { flies: [], remaining: 0 },
+  cloud:  { clouds: [], remaining: 0 },
 };
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
@@ -600,7 +647,8 @@ function showBag() {
 }
 
 function launchMinigameRound() {
-  S.mgQueue = shuffle(MINIGAME_TYPES);
+  // Pick 4 random from 5 types each round
+  S.mgQueue = shuffle(MINIGAME_TYPES).slice(0, 4);
   startNextMinigame();
 }
 
@@ -629,25 +677,30 @@ function initMinigame(type) {
   else if (type === 'wipe') initWipe();
   else if (type === 'crumple') initCrumple();
   else if (type === 'swat') initSwat();
+  else if (type === 'cloud') initCloud();
 }
 
 function mgClear(type) {
   S.phase = 'MG_CLEAR';
   hideMinigameUI(type);
-  const words = { bubble:'ALL CLEAR!', wipe:'SPOTLESS!', crumple:'TRASHED!', swat:'GOT EM!' };
+  const words = { bubble:'ALL CLEAR!', wipe:'SPOTLESS!', crumple:'TRASHED!', swat:'GOT EM!', cloud:'SUNSHINE!' };
   animImpact(words[type] || 'CLEAR!');
   $ghost.textContent = 'YES';
   setTimeout(startNextMinigame, 900);
 }
 
 function hideMinigameUI(type) {
-  const ids = { bubble:'mg-bubble', wipe:'mg-wipe-bg', crumple:'mg-crumple', swat:'mg-swat' };
+  const ids = { bubble:'mg-bubble', wipe:'mg-wipe-bg', crumple:'mg-crumple', swat:'mg-swat', cloud:'mg-cloud' };
   const el = document.getElementById(ids[type]);
   if (el) { el.style.opacity='0'; setTimeout(()=>{ el.style.display='none'; el.style.opacity=''; }, 350); }
   if (type === 'wipe') {
     $fogCanvas.style.display='none';
     const fCtx = $fogCanvas.getContext('2d');
     fCtx.clearRect(0,0,$fogCanvas.width,$fogCanvas.height);
+  }
+  if (type === 'cloud') {
+    document.getElementById('cloud-sky').classList.remove('revealed');
+    document.getElementById('cloud-sun-el').classList.remove('revealed');
   }
 }
 
@@ -924,6 +977,87 @@ function handleSwatShake() {
   if (MG.swat.remaining <= 0) setTimeout(()=>mgClear('swat'), 400);
 }
 
+// ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
+
+const CLOUD_COLORS = ['#6A7B94', '#7A8FAA', '#8A9EBC', '#607890', '#5E7088', '#8298B4'];
+
+const CLOUD_LAYOUT = [
+  { cx: 0.12, cy: 0.06, w: 340, h: 170, color: '#5E6F88' },
+  { cx: 0.52, cy: 0.03, w: 300, h: 150, color: '#7A8FA8' },
+  { cx: 0.80, cy: 0.08, w: 360, h: 180, color: '#5A6880' },
+  { cx: 0.22, cy: 0.32, w: 260, h: 130, color: '#8898B0' },
+  { cx: 0.72, cy: 0.30, w: 290, h: 145, color: '#6A7C96' },
+  { cx: 0.50, cy: 0.50, w: 320, h: 160, color: '#788AA2' },
+];
+
+function makeCloudSVG(w, h, color) {
+  return `<svg viewBox="0 0 240 120" fill="none" width="${w}" height="${h}">
+    <ellipse cx="120" cy="92" rx="116" ry="30" fill="${color}"/>
+    <ellipse cx="72"  cy="70" rx="54"  ry="44" fill="${color}"/>
+    <ellipse cx="155" cy="58" rx="70"  ry="50" fill="${color}"/>
+    <ellipse cx="105" cy="42" rx="48"  ry="40" fill="${color}"/>
+  </svg>`;
+}
+
+function initCloud() {
+  const wrap = document.getElementById('mg-cloud');
+  wrap.querySelectorAll('.cloud-el').forEach(c => c.remove());
+  document.getElementById('cloud-sky').classList.remove('revealed');
+  document.getElementById('cloud-sun-el').classList.remove('revealed');
+  MG.cloud.clouds = [];
+  MG.cloud.remaining = CLOUD_LAYOUT.length;
+
+  const W = $stage.offsetWidth, H = $stage.offsetHeight;
+  CLOUD_LAYOUT.forEach((cfg, i) => {
+    const el = document.createElement('div');
+    el.className = 'cloud-el';
+    el.innerHTML = makeCloudSVG(cfg.w, cfg.h, cfg.color);
+    const x = cfg.cx * W - cfg.w / 2;
+    const y = cfg.cy * H - cfg.h / 2;
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    el.dataset.x  = x; el.dataset.w = cfg.w;
+    el.dataset.dir = cfg.cx < 0.5 ? '-1' : '1'; // left clouds blow left, right blow right
+    wrap.appendChild(el);
+    MG.cloud.clouds.push(el);
+  });
+
+  document.getElementById('cloud-count').textContent = `${MG.cloud.remaining} clouds left`;
+
+  wrap.style.display = 'block'; wrap.style.opacity = '0';
+  wrap.style.transition = 'opacity 0.3s ease';
+  requestAnimationFrame(() => { wrap.style.opacity = '1'; });
+}
+
+function handleCloudWave() {
+  if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'cloud') return;
+  const alive = MG.cloud.clouds.filter(c => !c.classList.contains('blown'));
+  if (!alive.length) return;
+
+  const toBlow = Math.min(1 + Math.floor(Math.random() * 2), alive.length);
+  shuffle(alive).slice(0, toBlow).forEach(el => {
+    const dir = parseFloat(el.dataset.dir);
+    const W = $stage.offsetWidth;
+    const dist = W + parseFloat(el.dataset.w);
+    el.classList.add('blown');
+    el.style.transform = `translateX(${dir * dist}px) translateY(${-40 - Math.random()*60}px)`;
+    MG.cloud.remaining--;
+  });
+
+  const cnt = document.getElementById('cloud-count');
+  cnt.textContent = MG.cloud.remaining > 0
+    ? `${MG.cloud.remaining} ${MG.cloud.remaining === 1 ? 'cloud' : 'clouds'} left`
+    : 'DONE!';
+
+  animImpact(WORDS_CLOUD[Math.floor(Math.random() * WORDS_CLOUD.length)]);
+
+  if (MG.cloud.remaining <= 0) {
+    document.getElementById('cloud-sky').classList.add('revealed');
+    document.getElementById('cloud-sun-el').classList.add('revealed');
+    setTimeout(() => mgClear('cloud'), 1400);
+  }
+}
+
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
 
 function gesture(raw) {
@@ -949,8 +1083,9 @@ function gesture(raw) {
     }
 
   } else if (g === 'wave') {
-    if (S.phase === 'MG_ACTIVE' && S.currentMG === 'wipe') {
-      handleWipeWave();
+    if (S.phase === 'MG_ACTIVE') {
+      if (S.currentMG === 'wipe')  handleWipeWave();
+      if (S.currentMG === 'cloud') handleCloudWave();
     }
   }
 }
