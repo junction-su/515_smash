@@ -1,220 +1,196 @@
-# SMASH — Design Specification
+# SMASH — Design Specification (현재 상태)
 
 ## Design Philosophy
 
-Editorial meets physical. Real objects on a clean background — like a magazine spread where the product just sits there, no staging, no fake shadows. The violence of the interaction (smashing, exploding) contrasts with the calm, minimal environment around it.
-
-Reference: Favourite Routine editorial (Image 1) — objects floating on white with strong typography alongside. Not a game UI. Not a dashboard. A stage.
+전면 스테이지. 미니게임 오브젝트들이 화면 전체를 채우고, HUD는 하단 floating pill.
+왼쪽 패널 없음. 타이포그래피는 우상단 editorial 배치. 폭력적 인터랙션 + 차분한 여백의 대비.
 
 ---
 
 ## Color
 
-```
-Background:    #E8ECF0   cool blue-gray (not warm, not cream)
-Surface:       #FFFFFF   object cards, UI panels
-Border:        rgba(0,0,0,0.08)
-Text primary:  #1a1a18
-Text muted:    #8a8880
-Accent red:    #E53935   shake / impact
-Accent blue:   #1565C0   wave / ripple
+```css
+--ink:   #111110   /* 기본 텍스트, 오브젝트 */
+--dim:   #8A8880   /* muted 라벨 */
+--red:   #D4351C   /* shake 강조 */
+--go:    #16A34A   /* 연결됨 상태 */
+--paper: #FAFAF8   /* 서류 배경 */
+
+Stage background: #FFFFFF
+HUD background:   rgba(226,231,238,0.65)  + backdrop-filter:blur(14px)
+Ghost text:       rgba(17,17,16,0.032)
 ```
 
-No gradients. No glow. No neon. Single accent per gesture.
+그라디언트, 글로우, 네온 없음. 쉐도우/border-radius 추가 금지 (명시 요청 없으면).
 
 ---
 
 ## Typography
 
 ```css
-font-family: 'Geist', sans-serif;           /* UI, body */
-font-family: 'Geist Mono', monospace;       /* labels, status, counters */
+font-family: 'Geist', sans-serif;              /* UI, body */
+font-family: 'Geist Mono', monospace;          /* 라벨, 상태, 카운터 */
+font-family: 'Playfair Display', serif italic; /* editorial 제목 */
 ```
 
 ### Scale
-- Gesture name (big): `font-size: clamp(4rem, 10vw, 8rem)`, `font-weight: 900`, `letter-spacing: -0.04em`, `line-height: 0.85`
-- Section label: `font-size: 10px`, `letter-spacing: 0.25em`, `text-transform: uppercase`, Geist Mono
-- Body / status: `font-size: 12px`, `letter-spacing: 0.05em`, Geist Mono
-- Counter: `font-size: 11px`, Geist Mono, muted
-
-Rules:
-- No Inter, no Roboto
-- No emoji in UI
-- Sentence case for labels, uppercase only for mono tags
-- Body text never pure black — use `#1a1a18`
+- 미니게임 지시문: `font-size:clamp(5rem,13vw,10rem)`, `font-weight:900`, `letter-spacing:-0.06em`
+- Warmup 카운터: `font-size:clamp(6rem,18vw,14rem)`, `color:rgba(17,17,16,0.06)`
+- Impact 단어: `font-size:clamp(5rem,15vw,12rem)`, `font-weight:900`
+- Editorial 스크립트: `Playfair Display italic`, `clamp(2.2rem,4vw,3.4rem)`
+- Editorial 볼드: `Geist 900`, `clamp(3.5rem,7vw,6rem)`, `letter-spacing:-0.05em`
+- HUD 라벨: `Geist Mono 10px`, `letter-spacing:0.1em`, uppercase
+- 카운터: `Geist Mono 13px`, `letter-spacing:0.22em`, uppercase
 
 ---
 
 ## Layout
 
-### Grid
+### 전체 구조
 ```
-[Left panel 260px] | [Stage — remaining width]
+[Full-screen Stage]
+  ├── #canvas (z:0)  파티클
+  ├── #ghost (z:0)   배경 텍스트 "STRESS"
+  ├── 각 미니게임 레이어 (z:3~10)
+  ├── #typo-block (z:25)  우상단 editorial
+  ├── #cleared (z:25)     라운드 클리어
+  ├── #mg-intro (z:60)    미니게임 지시문 플래시
+  └── #hud-container (z:30) 하단 floating
 ```
 
-Left panel:
-- Wordmark top
-- Big gesture label + sub-label center
-- Controls + status bottom
-- `border-right: 1px solid rgba(0,0,0,0.08)`
-- `padding: 2.5rem 2rem`
+왼쪽 패널 없음. 1280px 고정 viewport width.
 
-Stage:
-- Background `#E8ECF0`
-- Sandbag hangs from top-center with chain
-- Active stress object floats near sandbag
-- Canvas layer for particles/effects behind everything
+### 우상단 Editorial Block (`#typo-block`)
+- `position:absolute; top:5rem; right:2rem; text-align:right; z-index:25`
+- Playfair italic + Geist 900 두 줄 조합
+- 항상 미니게임 위에 보임
 
-### Sandbag
-- PNG image: white canvas bag, metal chain, photorealistic
-- Hangs from top of screen
-- Physics: pendulum swing via CSS transform + JS angle/velocity
-- Reacts to gestures: big swing on shake, gentle sway on wave
-- `transform-origin: top center`
-
-### Stress Objects (Game Mode)
-- One object at a time
-- Floats in from edge with gentle bob animation
-- PNG with transparent background, no drop shadow
-- Sits to the side of the sandbag at varying heights
-- After destroy → brief pause (600ms) → next object slides in
-
-### Object Queue
-```
-[alarm clock] → [email icon] → [slack notification] → [invoice] → [repeat]
-```
-Randomize order. After full cycle → brief "cleared" moment → restart.
+### 하단 HUD (`#hud-container`)
+- `position:absolute; bottom:1.75rem; left:50%`
+- Floating pill: 상태 dot + status 텍스트 + 구분선 + 연결 버튼
+- 키보드 힌트 텍스트 아래에 표시
 
 ---
 
-## Animation
+## 샌드백
 
-### Idle State
-- Sandbag: slow pendulum, ±3deg, 3s period
-- Object: gentle float, `translateY` ±8px, 4s sine, slight rotation ±2deg
+```
+#bag-wrap: top:0; left:50%; transform-origin:top center
+#bag-cord: width:1px; height:60px; 그라디언트 #B0ACA4→#989088
+#bag-img: height:clamp(420px,68dvh,820px)
+          filter:drop-shadow(0 32px 64px rgba(17,17,16,0.16))
+```
 
-### Shake Effect
-- Sandbag: immediate large swing (±25deg), damped oscillation back
-- Object: flies off screen in random direction, rotates 360–720deg, scales to 0
-- Particles: 80–120 rect/circle fragments from object position, physics (gravity, decay)
-- Impact word: "SMASH!" / "POW!" / "CRUSH!" — appears center-stage, large, fades in 80ms, fades out over 400ms
-- Screen flash: `rgba(229,57,53,0.06)` overlay for 100ms
-- Screen shake: `translate` ±6px for 8 frames
-
-### Wave Effect
-- Sandbag: medium swing (±12deg)
-- Object: splits into two halves, slide apart, fade out
-- Ripples: 4–5 expanding circles from object center, blue palette
-- Particles: 30–40 smaller fragments, arc trajectory
-
-### Idle (no gesture)
-- Nothing happens visually
-- Label updates to "IDLE"
+- 워밍업 단계에만 활성 (MG_ACTIVE 중에도 표시되지만 중심에서 벗어나 있음)
+- shake → 큰 스윙 ±25deg 댐핑 진동
+- wave → 중간 스윙 ±12deg
+- idle → ±3deg 천천히 진동
 
 ---
 
-## Components
+## 미니게임 레이어 규칙
 
-### Left Panel
+- 각 미니게임은 `display:none ↔ display:block/flex`로 토글
+- `hideMinigameUI(type)`: 즉시 `display:none` (딜레이 없음)
+- init 함수에서 opacity/transform 반드시 리셋
+- z-index 범위: 미니게임 3~10, #typo-block 25, #mg-intro 60
+
+---
+
+## 미니게임별 비주얼
+
+### WIPE IT — 창문 닦기 (wave)
 ```
-┌─────────────────────────┐
-│ SMASH · Gesture UI      │  ← wordmark, 11px mono muted
-│                         │
-│                         │
-│ SHAKE                   │  ← big label, 900 weight
-│ impact detected · #12   │  ← sub label, mono muted
-│                         │
-│                         │
-│ ● connected             │  ← status dot + text
-│ [ r ]  record gesture   │  ← primary button
-│ connect device          │  ← outline button
-└─────────────────────────┘
+#mg-wipe-bg: inset:0; z-index:6
+#wipe-img: inset:5%; 90%×90%; object-fit:cover
+  → window_00.png ~ window_04.png (wave마다 다음 프레임)
+#rag-el: 420px wide; translateX(-500px) 시작 → 오른쪽으로 sweep
+  → 4개 Y 위치 순환; sweep 중간(50%)에 이미지 교체
 ```
 
-### Buttons
+### CRUMPLE! — 종이 구기기 (shake)
+```
+#mg-crumple: flex; align-items:center; justify-content:center; z-index:3
+#paper-el: SVG 서류; transform-origin:center; transition 0.22s
+  → 4단계 변형: skew → 구겨짐 → 둥글게 → 튕겨나감
+  → initCrumple에서 opacity:1 리셋 필수
+```
+
+### SWAT IT! — 파리채 (shake)
+```
+#mg-swat: inset:0; z-index:3
+.fly: 72px×72px; position:absolute; left:0; top:0
+  → transform만으로 이동 (left/top 직접 변경 금지)
+  → 5개 파리, zone-based 배치 (뷰포트 5구역)
+  → .fly.dead: opacity:0; transform:scale(0)
+#swatter-el: 700px wide; transform-origin:top center
+  → 상단에서 slam 애니메이션 (글러브와 동일 패턴)
+```
+
+### BLOW IT! — 구름 날리기 (wave)
+```
+#mg-cloud: inset:0; z-index:3; overflow:hidden
+.cloud-el: 크기 clamp(60vw,70vw,85vw); position:absolute
+  → center-based Y 배치: const y = centerY - cloudH/2
+  → 3행 배치: centerY at 12%, 38%, 65% of vh
+  → cloud.png 7개 배치
+  → .blown: opacity:0; transform:translateX(±1200px)
+#fan-el: 380px; bottom:8%; left:50%; transform-origin:bottom center
+  → 부채질 애니메이션: -55deg → +55deg 왕복
+reveal 순서:
+  → 0ms: sky 페이드인
+  → 1000ms: field translateY(105%→0)
+  → 1600ms: sun translateY(-110%→0)
+  → 4500ms: mgClear
+```
+
+### (비활성) BUBBLE — 뽁뽁이 (shake)
+```
+주석처리됨. MINIGAME_TYPES에서 제외.
+bubble_00~06.png: 전체 화면 cover, shake마다 다음 프레임
+```
+
+---
+
+## 애니메이션 규칙
+
+- `transform`, `opacity`만 사용. `top`/`left`/`width` 직접 애니메이션 금지.
+- 스크린 shake: `#stage.shake` CSS 애니메이션 0.18s
+- Impact word: opacity 0→1 80ms, 400ms 후 fade out
+- 파티클: `spawnParts(x, y, count)` → canvas에 렌더링
+
+---
+
+## WarioWare 지시문 플래시 (`#mg-intro`)
+
 ```css
-/* Primary */
-background: #1a1a18;
-color: #fff;
-border: none;
-padding: 0.7rem 1rem;
-font-family: Geist Mono;
-font-size: 10px;
-letter-spacing: 0.15em;
-text-transform: uppercase;
-
-/* Outline */
-background: transparent;
-color: #1a1a18;
-border: 1px solid rgba(0,0,0,0.12);
-
-/* Hover */
-transform: scale(0.97) on :active
+position:absolute; top:46%; left:50%; z-index:60;
+font-size:clamp(5rem,13vw,10rem); font-weight:900;
+transform:translate(-50%,-50%) scale(0.75); opacity:0;
+transition:opacity 0.1s, transform 0.15s cubic-bezier(0.16,1,0.3,1);
 ```
+- `.show`: opacity:1, scale(1)
+- 900ms 후 fade out → 미니게임 시작
 
-No border-radius (or max 2px). No box-shadow.
+---
 
-### Status Dot
-```css
-width: 6px; height: 6px; border-radius: 50%;
-background: #ccc;                    /* disconnected */
-background: #52c41a;                 /* connected */
+## HUD 상태
+
+| 상태 | dot | status 텍스트 |
+|------|-----|--------------|
+| 미연결 | gray `rgba(30,42,60,0.3)` | DISCONNECTED |
+| 연결됨 | green `#16A34A` | CONNECTED |
+| 녹화중 | green blink | RECORDING |
+
+버튼: `Geist Mono 10px`, uppercase, 흰 배경 pill, `box-shadow:0 1px 3px rgba(0,0,0,0.08)`
+
+---
+
+## 데모용 키보드
+
 ```
-
----
-
-## Assets Required
-
-| File | Description | Source |
-|------|-------------|--------|
-| `sandbag.png` | White canvas sandbag, chain, transparent bg | Image 2, remove.bg |
-| `alarm.png` | Flip clock / alarm clock, transparent bg | Image 3, remove.bg |
-| `email.png` | Email app icon with badge, transparent bg | Image 4, remove.bg |
-| `slack.png` | Slack notification, transparent bg | Custom SVG or screenshot |
-| `invoice.png` | Bill/invoice, transparent bg | Custom SVG |
-
-Recommended: process through [remove.bg](https://remove.bg) for clean transparent PNGs.
-
-Fallback: SVG illustrations if PNGs not available (see `smash.html` SVG definitions).
-
----
-
-## Canvas Particle System
-
-```js
-class Particle {
-  // rect or circle shape
-  // gravity: 0.5
-  // decay: 0.016–0.028
-  // rotation with rotV
-  // vx *= 0.97 per frame (air resistance)
-}
-
-class Ripple {
-  // expanding circle
-  // speed: 9px/frame
-  // alpha decay: 0.01/frame
-}
+1 → shake
+2 → wave
+3 → idle
+r → record (연결 시)
 ```
-
-Animate exclusively via `transform` and `opacity`. No `top`/`left` animation.
-
----
-
-## Interaction States
-
-| State | Big Label | Sub Label | Dot |
-|-------|-----------|-----------|-----|
-| Disconnected | — | awaiting connection | gray |
-| Connected, idle | — | awaiting gesture | green |
-| Recording | RECORDING | … | green, pulse |
-| Shake detected | SHAKE | impact detected · #N | green |
-| Wave detected | WAVE | slice detected · #N | green |
-| Idle detected | IDLE | no gesture · #N | green |
-
----
-
-## Responsive
-
-Desktop only (1280px+ recommended for demo). No mobile support needed.
-Min viable width: 900px.

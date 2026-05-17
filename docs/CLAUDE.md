@@ -1,172 +1,84 @@
-# CLAUDE.md — SMASH Project
+# CLAUDE.md — SMASH
 
-This file tells Claude Code how to work on this project.
+Single-file browser app. No build step. Vanilla HTML/CSS/JS + Canvas.
 
----
-
-## Project
-
-SMASH is a single-page browser app (`smash.html`) that visualizes physical gesture data from a wrist-worn ESP32S3 device. No build step. No framework. Vanilla HTML/CSS/JS + Canvas.
-
----
-
-## Key Files
-
+## Files
 ```
-smash.html          ← THE main deliverable (single file)
-assets/             ← PNG images with transparent backgrounds
-  sandbag.png
-  alarm.png
-  email.png
-  slack.png
-  invoice.png
-smash.ino           ← Arduino firmware (do not modify unless asked)
-gesture_model.h     ← ML model header (do not modify)
-docs/PRD.md         ← Full product spec
-docs/DESIGN.md      ← Visual design spec (READ THIS FIRST)
+smash.html          ← 전체 게임 (HTML+CSS+JS 단일 파일)
+asset/              ← 모든 PNG 에셋 (transparent bg)
+docs/DESIGN.md      ← 비주얼 디자인 스펙
+smash.ino           ← Arduino 펌웨어 (수정 금지)
+gesture_model.h     ← ML 모델 헤더 (수정 금지)
 ```
 
----
+## Stack
+- Vanilla HTML/CSS/JS only. No framework, no bundler.
+- Canvas API: 파티클 시스템
+- Web Serial API: 디바이스 연결 (Chrome only)
+- Google Fonts: Geist + Geist Mono + Playfair Display
 
-## Rules
+## Game Structure
 
-### Always read DESIGN.md before touching smash.html
-Design decisions are documented there. Do not deviate without explicit user instruction.
-
-### Stack
-- Vanilla HTML/CSS/JS only
-- No React, no Vue, no build tools
-- Canvas API for particles and effects
-- Web Serial API for device connection
-- Google Fonts: Geist + Geist Mono (already linked)
-
-### Colors — use exactly these
+**WarioWare 스타일.** 5개 미니게임 중 매 라운드 랜덤 4개 선택.
 ```
-Background:  #E8ECF0
-Text:        #1a1a18
-Muted:       #8a8880
-Border:      rgba(0,0,0,0.08)
-Accent red:  #E53935  (shake)
-Accent blue: #1565C0  (wave)
+샌드백 워밍업 (4~5 shake) → 미니게임 4개 랜덤 → ROUND CLEAR → 반복
 ```
-No other colors without asking.
 
-### Typography rules
-- Geist for UI, Geist Mono for labels/status/counters
-- No Inter, no Roboto, no system fonts
-- No emoji anywhere
-- Uppercase only for Geist Mono short labels (status tags, kbd shortcuts)
-- Sentence case for everything else
+게임 페이즈: `WARMUP` → `MG_INTRO` → `MG_ACTIVE` → `MG_CLEAR` → `ROUND_CLEAR`
 
-### Layout rules
-- Left panel: 260px fixed, `border-right: 1px solid rgba(0,0,0,0.08)`
-- Stage: remaining width, background `#E8ECF0`
-- Sandbag hangs from top of stage, center
-- One stress object active at a time (game loop)
-- Canvas sits behind everything (`z-index: 0`)
+## 미니게임 목록
 
-### Animation rules
-- Animate ONLY `transform` and `opacity` — never `top`, `left`, `width`, `height`
-- Sandbag: pendulum physics (angle + velocity + damping), `transform-origin: top center`
-- Particles: gravity + air resistance, rect and circle shapes
-- No CSS gradients on backgrounds
-- No box-shadow (except ultra-subtle `0 1px 3px rgba(0,0,0,0.04)` on surface elements)
-- No glow, no neon, no blur (except `backdrop-filter` on modal if needed)
+| ID | 지시문 | 제스처 | 상태 |
+|---|---|---|---|
+| `bubble` | POP IT! | shake | **비활성** (주석처리) |
+| `wipe` | WIPE IT! | wave | `window_00~04.png` + `rag.png` |
+| `crumple` | CRUMPLE! | shake | SVG 서류 4단계 변형 |
+| `swat` | SWAT IT! | shake | `fly.png` 5마리 + `swatter.png` |
+| `cloud` | BLOW IT! | wave | `cloud.png` 7개 + `fan.png` + reveal |
 
-### Asset handling
+미니게임 활성/비활성: `MINIGAME_TYPES` 배열에서 주석 처리.
+
+## 에셋 목록
+```
+asset/sandbag.png
+asset/glove_left.png, glove_right.png
+asset/bubble_00~06.png   (비활성)
+asset/window_00~04.png, rag.png
+asset/swatter.png, fly.png
+asset/cloud.png, fan.png, sky.png, field.png, sun.png
+```
+
+## Key JS 구조
 ```js
-// If PNG exists, use it
-<img src="assets/sandbag.png" alt="" />
+const S = { phase, warmupHits, warmupTarget, mgQueue, currentMG, ... }
+const MG = { bubble, wipe, crumple, swat, cloud }  // 게임별 상태
 
-// If PNG missing, fall back to inline SVG
-// SVG fallbacks are defined in smash.html
+function gesture(raw)        // 'shake' | 'wave' | 'idle' 처리
+function initMinigame(type)  // 미니게임 초기화
+function mgClear(type)       // 미니게임 클리어 → 다음으로
+function hideMinigameUI(type)// 즉시 숨김 (display:none)
 ```
 
-Always check if asset file exists before referencing. If `assets/` folder is empty, use SVG fallbacks.
-
-### Web Serial
-```js
-// Connect
-port = await navigator.serial.requestPort();
-await port.open({ baudRate: 115200 });
-
-// Write (trigger record)
-await writer.write('r');
-
-// Read loop — parse gesture labels
-// Valid labels: 'shake', 'wave', 'idle'
-// Ignore: 'READY', 'START', 'END', 'Recording...'
-```
-
-### Game Loop
-```
-State machine:
-IDLE → WAITING → OBJECT_ACTIVE → DESTROYING → PAUSE → OBJECT_ACTIVE → ...
-
-IDLE:          No gesture received yet. Sandbag sways. No object shown.
-WAITING:       Device connected. First object spawning.
-OBJECT_ACTIVE: Object floating near sandbag. Waiting for gesture.
-DESTROYING:    Gesture received. Destruction animation playing.
-PAUSE:         600ms gap. Object gone. Next object loading.
-```
-
-Object queue: `['alarm', 'email', 'slack', 'invoice']` — randomize each cycle.
-
-### Keyboard shortcuts (demo mode — no device needed)
+## 키보드 (데모용)
 ```
 1 → shake
 2 → wave
 3 → idle
-r → trigger record (if device connected)
+r → record (디바이스 연결 시)
 ```
 
----
+## Web Serial
+```js
+port = await navigator.serial.requestPort();
+await port.open({ baudRate: 115200 });
+// 수신: 'shake' | 'wave' | 'idle' (줄바꿈으로 구분)
+// 무시: 'READY', 'START', 'END', 'Recording...'
+// 전송: 'r' (recording 트리거)
+```
 
-## What NOT to do
-
-- Do not add a framework or bundler
-- Do not use localStorage or sessionStorage
-- Do not add more than 2 font families
-- Do not add border-radius > 4px on buttons
-- Do not use `h-screen` — use `min-height: 100dvh` if needed
-- Do not add purple/violet/gradient to anything
-- Do not center the main layout (left-aligned left panel is intentional)
-- Do not add tooltip libraries or icon libraries (use inline SVG for icons)
-- Do not make the UI responsive for mobile (desktop only)
-
----
-
-## Testing Without Device
-
-Open `smash.html` in Chrome. Press `1`, `2`, `3` on keyboard to simulate gestures.
-Do NOT need to connect device to test visuals.
-
----
-
-## Common Tasks
-
-### Add a new stress object
-1. Add PNG to `assets/` folder
-2. Add SVG fallback to `FALLBACK_SVGS` object in smash.html
-3. Add key to `OBJECT_QUEUE` array
-
-### Tune particle physics
-- `gravity`: higher = faster fall (default 0.5)
-- `decay`: higher = faster fade (default 0.018)
-- Count: shake=100, wave=50
-
-### Tune sandbag swing
-- `punchForce`: shake=14, wave=6
-- `damping`: 0.93 (lower = more oscillation)
-
-### Change gesture colors
-Edit CSS variables at top of `<style>` block only.
-
----
-
-## Device Connection Troubleshooting
-
-- Close Arduino IDE Serial Monitor before opening browser (port conflict)
-- Use Chrome only (Firefox/Safari don't support Web Serial)
-- If port not showing: unplug and replug USB, refresh page
-- Baud rate must match firmware: 115200
+## 규칙
+- `transform`, `opacity`만 애니메이션. `top`/`left`/`width` 직접 애니메이션 금지.
+- 미니게임 UI는 `hideMinigameUI()` 로만 숨김 (타이머 지연 없이 즉시).
+- `#typo-block` z-index: 25 (항상 미니게임 위에).
+- 파티클: `spawnParts(x, y, count)` 호출.
+- 디바이스 연결 없이 키보드로 전체 테스트 가능.
