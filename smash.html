@@ -864,8 +864,8 @@ function initSwat() {
     el.dataset.vy = (Math.random()-0.5)*1.2;
     el.dataset.phase = Math.random()*Math.PI*2;
     el.dataset.alive = 'true';
-    el.style.left = el.dataset.x + 'px';
-    el.style.top  = el.dataset.y + 'px';
+    el.style.left = '0'; el.style.top = '0';
+    el.style.transform = `translate(${el.dataset.x}px,${el.dataset.y}px)`;
     wrap.appendChild(el);
     MG.swat.flies.push(el);
   }
