@@ -974,21 +974,21 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  // 구름 중심점을 화면 상/중/하에 고르게 배치
-  // cloud.png aspect ratio ≈ 0.65 (height/width)
   const rows = [0, 0, 0, 1, 1, 2, 2];
-  const rowCY = [0.12, 0.38, 0.65]; // 각 줄 중심 Y 비율
+  // 중심 Y를 구름 크기 고려해서 잘리지 않게 배치
+  const rowCY = [0.28, 0.55, 0.80];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.75, 1100);
+    const maxW = Math.min(W * 0.65, 920);
     const w = maxW * (0.5 + Math.random() * 0.5);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const cloudH = w * 0.65;
     const row = rows[i];
-    const centerY = H * rowCY[row] + (Math.random() - 0.5) * H * 0.1;
+    const centerY = H * rowCY[row] + (Math.random() - 0.5) * H * 0.06;
     const x = (Math.random() - 0.1) * (W - w * 0.7);
-    const y = centerY - cloudH / 2; // top = center - half height
+    // 위/아래 최대 15% 잘림 허용, 하지만 화면 안에 중심이 오도록
+    const y = Math.max(-cloudH * 0.15, centerY - cloudH / 2);
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
     el.dataset.dir = x + w / 2 < W / 2 ? '-1' : '1';
