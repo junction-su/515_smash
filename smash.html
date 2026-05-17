@@ -170,7 +170,12 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #cloud-count {
   position:absolute; bottom:7rem; left:50%; transform:translateX(-50%);
   font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
-  text-transform:uppercase; color:rgba(17,17,16,0.5); z-index:4;
+  text-transform:uppercase; color:rgba(17,17,16,0.5); z-index:11;
+}
+#cloud-bottom-fade {
+  position:absolute; bottom:0; left:0; right:0; height:220px;
+  background:linear-gradient(to top, rgba(255,255,255,0.3) 0%, transparent 100%);
+  z-index:9; pointer-events:none;
 }
 
 /* ── FLY SWATTER ─────────────────────────────────────────── */
@@ -368,6 +373,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
       <img id="reveal-field" src="asset/field.png" alt="">
       <img id="reveal-sun"   src="asset/sun.png"   alt="">
     </div>
+    <div id="cloud-bottom-fade"></div>
     <div id="cloud-count"></div>
   </div>
 
@@ -963,7 +969,7 @@ function handleSwatShake() {
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
 
-const CLOUD_COUNT = 7;
+const CLOUD_COUNT = 9;
 
 function initCloud() {
   const wrap = document.getElementById('mg-cloud');
@@ -974,22 +980,23 @@ function initCloud() {
   MG.cloud.remaining = CLOUD_COUNT;
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
-  const rows = [0, 0, 0, 1, 1, 2, 2];
-  // top edge 기반 3등분: [시작%, 끝%] — 화면을 상/중/하로 나눔
+  const rows = [0, 0, 0, 0, 1, 1, 1, 2, 2]; // 9개: 상4 중3 하2
+  // top edge 기반 3등분
   const rowTopRange = [
-    [0.00, 0.20],  // 상단: top이 화면 0~20%
-    [0.28, 0.48],  // 중단: top이 화면 28~48%
-    [0.58, 0.75],  // 하단: top이 화면 58~75%
+    [0.00, 0.22],  // 상단: top 0~22%
+    [0.30, 0.50],  // 중단: top 30~50%
+    [0.60, 0.75],  // 하단: top 60~75%
   ];
   for (let i = 0; i < CLOUD_COUNT; i++) {
     const el = document.createElement('div');
     el.className = 'cloud-el';
-    const maxW = Math.min(W * 0.55, 800);
-    const w = maxW * (0.5 + Math.random() * 0.5);
+    const maxW = Math.min(W * 0.52, 750);
+    const w = maxW * (0.45 + Math.random() * 0.55);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
     const row = rows[i];
     const [t0, t1] = rowTopRange[row];
-    const x = (Math.random() - 0.1) * (W - w * 0.7);
+    // x: 화면 전체 폭에 고르게 (0~100% - cloud width)
+    const x = Math.random() * (W - w * 0.8);
     const y = H * (t0 + Math.random() * (t1 - t0));
     el.style.left = x + 'px';
     el.style.top  = y + 'px';
