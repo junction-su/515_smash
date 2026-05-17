@@ -90,26 +90,12 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #mg-intro.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
 
 /* ── BUBBLE WRAP ─────────────────────────────────────────── */
-#mg-bubble {
-  position:absolute; inset:0; display:none;
-  flex-direction:column; align-items:center; justify-content:center; gap:24px;
-  z-index:3;
-}
-#bubble-grid {
-  display:grid; grid-template-columns:repeat(5,1fr); gap:18px;
-  width:min(520px,72vw);
-}
-.bubble {
-  width:100%; aspect-ratio:1; border-radius:50%;
-  background:radial-gradient(circle at 35% 35%, #E8EEF8, #B8CADC);
-  box-shadow:inset 0 -4px 8px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06);
-  transition:transform 0.14s cubic-bezier(0.16,1,0.3,1), opacity 0.1s ease;
-  cursor:default; position:relative;
-}
-.bubble.popped { transform:scale(0); opacity:0; }
+#mg-bubble { position:absolute; inset:0; display:none; z-index:3; }
+#bubble-img { width:100%; height:100%; object-fit:cover; display:block; }
 #bubble-count {
+  position:absolute; bottom:7rem; left:50%; transform:translateX(-50%);
   font-family:'Geist Mono',monospace; font-size:13px; letter-spacing:0.22em;
-  text-transform:uppercase; color:var(--dim);
+  text-transform:uppercase; color:rgba(17,17,16,0.5); z-index:4;
 }
 
 /* ── WINDOW WIPE ─────────────────────────────────────────── */
@@ -169,16 +155,18 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 /* ── FLY SWATTER ─────────────────────────────────────────── */
 #mg-swat { position:absolute; inset:0; display:none; z-index:3; }
 .fly {
-  position:absolute; width:52px; height:52px;
+  position:absolute; width:72px; height:72px;
   will-change:transform; pointer-events:none;
-  transition:transform 0.1s ease, opacity 0.1s ease;
+  transition:opacity 0.12s ease;
 }
-.fly.dead { transform:scale(0) !important; opacity:0; }
+.fly img { width:100%; height:100%; object-fit:contain; display:block; }
+.fly.dead { opacity:0; transform:scale(0) !important; }
 #swatter-el {
   position:absolute; pointer-events:none; z-index:10;
-  width:80px; height:160px; display:none;
+  width:300px; height:auto; display:none;
   transform-origin:top center;
 }
+#swatter-el img { width:100%; height:auto; display:block; }
 #swat-count {
   position:absolute; bottom:7rem; left:50%;
   transform:translateX(-50%);
@@ -318,7 +306,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Bubble Wrap -->
   <div id="mg-bubble">
-    <div id="bubble-grid"></div>
+    <img id="bubble-img" src="asset/bubble_00.png" alt="">
     <div id="bubble-count"></div>
   </div>
 
@@ -373,16 +361,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <!-- MG: Fly Swatter -->
   <div id="mg-swat">
     <div id="swatter-el">
-      <svg viewBox="0 0 50 110" fill="none" width="80" height="160">
-        <rect x="2" y="2" width="46" height="55" rx="8" fill="#C8D8A0" stroke="#7A9B50" stroke-width="1.5"/>
-        <line x1="14" y1="2" x2="14" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <line x1="26" y1="2" x2="26" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <line x1="38" y1="2" x2="38" y2="57" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <line x1="2" y1="18" x2="48" y2="18" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <line x1="2" y1="34" x2="48" y2="34" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <line x1="2" y1="50" x2="48" y2="50" stroke="#7A9B50" stroke-width="0.8" opacity="0.7"/>
-        <rect x="21" y="57" width="8" height="50" rx="4" fill="#8A8070" stroke="#6A6058" stroke-width="1"/>
-      </svg>
+      <img src="asset/swatter.png" alt="">
     </div>
     <div id="swat-count"></div>
   </div>
@@ -725,43 +704,33 @@ function showRoundClear() {
 
 // ── MINIGAME: BUBBLE WRAP ─────────────────────────────────────────────────────
 
-function initBubble() {
-  const grid = document.getElementById('bubble-grid');
-  grid.innerHTML = '';
-  MG.bubble.bubbles = [];
-  MG.bubble.remaining = 20;
+const BUBBLE_FRAMES = 7; // bubble_00 … bubble_06
 
-  for (let i=0; i<20; i++) {
-    const b = document.createElement('div');
-    b.className = 'bubble'; b.dataset.id = i;
-    grid.appendChild(b);
-    MG.bubble.bubbles.push({ el: b, popped: false });
-  }
-  document.getElementById('bubble-count').textContent = '20 bubbles left';
+function initBubble() {
+  MG.bubble.frame = 0;
+  const img = document.getElementById('bubble-img');
+  img.src = 'asset/bubble_00.png';
+
+  const rem = BUBBLE_FRAMES - 1;
+  document.getElementById('bubble-count').textContent = `${rem} pops left`;
 
   const wrap = document.getElementById('mg-bubble');
-  wrap.style.display = 'flex'; wrap.style.opacity = '0';
+  wrap.style.display = 'block'; wrap.style.opacity = '0';
   wrap.style.transition = 'opacity 0.3s ease';
   requestAnimationFrame(() => { wrap.style.opacity = '1'; });
 }
 
 function handleBubbleShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'bubble') return;
-  const unpopped = MG.bubble.bubbles.filter(b => !b.popped);
-  if (!unpopped.length) return;
-  const toPop = Math.min(3 + Math.floor(Math.random()*3), unpopped.length);
-  const chosen = shuffle(unpopped).slice(0, toPop);
-  chosen.forEach(b => {
-    b.popped = true; b.el.classList.add('popped');
-    const rect = b.el.getBoundingClientRect();
-    const stageRect = $stage.getBoundingClientRect();
-    spawnParts(rect.left - stageRect.left + rect.width/2, rect.top - stageRect.top + rect.height/2, 8);
-  });
-  MG.bubble.remaining -= chosen.length;
+  if (MG.bubble.frame >= BUBBLE_FRAMES - 1) return;
+  MG.bubble.frame++;
+  const f = String(MG.bubble.frame).padStart(2, '0');
+  document.getElementById('bubble-img').src = `asset/bubble_${f}.png`;
+  const rem = BUBBLE_FRAMES - 1 - MG.bubble.frame;
   document.getElementById('bubble-count').textContent =
-    MG.bubble.remaining > 0 ? `${MG.bubble.remaining} left` : 'DONE!';
+    rem > 0 ? `${rem} pops left` : 'DONE!';
   animImpact(WORDS_POP[Math.floor(Math.random()*WORDS_POP.length)]);
-  if (MG.bubble.remaining <= 0) setTimeout(() => mgClear('bubble'), 400);
+  if (MG.bubble.frame >= BUBBLE_FRAMES - 1) setTimeout(() => mgClear('bubble'), 350);
 }
 
 // ── MINIGAME: WINDOW WIPE ─────────────────────────────────────────────────────
@@ -865,14 +834,7 @@ function handleCrumpleShake() {
 
 // ── MINIGAME: FLY SWATTER ─────────────────────────────────────────────────────
 
-const FLY_SVG = `<svg viewBox="0 0 32 32" fill="none" width="52" height="52">
-  <ellipse cx="10" cy="13" rx="9" ry="5" fill="#C8D4DC" opacity="0.75" transform="rotate(-20 10 13)"/>
-  <ellipse cx="22" cy="13" rx="9" ry="5" fill="#C8D4DC" opacity="0.75" transform="rotate(20 22 13)"/>
-  <ellipse cx="16" cy="19" rx="5.5" ry="7" fill="#1E1C18"/>
-  <circle cx="16" cy="11" r="4.5" fill="#1E1C18"/>
-  <circle cx="13.5" cy="10" r="1.4" fill="#C8201C"/>
-  <circle cx="18.5" cy="10" r="1.4" fill="#C8201C"/>
-</svg>`;
+const FLY_HTML = `<img src="asset/fly.png" alt="" draggable="false">`;
 
 let flyAnimFrame = null;
 
@@ -887,7 +849,7 @@ function initSwat() {
   for (let i=0; i<5; i++) {
     const el = document.createElement('div');
     el.className = 'fly';
-    el.innerHTML = FLY_SVG;
+    el.innerHTML = FLY_HTML;
     el.dataset.x = 100 + Math.random() * (W - 200);
     el.dataset.y = 100 + Math.random() * (H - 300);
     el.dataset.vx = (Math.random()-0.5)*1.2;
@@ -933,20 +895,24 @@ function handleSwatShake() {
   const sy = 80 + Math.random() * (H - 280);
   const RADIUS = 130;
 
-  // Show swatter
+  // Show swatter — slam in like glove
   const swEl = document.getElementById('swatter-el');
-  swEl.style.left = (sx - 40) + 'px';
-  swEl.style.top  = (sy - 10) + 'px';
-  swEl.style.display='block'; swEl.style.opacity='1';
-  swEl.style.transform='rotate(-30deg) scale(0.6)';
-  swEl.style.transition='transform 0.12s cubic-bezier(0.16,1,0.3,1), opacity 0.1s ease';
-  requestAnimationFrame(()=>{
-    swEl.style.transform='rotate(0deg) scale(1)';
-    setTimeout(()=>{
-      swEl.style.opacity='0';
-      setTimeout(()=>{ swEl.style.display='none'; }, 200);
+  swEl.style.left = (sx - 150) + 'px'; // center 300px swatter
+  swEl.style.top  = (sy - 80) + 'px';
+  swEl.style.transition = 'none';
+  swEl.style.transform = 'translateY(-280px) rotate(-20deg) scale(0.7)';
+  swEl.style.opacity = '0'; swEl.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    swEl.style.transition = 'transform 0.14s cubic-bezier(0.16,1,0.3,1), opacity 0.08s ease';
+    swEl.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+    swEl.style.opacity = '1';
+    setTimeout(() => {
+      swEl.style.transition = 'transform 0.3s cubic-bezier(0.4,0,0.8,1), opacity 0.18s ease 0.1s';
+      swEl.style.transform = 'translateY(-240px) rotate(15deg) scale(0.6)';
+      swEl.style.opacity = '0';
+      setTimeout(() => { swEl.style.display = 'none'; }, 350);
     }, 200);
-  });
+  }));
 
   // Hit check
   let hit = false;
