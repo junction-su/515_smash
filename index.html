@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SMASH</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,21 +59,21 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   transform:translateX(-50%); transform-origin:top center;
   z-index:2; pointer-events:none; will-change:transform;
 }
-#bag-cord { display:block; margin:0 auto; width:1px; height:60px;
+#bag-cord { display:block; margin:0 auto; width:1px; height:clamp(28px,5vh,60px);
   background:linear-gradient(to bottom,#B0ACA4,#989088); }
 #bag-img {
-  display:block; height:clamp(420px,68dvh,820px); width:auto; margin:0 auto;
+  display:block; height:clamp(200px,52dvh,820px); width:auto; margin:0 auto;
   filter:drop-shadow(0 32px 64px rgba(17,17,16,0.16)); will-change:transform;
 }
 
 /* ── BOXING GLOVE ────────────────────────────────────────── */
 #glove-wrap {
-  position:absolute; top:calc(60px + 42dvh); left:50%;
+  position:absolute; top:calc(clamp(28px,5vh,60px) + 42dvh); left:50%;
   transform:translateX(-50%);
   z-index:4; pointer-events:none; will-change:transform,opacity;
   display:none; opacity:0;
 }
-#glove-img { display:block; width:200px; height:auto;
+#glove-img { display:block; width:clamp(100px,15vw,200px); height:auto;
   filter:drop-shadow(0 10px 24px rgba(17,17,16,0.20)); }
 
 /* ── WARIOWARE INTRO FLASH ───────────────────────────────── */
@@ -101,7 +101,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #hint-icon { display:flex; align-items:center; justify-content:center; }
 #hint-icon svg { overflow:visible; }
 #hint-label {
-  font-family:'Geist Mono',monospace; font-size:11px; font-weight:500;
+  font-family:'Geist Mono',monospace; font-size:clamp(9px,1.2vw,11px); font-weight:500;
   letter-spacing:0.28em; text-transform:uppercase; color:var(--dim);
 }
 @keyframes smash-hint {
@@ -133,8 +133,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 #rag-el {
   position:absolute; top:50%; left:0;
-  transform:translateX(-500px) translateY(-50%);
-  width:420px; height:auto; z-index:10; pointer-events:none;
+  transform:translateX(calc(-100% - 80px)) translateY(-50%);
+  width:clamp(200px,33vw,420px); height:auto; z-index:10; pointer-events:none;
 }
 #rag-el img { width:100%; height:auto; display:block; }
 #wipe-progress {
@@ -164,7 +164,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   z-index:5; pointer-events:none;
   transition:opacity 0.15s ease;
 }
-#crumple-hand img { display:block; filter:drop-shadow(0 4px 12px rgba(17,17,16,0.15)); }
+#crumple-hand img { display:block; width:clamp(120px,21vw,267px); height:auto; filter:drop-shadow(0 4px 12px rgba(17,17,16,0.15)); }
 
 /* ── CRUMPLE TRASH ───────────────────────────────────────── */
 #crumple-trash {
@@ -174,7 +174,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
 }
 #crumple-trash.show { transform:translateY(0); opacity:1; }
-#crumple-trash img { display:block; width:560px; height:auto; }
+#crumple-trash img { display:block; width:clamp(240px,44vw,560px); height:auto; }
 
 /* ── CLOUD BLOW ──────────────────────────────────────────── */
 #mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
@@ -186,8 +186,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .cloud-el.blown { opacity:0; }
 #fan-el {
   position:absolute; pointer-events:none; z-index:10;
-  width:380px; height:auto; display:none;
-  bottom:22%; left:50%; margin-left:-190px;
+  width:clamp(180px,30vw,380px); height:auto; display:none;
+  bottom:22%; left:50%; transform:translateX(-50%) rotate(0deg);
   transform-origin:bottom center;
 }
 #fan-el img { width:100%; display:block; }
@@ -218,7 +218,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   text-transform:uppercase; color:rgba(17,17,16,0.5); z-index:11;
 }
 #cloud-bottom-fade {
-  position:absolute; bottom:0; left:0; right:0; height:220px;
+  position:absolute; bottom:0; left:0; right:0; height:clamp(80px,17vh,220px);
   background:linear-gradient(to top, rgba(255,255,255,0.5) 0%, transparent 100%);
   z-index:9; pointer-events:none;
 }
@@ -226,7 +226,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 /* ── FLY SWATTER ─────────────────────────────────────────── */
 #mg-swat { position:absolute; inset:0; display:none; z-index:3; }
 .fly {
-  position:absolute; width:72px; height:72px;
+  position:absolute; width:clamp(36px,5.6vmin,72px); height:clamp(36px,5.6vmin,72px);
   will-change:transform; pointer-events:none;
   transition:opacity 0.12s ease;
 }
@@ -234,7 +234,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .fly.dead { opacity:0; transform:scale(0) !important; }
 #swatter-el {
   position:absolute; pointer-events:none; z-index:10;
-  width:700px; height:auto; display:none;
+  width:clamp(320px,55vw,700px); height:auto; display:none;
   transform-origin:top center;
 }
 #swatter-el img { width:100%; height:auto; display:block; }
@@ -336,6 +336,26 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.24em;
   text-transform:uppercase; color:var(--dim);
 }
+
+/* ── TOUCH BUTTONS ───────────────────────────────────────── */
+#touch-btns {
+  position:absolute; bottom:5rem; left:50%;
+  transform:translateX(-50%);
+  display:none; gap:12px; z-index:30;
+}
+#touch-btns button {
+  font-family:'Geist',sans-serif; font-weight:900; font-size:1rem;
+  letter-spacing:0.06em; text-transform:uppercase;
+  color:#FFFFFF; background:var(--ink); border:none; border-radius:100px;
+  padding:14px 32px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:transform 0.08s, opacity 0.08s;
+}
+#touch-btns button:active { transform:scale(0.94); opacity:0.8; }
+#touch-swipe { background:rgba(17,17,16,0.55); }
+@media (hover:none) and (pointer:coarse) {
+  #touch-btns { display:flex; }
+  #hud-hint { display:none; }
+}
 </style>
 </head>
 <body>
@@ -394,7 +414,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Paper Crumple -->
   <div id="mg-crumple">
-    <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.png" width="267" height="auto" draggable="false"></div>
+    <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.png" draggable="false"></div>
     <div id="crumple-trash"><img id="crumple-trash-img" src="asset/trash.png" draggable="false"></div>
     <div id="paper-el">
       <img id="crumple-img" src="asset/crumple_00.png" draggable="false"
@@ -444,6 +464,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
       <button id="hud-btn">connect device</button>
     </div>
     <div id="hud-hint">keyboard: 1 smash · 2 swipe</div>
+  </div>
+  <div id="touch-btns">
+    <button id="touch-smash">SMASH</button>
+    <button id="touch-swipe">SWIPE</button>
   </div>
 </div>
 
@@ -813,7 +837,7 @@ function initWipe() {
 
   const ragEl = document.getElementById('rag-el');
   ragEl.style.transition = 'none';
-  ragEl.style.transform = 'translateX(-500px) translateY(-50%)';
+  ragEl.style.transform = 'translateX(calc(-100% - 80px)) translateY(-50%)';
   ragEl.style.top = '50%';
 
   const bgEl = document.getElementById('mg-wipe-bg');
@@ -1044,7 +1068,7 @@ function handleSwatShake() {
 
   // Show swatter — slam in like glove
   const swEl = document.getElementById('swatter-el');
-  swEl.style.left = (sx - 350) + 'px'; // center 700px swatter
+  swEl.style.left = (sx - swEl.offsetWidth / 2) + 'px';
   swEl.style.top  = (sy - 80) + 'px';
   swEl.style.transition = 'none';
   swEl.style.transform = 'translateY(-280px) rotate(-20deg) scale(0.7)';
@@ -1150,15 +1174,14 @@ function showFanSweep() {
   fanEl.style.display = 'block';
   fanEl.style.opacity = '0';
   fanEl.style.transition = 'none';
-  fanEl.style.transform = 'rotate(-55deg)';
+  fanEl.style.transform = 'translateX(-50%) rotate(-55deg)';
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    // fade in + swing right
     fanEl.style.transition = 'transform 0.18s ease-out, opacity 0.12s ease';
     fanEl.style.opacity = '1';
-    fanEl.style.transform = 'rotate(-55deg)';
+    fanEl.style.transform = 'translateX(-50%) rotate(-55deg)';
     setTimeout(() => {
       fanEl.style.transition = 'transform 0.36s cubic-bezier(0.4,0,0.2,1)';
-      fanEl.style.transform = 'rotate(55deg)';
+      fanEl.style.transform = 'translateX(-50%) rotate(55deg)';
       setTimeout(() => {
         fanEl.style.transition = 'opacity 0.2s ease';
         fanEl.style.opacity = '0';
@@ -1309,6 +1332,9 @@ $hudBtn.addEventListener('click', () => {
     setConnUI(false); S.connected=false; S.port=null; S.writer=null;
   } else connectSerial();
 });
+
+document.getElementById('touch-smash').addEventListener('click', () => gesture('shake'));
+document.getElementById('touch-swipe').addEventListener('click', () => gesture('wave'));
 </script>
 </body>
 </html>
