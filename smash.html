@@ -78,7 +78,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 /* ── WARIOWARE INTRO FLASH ───────────────────────────────── */
 #mg-intro {
-  position:absolute; top:46%; left:50%;
+  position:absolute; top:42%; left:50%;
   transform:translate(-50%,-50%) scale(0.75);
   z-index:60; pointer-events:none;
   font-family:'Geist',sans-serif; font-weight:900;
@@ -88,6 +88,32 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   transition:opacity 0.1s ease, transform 0.15s cubic-bezier(0.16,1,0.3,1);
 }
 #mg-intro.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+/* ── GESTURE HINT ────────────────────────────────────────── */
+#mg-gesture-hint {
+  position:absolute; top:58%; left:50%;
+  transform:translateX(-50%);
+  z-index:60; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  opacity:0; transition:opacity 0.12s ease;
+}
+#mg-gesture-hint.show { opacity:1; }
+#hint-icon { display:flex; align-items:center; justify-content:center; }
+#hint-icon svg { overflow:visible; }
+#hint-label {
+  font-family:'Geist Mono',monospace; font-size:11px; font-weight:500;
+  letter-spacing:0.28em; text-transform:uppercase; color:var(--dim);
+}
+@keyframes smash-hint {
+  0%,100% { transform:translateY(0) rotate(0deg); }
+  20%     { transform:translateY(-20px) rotate(-10deg); }
+  50%     { transform:translateY(14px)  rotate(6deg); }
+  80%     { transform:translateY(-10px) rotate(-5deg); }
+}
+@keyframes swipe-hint {
+  0%,100% { transform:translateX(-32px) rotate(-12deg); }
+  55%     { transform:translateX(32px)  rotate(12deg); }
+}
 
 /* ── BUBBLE WRAP ─────────────────────────────────────────── */
 #mg-bubble { position:absolute; inset:0; display:none; z-index:3; }
@@ -329,6 +355,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- WarioWare intro flash -->
   <div id="mg-intro"></div>
+  <div id="mg-gesture-hint">
+    <div id="hint-icon"></div>
+    <span id="hint-label"></span>
+  </div>
 
   <!-- MG: Bubble Wrap -->
   <div id="mg-bubble">
@@ -415,6 +445,24 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 const MINIGAME_TYPES = [/*'bubble',*/ 'wipe', 'crumple', 'swat', 'cloud'];
 
+// 손 모양 SVG (라인아트, stroke only)
+const FIST_SVG = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="16" y="26" width="32" height="22" rx="6" stroke="#111110" stroke-width="2.5"/>
+  <rect x="20" y="18" width="7" height="12" rx="3.5" stroke="#111110" stroke-width="2.5"/>
+  <rect x="29" y="16" width="7" height="14" rx="3.5" stroke="#111110" stroke-width="2.5"/>
+  <rect x="38" y="18" width="7" height="12" rx="3.5" stroke="#111110" stroke-width="2.5"/>
+  <path d="M16 34 Q12 34 12 38 L12 44 Q12 48 16 48" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
+</svg>`;
+
+const PALM_SVG = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="22" y="28" width="20" height="24" rx="5" stroke="#111110" stroke-width="2.5"/>
+  <rect x="14" y="22" width="6" height="18" rx="3" stroke="#111110" stroke-width="2.5"/>
+  <rect x="22" y="16" width="6" height="16" rx="3" stroke="#111110" stroke-width="2.5"/>
+  <rect x="30" y="14" width="6" height="18" rx="3" stroke="#111110" stroke-width="2.5"/>
+  <rect x="38" y="16" width="6" height="16" rx="3" stroke="#111110" stroke-width="2.5"/>
+  <path d="M42 28 Q46 28 46 32 L46 38 Q46 42 42 42" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
+</svg>`;
+
 const MG_INTRO_LABELS = {
   bubble:  'POP IT!',
   wipe:    'WIPE IT!',
@@ -470,6 +518,9 @@ const $ghost    = document.getElementById('ghost');
 const $typoScript = document.getElementById('typo-script');
 const $typoBold   = document.getElementById('typo-bold');
 const $mgIntro  = document.getElementById('mg-intro');
+const $mgGestureHint = document.getElementById('mg-gesture-hint');
+const $hintIcon = document.getElementById('hint-icon');
+const $hintLabel= document.getElementById('hint-label');
 const $impact   = document.getElementById('impact');
 const $impWord  = document.getElementById('impact-word');
 const $cleared  = document.getElementById('cleared');
@@ -655,13 +706,22 @@ function startNextMinigame() {
   S.currentMG = type;
   S.phase = 'MG_INTRO';
 
-  // WarioWare flash
+  // WarioWare flash + 제스처 힌트
   $mgIntro.textContent = MG_INTRO_LABELS[type];
   $mgIntro.classList.add('show');
+  const isSmash = ['crumple','swat','bubble'].includes(type);
+  $hintIcon.innerHTML = isSmash ? FIST_SVG : PALM_SVG;
+  $hintIcon.style.animation = isSmash
+    ? 'smash-hint 0.38s ease-in-out infinite'
+    : 'swipe-hint 0.85s cubic-bezier(0.4,0,0.2,1) infinite';
+  $hintLabel.textContent = isSmash ? 'SMASH' : 'SWIPE';
+  $mgGestureHint.classList.add('show');
   setTimeout(() => {
     $mgIntro.classList.remove('show');
+    $mgGestureHint.classList.remove('show');
+    $hintIcon.style.animation = '';
     setTimeout(() => initMinigame(type), 150);
-  }, 900);
+  }, 1100);
 }
 
 function initMinigame(type) {
