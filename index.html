@@ -157,6 +157,25 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 #paper-el svg { display:block; }
 
+/* ── CRUMPLE HAND ────────────────────────────────────────── */
+#crumple-hand {
+  position:absolute; bottom:10%; left:50%;
+  transform:translateX(-50%);
+  z-index:5; pointer-events:none;
+  transition:opacity 0.15s ease;
+}
+#crumple-hand img { display:block; filter:drop-shadow(0 4px 12px rgba(17,17,16,0.15)); }
+
+/* ── CRUMPLE TRASH ───────────────────────────────────────── */
+#crumple-trash {
+  position:absolute; right:8%; bottom:12%;
+  z-index:5; pointer-events:none;
+  transform:translateY(80px); opacity:0;
+  transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+}
+#crumple-trash.show { transform:translateY(0); opacity:1; }
+#crumple-trash img { display:block; width:88px; height:auto; }
+
 /* ── CLOUD BLOW ──────────────────────────────────────────── */
 #mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
 .cloud-el {
@@ -375,6 +394,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Paper Crumple -->
   <div id="mg-crumple">
+    <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.svg" width="72" height="72" draggable="false"></div>
+    <div id="crumple-trash"><img id="crumple-trash-img" src="asset/trash.svg" draggable="false"></div>
     <div id="paper-el">
       <svg width="340" height="460" viewBox="0 0 92 122" fill="none">
         <rect x="4" y="4" width="84" height="114" rx="3" fill="#FAFAF8" stroke="#C8C3BC" stroke-width="1.2"/>
@@ -443,7 +464,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────────────────
 
-const MINIGAME_TYPES = [/*'bubble',*/ 'wipe', 'crumple', 'swat', 'cloud'];
+const MINIGAME_TYPES = ['bubble', 'wipe', 'crumple', 'swat', 'cloud'];
 
 // 제스처 힌트 SVG — asset/fist.svg, asset/palm.svg 파일로 교체 가능
 const FIST_SVG = `<img src="asset/fist.svg" width="64" height="64" draggable="false">`;
@@ -464,12 +485,13 @@ const WORDS_SWAT  = ['SWAT!', 'GOT IT!', 'ZAP!'];
 const WORDS_CRUMPLE = ['CRUNCH!', 'DONE!', 'GONE!'];
 const WORDS_CLOUD = ['WOOSH!', 'GONE!', 'CLEAR!', 'YEAH!'];
 
-// Paper crumple stages (transform + border-radius)
+// Paper crumple stages (transform + border-radius) — 5 stages, 4 smashes then fly-off
 const CRUMPLE_STAGES = [
-  { t: 'none',                                              r: '4px' },
-  { t: 'rotate(4deg) skewX(2deg) scale(0.95)',             r: '6px' },
-  { t: 'rotate(-9deg) skewX(-5deg) scale(0.80)',           r: '12px' },
-  { t: 'rotate(20deg) scale(0.58) skewX(8deg)',            r: '42%' },
+  { t: 'none',                                                    r: '4px'  },
+  { t: 'rotate(5deg) skewX(3deg) scale(0.93)',                   r: '8px'  },
+  { t: 'rotate(-12deg) skewX(-6deg) scale(0.78)',                r: '16px' },
+  { t: 'rotate(22deg) skewX(10deg) scale(0.56)',                 r: '34%'  },
+  { t: 'rotate(-32deg) skewX(-14deg) scale(0.36)',               r: '50%'  },
 ];
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
@@ -880,7 +902,19 @@ function initCrumple() {
   el.style.transition = 'none';
   el.style.transform = CRUMPLE_STAGES[0].t;
   el.style.borderRadius = CRUMPLE_STAGES[0].r;
-  el.style.opacity = '1'; // reset from previous fly-off
+  el.style.opacity = '1';
+
+  // Reset hand
+  const handEl = document.getElementById('crumple-hand');
+  const handImg = document.getElementById('crumple-hand-img');
+  if (handEl) handEl.style.opacity = '1';
+  if (handImg) handImg.src = 'asset/hand_open.svg';
+
+  // Reset trash
+  const trashEl = document.getElementById('crumple-trash');
+  const trashImg = document.getElementById('crumple-trash-img');
+  if (trashEl) trashEl.classList.remove('show');
+  if (trashImg) trashImg.src = 'asset/trash.svg';
 
   const wrap = document.getElementById('mg-crumple');
   wrap.style.display = 'flex'; wrap.style.opacity = '0';
@@ -888,11 +922,19 @@ function initCrumple() {
   requestAnimationFrame(() => { wrap.style.opacity = '1'; });
 }
 
+function flashCrumpleHand() {
+  const img = document.getElementById('crumple-hand-img');
+  if (!img) return;
+  img.src = 'asset/hand_close.svg';
+  setTimeout(() => { img.src = 'asset/hand_open.svg'; }, 200);
+}
+
 function handleCrumpleShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'crumple') return;
   MG.crumple.stage++;
   const el = document.getElementById('paper-el');
   animImpact(WORDS_CRUMPLE[Math.floor(Math.random()*WORDS_CRUMPLE.length)]);
+  flashCrumpleHand();
 
   if (MG.crumple.stage < CRUMPLE_STAGES.length) {
     const st = CRUMPLE_STAGES[MG.crumple.stage];
@@ -900,17 +942,39 @@ function handleCrumpleShake() {
     el.style.transform = st.t;
     el.style.borderRadius = st.r;
   } else {
-    // Final: fly off
-    const W = $stage.offsetWidth, H = $stage.offsetHeight;
-    const tx = (Math.random() - 0.5) * W * 1.4;
-    const ty = -(H * 0.8 + Math.random() * H * 0.4);
-    el.style.transition = 'transform 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease 0.15s';
-    el.style.transform = `${CRUMPLE_STAGES[CRUMPLE_STAGES.length-1].t} translate(${tx}px,${ty}px) rotate(${(Math.random()-0.5)*540}deg) scale(0.05)`;
-    el.style.opacity = '0';
-    const rect = el.getBoundingClientRect();
-    const sr = $stage.getBoundingClientRect();
-    spawnParts(rect.left - sr.left + rect.width/2, rect.top - sr.top + rect.height/2, 70);
-    setTimeout(() => mgClear('crumple'), 600);
+    // Final: fly into trash can
+    const trashEl = document.getElementById('crumple-trash');
+    const trashImg = document.getElementById('crumple-trash-img');
+    const handEl = document.getElementById('crumple-hand');
+
+    // Hide hand
+    if (handEl) handEl.style.opacity = '0';
+
+    // Show trash can
+    if (trashEl) trashEl.classList.add('show');
+
+    setTimeout(() => {
+      // Open lid
+      if (trashImg) trashImg.src = 'asset/trash_open.svg';
+
+      // Fly paper into trash
+      const trashRect = trashEl ? trashEl.getBoundingClientRect() : null;
+      const sr = $stage.getBoundingClientRect();
+      const tx = trashRect ? (trashRect.left - sr.left + trashRect.width/2 - $stage.offsetWidth/2) : 200;
+      const ty = trashRect ? (trashRect.top - sr.top - $stage.offsetHeight/2 + 40) : 300;
+      const rect = el.getBoundingClientRect();
+      spawnParts(rect.left - sr.left + rect.width/2, rect.top - sr.top + rect.height/2, 50);
+
+      el.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease 0.2s';
+      el.style.transform = `${CRUMPLE_STAGES[CRUMPLE_STAGES.length-1].t} translate(${tx}px,${ty}px) scale(0.08)`;
+      el.style.opacity = '0';
+
+      // Close lid after paper lands
+      setTimeout(() => {
+        if (trashImg) trashImg.src = 'asset/trash.svg';
+        setTimeout(() => mgClear('crumple'), 400);
+      }, 520);
+    }, 300);
   }
 }
 
