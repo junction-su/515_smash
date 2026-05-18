@@ -168,13 +168,13 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 /* ── CRUMPLE TRASH ───────────────────────────────────────── */
 #crumple-trash {
-  position:absolute; right:8%; bottom:12%;
+  position:absolute; right:-4%; bottom:8%;
   z-index:5; pointer-events:none;
   transform:translateY(80px); opacity:0;
   transition:transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
 }
 #crumple-trash.show { transform:translateY(0); opacity:1; }
-#crumple-trash img { display:block; width:704px; height:auto; }
+#crumple-trash img { display:block; width:560px; height:auto; }
 
 /* ── CLOUD BLOW ──────────────────────────────────────────── */
 #mg-cloud { position:absolute; inset:0; display:none; z-index:3; overflow:hidden; }
@@ -394,11 +394,11 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Paper Crumple -->
   <div id="mg-crumple">
-    <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.png" width="800" height="auto" draggable="false"></div>
+    <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.png" width="267" height="auto" draggable="false"></div>
     <div id="crumple-trash"><img id="crumple-trash-img" src="asset/trash.png" draggable="false"></div>
     <div id="paper-el">
       <img id="crumple-img" src="asset/crumple_00.png" draggable="false"
-           style="height:clamp(320px,55dvh,620px);width:auto;display:block;">
+           style="height:clamp(480px,72dvh,860px);width:auto;display:block;">
     </div>
   </div>
 
