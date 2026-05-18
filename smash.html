@@ -436,7 +436,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
       <div id="hud-sep"></div>
       <button id="hud-btn">connect device</button>
     </div>
-    <div id="hud-hint">keyboard: 1 shake · 2 wave · 3 idle</div>
+    <div id="hud-hint">keyboard: 1 smash · 2 swipe</div>
   </div>
 </div>
 
@@ -445,23 +445,9 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 const MINIGAME_TYPES = [/*'bubble',*/ 'wipe', 'crumple', 'swat', 'cloud'];
 
-// 손 모양 SVG (라인아트, stroke only)
-const FIST_SVG = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="16" y="26" width="32" height="22" rx="6" stroke="#111110" stroke-width="2.5"/>
-  <rect x="20" y="18" width="7" height="12" rx="3.5" stroke="#111110" stroke-width="2.5"/>
-  <rect x="29" y="16" width="7" height="14" rx="3.5" stroke="#111110" stroke-width="2.5"/>
-  <rect x="38" y="18" width="7" height="12" rx="3.5" stroke="#111110" stroke-width="2.5"/>
-  <path d="M16 34 Q12 34 12 38 L12 44 Q12 48 16 48" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
-</svg>`;
-
-const PALM_SVG = `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="22" y="28" width="20" height="24" rx="5" stroke="#111110" stroke-width="2.5"/>
-  <rect x="14" y="22" width="6" height="18" rx="3" stroke="#111110" stroke-width="2.5"/>
-  <rect x="22" y="16" width="6" height="16" rx="3" stroke="#111110" stroke-width="2.5"/>
-  <rect x="30" y="14" width="6" height="18" rx="3" stroke="#111110" stroke-width="2.5"/>
-  <rect x="38" y="16" width="6" height="16" rx="3" stroke="#111110" stroke-width="2.5"/>
-  <path d="M42 28 Q46 28 46 32 L46 38 Q46 42 42 42" stroke="#111110" stroke-width="2.5" stroke-linecap="round"/>
-</svg>`;
+// 제스처 힌트 SVG — asset/fist.svg, asset/palm.svg 파일로 교체 가능
+const FIST_SVG = `<img src="asset/fist.svg" width="64" height="64" draggable="false">`;
+const PALM_SVG = `<img src="asset/palm.svg" width="64" height="64" draggable="false">`;
 
 const MG_INTRO_LABELS = {
   bubble:  'POP IT!',
@@ -1165,9 +1151,8 @@ function handleCloudWave() {
 
 function showCloudReveal() {
   document.getElementById('reveal-sky').classList.add('show');
-  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 1000);
-  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 1600);
-  // field 위에 텍스트 오버레이 (mg-cloud 숨기기 전에)
+  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 500);
+  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 900);
   setTimeout(() => {
     $ghost.textContent = 'YES';
     document.getElementById('cleared-script').textContent = 'Sunshine';
@@ -1175,8 +1160,7 @@ function showCloudReveal() {
     document.getElementById('cleared-sub').textContent = 'skies are bright';
     $cleared.style.transition = 'opacity 0.4s ease';
     $cleared.style.opacity = '1';
-  }, 2800);
-  // 텍스트 + field 함께 있다가 페이드아웃 후 다음 게임으로
+  }, 2000);
   setTimeout(() => {
     $cleared.style.opacity = '0';
     setTimeout(() => {
@@ -1184,7 +1168,7 @@ function showCloudReveal() {
       hideMinigameUI('cloud');
       setTimeout(startNextMinigame, 300);
     }, 400);
-  }, 4800);
+  }, 3600);
 }
 
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
