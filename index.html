@@ -564,17 +564,18 @@ const particles = [];
 class Particle {
   constructor(x, y, dir = 0) {
     this.x = x; this.y = y;
-    this.shape = Math.random() < 0.5 ? 'rect' : 'circle';
-    this.size  = 4 + Math.random() * 8;
-    const spd  = 4 + Math.random() * 13;
+    this.shape = Math.random() < 0.7 ? 'rect' : 'circle';
+    this.size  = 5 + Math.random() * 10;
+    this.flat  = 0.35 + Math.random() * 0.25; // ribbon flatness
+    const spd  = 5 + Math.random() * 14;
     const ang  = Math.random() * Math.PI * 2;
     this.vx = Math.cos(ang) * spd + dir * 3;
-    this.vy = Math.sin(ang) * spd - 5;
-    this.g = 0.48; this.alpha = 1;
-    this.decay = 0.013 + Math.random() * 0.01;
+    this.vy = Math.sin(ang) * spd - 6;
+    this.g = 0.45; this.alpha = 1;
+    this.decay = 0.012 + Math.random() * 0.009;
     this.rot = Math.random() * Math.PI * 2;
-    this.rotV = (Math.random() - 0.5) * 0.3;
-    const pal = ['#111110','#8A8880','#C8C4BE','#E8E4DE','#FAFAF8','#D4351C'];
+    this.rotV = (Math.random() - 0.5) * 0.45;
+    const pal = ['#FF4B4B','#FF8C00','#FFD600','#00C853','#2979FF','#AA00FF','#FF2D78','#00E5FF'];
     this.color = pal[Math.floor(Math.random() * pal.length)];
   }
   update() {
@@ -587,7 +588,7 @@ class Particle {
     if (this.alpha <= 0) return;
     c.save(); c.globalAlpha = this.alpha; c.fillStyle = this.color;
     c.translate(this.x, this.y); c.rotate(this.rot);
-    if (this.shape === 'rect') c.fillRect(-this.size/2, -this.size/2, this.size, this.size*0.55);
+    if (this.shape === 'rect') c.fillRect(-this.size/2, -this.size/2, this.size, this.size*this.flat);
     else { c.beginPath(); c.arc(0,0,this.size/2,0,Math.PI*2); c.fill(); }
     c.restore();
   }
@@ -969,6 +970,9 @@ function handleCrumpleShake() {
     if (handEl) handEl.style.opacity = '0';
     if (trashEl) trashEl.classList.add('show');
 
+    // preload trash_open so the swap is instant
+    const _preload = new Image(); _preload.src = 'asset/trash_open.png';
+
     setTimeout(() => {
       if (trashImg) trashImg.src = 'asset/trash_open.png';
 
@@ -986,8 +990,8 @@ function handleCrumpleShake() {
       setTimeout(() => {
         if (trashImg) trashImg.src = 'asset/trash.png';
         setTimeout(() => mgClear('crumple'), 400);
-      }, 520);
-    }, 300);
+      }, 550);
+    }, 480);
   }
 }
 
@@ -1063,10 +1067,10 @@ function handleSwatShake() {
   // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
   const alive = MG.swat.flies.filter(el => el.dataset.alive === 'true');
   let sx, sy;
-  if (alive.length > 0 && Math.random() < 0.70) {
+  if (alive.length > 0 && Math.random() < 0.85) {
     const t = alive[Math.floor(Math.random() * alive.length)];
-    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 160;
-    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 160;
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 120;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 120;
     sx = Math.max(80, Math.min(W - 80, sx));
     sy = Math.max(80, Math.min(H - 280, sy));
   } else {
@@ -1074,7 +1078,7 @@ function handleSwatShake() {
     sy = 80 + Math.random() * (H - 280);
   }
   const swEl = document.getElementById('swatter-el');
-  const RADIUS = swEl.offsetWidth * 0.28;
+  const RADIUS = swEl.offsetWidth * 0.32;
 
   // Show swatter — slam in like glove
   swEl.style.left = (sx - swEl.offsetWidth / 2) + 'px';
