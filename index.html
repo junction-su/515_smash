@@ -155,6 +155,13 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   overflow:hidden;
 }
 #paper-el svg { display:block; }
+#crumple-img {
+  height:clamp(220px,55dvh,860px); max-width:80vw;
+  width:auto; display:block;
+}
+@media (max-width:600px) {
+  #crumple-img { height:auto; max-height:40dvh; max-width:72vw; }
+}
 
 /* ── CRUMPLE HAND ────────────────────────────────────────── */
 #crumple-hand {
@@ -420,8 +427,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     <div id="crumple-hand"><img id="crumple-hand-img" src="asset/hand_open.png" draggable="false"></div>
     <div id="crumple-trash"><img id="crumple-trash-img" src="asset/trash.png" draggable="false"></div>
     <div id="paper-el">
-      <img id="crumple-img" src="asset/crumple_00.png" draggable="false"
-           style="height:clamp(220px,60dvh,860px);max-width:80vw;width:auto;display:block;">
+      <img id="crumple-img" src="asset/crumple_00.png" draggable="false">
     </div>
   </div>
 
