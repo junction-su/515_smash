@@ -1078,10 +1078,12 @@ function handleSwatShake() {
     sy = 80 + Math.random() * (H - 280);
   }
   const swEl = document.getElementById('swatter-el');
-  const RADIUS = swEl.offsetWidth * 0.32;
+  // swEl is display:none here so offsetWidth=0; compute from CSS clamp directly
+  const swatterW = Math.min(Math.max(320, W * 0.55), 700);
+  const RADIUS = swatterW * 0.32;
 
   // Show swatter — slam in like glove
-  swEl.style.left = (sx - swEl.offsetWidth / 2) + 'px';
+  swEl.style.left = (sx - swatterW / 2) + 'px';
   swEl.style.top  = (sy - 80) + 'px';
   swEl.style.transition = 'none';
   swEl.style.transform = 'translateY(-280px) rotate(-20deg) scale(0.7)';
