@@ -1065,8 +1065,8 @@ function handleSwatShake() {
   let sx, sy;
   if (alive.length > 0 && Math.random() < 0.70) {
     const t = alive[Math.floor(Math.random() * alive.length)];
-    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 100;
-    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 100;
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 160;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 160;
     sx = Math.max(80, Math.min(W - 80, sx));
     sy = Math.max(80, Math.min(H - 280, sy));
   } else {
@@ -1074,7 +1074,7 @@ function handleSwatShake() {
     sy = 80 + Math.random() * (H - 280);
   }
   const swEl = document.getElementById('swatter-el');
-  const RADIUS = swEl.offsetWidth * 0.18;
+  const RADIUS = swEl.offsetWidth * 0.28;
 
   // Show swatter — slam in like glove
   swEl.style.left = (sx - swEl.offsetWidth / 2) + 'px';
