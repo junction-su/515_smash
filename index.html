@@ -1065,18 +1065,18 @@ function handleSwatShake() {
   let sx, sy;
   if (alive.length > 0 && Math.random() < 0.70) {
     const t = alive[Math.floor(Math.random() * alive.length)];
-    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 280;
-    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 280;
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 100;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 100;
     sx = Math.max(80, Math.min(W - 80, sx));
     sy = Math.max(80, Math.min(H - 280, sy));
   } else {
     sx = 80 + Math.random() * (W - 160);
     sy = 80 + Math.random() * (H - 280);
   }
-  const RADIUS = 130;
+  const swEl = document.getElementById('swatter-el');
+  const RADIUS = swEl.offsetWidth * 0.18;
 
   // Show swatter — slam in like glove
-  const swEl = document.getElementById('swatter-el');
   swEl.style.left = (sx - swEl.offsetWidth / 2) + 'px';
   swEl.style.top  = (sy - 80) + 'px';
   swEl.style.transition = 'none';
@@ -1145,7 +1145,7 @@ function initCloud() {
     const el = document.createElement('div');
     el.className = 'cloud-el';
     // row1(가운데)은 더 크게, 나머지는 기본 크기
-    const baseMax = Math.min(W * 0.72, 1050);
+    const baseMax = Math.min(W * (W < 600 ? 1.05 : 0.72), 1050);
     const row = rows[i];
     const w = baseMax * (row === 1 ? 0.65 + Math.random() * 0.35 : 0.52 + Math.random() * 0.48);
     el.innerHTML = `<img src="asset/cloud.png" style="width:${w}px" draggable="false">`;
