@@ -356,25 +356,57 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 /* ── TOUCH BUTTONS ───────────────────────────────────────── */
 #touch-btns {
-  position:absolute; bottom:1.75rem; left:50%;
+  position:absolute; bottom:calc(1rem + env(safe-area-inset-bottom)); left:50%;
   transform:translateX(-50%);
-  display:none; gap:12px; z-index:30;
+  display:none; gap:8px; z-index:30;
+  width:min(430px, calc(100vw - 28px));
+  padding:6px;
+  background:rgba(250,250,248,0.72);
+  border:1px solid rgba(17,17,16,0.10);
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(17,17,16,0.10);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
 }
 #touch-btns button {
-  font-family:'Geist',sans-serif; font-weight:700; font-size:0.9rem;
-  letter-spacing:0.08em; text-transform:uppercase;
-  color:var(--ink); background:rgba(226,231,238,0.55);
-  border:1px solid rgba(17,17,16,0.10); border-radius:100px;
-  padding:12px 28px; cursor:pointer; -webkit-tap-highlight-color:transparent;
-  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  flex:1 1 0; min-width:0; min-height:58px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  font-family:'Geist',sans-serif; font-weight:850; font-size:1rem;
+  letter-spacing:0.04em; text-transform:uppercase;
+  color:var(--ink); background:rgba(255,255,255,0.82);
+  border:1px solid rgba(17,17,16,0.08); border-radius:8px;
+  padding:9px 12px; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation; user-select:none;
   transition:transform 0.08s, opacity 0.08s;
 }
-#touch-btns button:active { transform:scale(0.94); opacity:0.7; }
+#touch-smash {
+  color:#fff;
+  background:var(--ink);
+  border-color:rgba(17,17,16,0.16);
+}
+#touch-swipe {
+  background:rgba(226,231,238,0.82);
+}
+#touch-btns[data-needed="swipe"] #touch-smash,
+#touch-btns[data-needed="smash"] #touch-swipe {
+  opacity:0.46;
+}
+#touch-btns[data-needed="swipe"] #touch-swipe {
+  background:#fff;
+  box-shadow:inset 0 0 0 2px rgba(17,17,16,0.70);
+}
+#touch-btns[data-needed="smash"] #touch-smash {
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35);
+}
+.touch-sub {
+  font-family:'Geist Mono',monospace; font-size:9px; font-weight:600;
+  letter-spacing:0.16em; opacity:0.62;
+}
+#touch-btns button:active { transform:scale(0.97); opacity:0.78; }
 @media (hover:none) and (pointer:coarse) {
   #touch-btns { display:flex; }
   #hud-container { display:none; }
   #cloud-count, #swat-count, #wipe-progress, #bubble-count {
-    bottom: calc(1.75rem + 64px);
+    bottom: calc(1rem + env(safe-area-inset-bottom) + 92px);
   }
 }
 
@@ -631,9 +663,9 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     </div>
     <div id="hud-hint">keyboard: 1 smash · 2 swipe</div>
   </div>
-  <div id="touch-btns">
-    <button id="touch-smash">SMASH</button>
-    <button id="touch-swipe">SWIPE</button>
+  <div id="touch-btns" data-needed="smash">
+    <button id="touch-smash"><span>SMASH</span><span class="touch-sub">FIST</span></button>
+    <button id="touch-swipe"><span>SWIPE</span><span class="touch-sub">WAVE</span></button>
   </div>
 
   <!-- Tutorial coach overlay -->
@@ -771,6 +803,7 @@ const $warmupN  = document.getElementById('warmup-counter');
 const $hudDot   = document.getElementById('hud-dot');
 const $hudStatus= document.getElementById('hud-status');
 const $hudBtn   = document.getElementById('hud-btn');
+const $touchBtns= document.getElementById('touch-btns');
 const ctx = $canvas.getContext('2d');
 
 const resize = () => {
@@ -918,6 +951,10 @@ function showWarmupCount() {
   S._wt = setTimeout(() => { $warmupN.style.opacity = '0'; }, 600);
 }
 
+function setTouchNeeded(kind) {
+  if ($touchBtns) $touchBtns.dataset.needed = kind;
+}
+
 // ── GAME FLOW ─────────────────────────────────────────────────────────────────
 
 function hideBag(cb) {
@@ -950,6 +987,7 @@ function startNextMinigame() {
   const type = S.mgQueue.shift();
   S.currentMG = type;
   S.phase = 'MG_INTRO';
+  setTouchNeeded(['crumple','swat','bubble'].includes(type) ? 'smash' : 'swipe');
 
   // WarioWare flash + 제스처 힌트
   $mgIntro.textContent = MG_INTRO_LABELS[type];
@@ -1020,6 +1058,7 @@ function showRoundClear() {
       S.warmupHits = 0;
       S.warmupTarget = 4 + Math.floor(Math.random() * 2);
       S.phase = 'WARMUP';
+      setTouchNeeded('smash');
       $ghost.textContent = 'STRESS';
       $typoScript.textContent = 'Stress';
       $typoBold.textContent = 'SMASH';
@@ -1504,6 +1543,7 @@ function gesture(raw) {
 
     if (S.phase === 'WARMUP') {
       animateGlove();
+      animImpact(WORDS_SHAKE[Math.floor(Math.random()*WORDS_SHAKE.length)]);
       S.warmupHits++;
       showWarmupCount();
       if (S.warmupHits >= S.warmupTarget) {
@@ -1589,8 +1629,17 @@ $hudBtn.addEventListener('click', () => {
   } else connectSerial();
 });
 
-document.getElementById('touch-smash').addEventListener('click', () => { warmupSFX(); gesture('shake'); });
-document.getElementById('touch-swipe').addEventListener('click', () => { warmupSFX(); gesture('wave'); });
+function bindTouchGesture(id, raw) {
+  const el = document.getElementById(id);
+  const type = window.PointerEvent ? 'pointerdown' : 'click';
+  el.addEventListener(type, e => {
+    e.preventDefault();
+    warmupSFX();
+    gesture(raw);
+  });
+}
+bindTouchGesture('touch-smash', 'shake');
+bindTouchGesture('touch-swipe', 'wave');
 
 // ── TUTORIAL COACH ────────────────────────────────────────────────────────────
 
@@ -1664,11 +1713,30 @@ function exitIntro() {
   const el = document.getElementById('intro-overlay');
   if (!el || el.style.display === 'none') return;
   S.phase = 'WARMUP'; S.warmupHits = 0;
+  setTouchNeeded('smash');
   el.classList.add('fade-out');
   setTimeout(() => { el.style.display = 'none'; }, 520);
 }
 
-if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) startTutorial();
+function disableTutorialForTouch() {
+  const el = document.getElementById('intro-overlay');
+  if (el) {
+    el.classList.remove('step-connect', 'fade-out');
+    el.style.display = 'none';
+  }
+  if (S.phase === 'TUTORIAL') {
+    S.phase = 'WARMUP';
+    S.warmupHits = 0;
+    setTouchNeeded('smash');
+  }
+}
+
+const desktopPointerQuery = window.matchMedia('(hover:hover) and (pointer:fine)');
+if (desktopPointerQuery.matches) startTutorial();
+else disableTutorialForTouch();
+desktopPointerQuery.addEventListener('change', e => {
+  if (!e.matches) disableTutorialForTouch();
+});
 </script>
 </body>
 </html>
