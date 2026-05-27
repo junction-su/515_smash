@@ -512,7 +512,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <!-- Sandbag (warmup) -->
   <div id="bag-wrap">
     <div id="bag-cord"></div>
-    <img id="bag-img" src="asset/sandbag.png" alt=""
+    <img id="bag-img" src="asset/sandbag.webp" alt=""
          onerror="this.style.display='none';document.getElementById('bag-svg-wrap').style.display='block'">
     <div id="bag-svg-wrap" style="display:none">
       <svg id="bag-svg" style="height:clamp(420px,68dvh,820px);width:auto" viewBox="0 0 148 210" fill="none">
@@ -528,7 +528,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- Glove -->
   <div id="glove-wrap">
-    <img id="glove-img" src="asset/glove_right.png" alt="">
+    <img id="glove-img" src="asset/glove_right.webp" alt="">
   </div>
 
   <!-- WarioWare intro flash -->
@@ -546,7 +546,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
   <!-- MG: Window Wipe -->
   <div id="mg-wipe-bg">
-    <img id="wipe-img" src="asset/window_00.png" alt="">
+    <img id="wipe-img" src="asset/window_00.webp" alt="">
     <div id="rag-el"><img src="asset/rag.png" alt="" draggable="false"></div>
     <div id="wipe-progress">wave to wipe</div>
   </div>
@@ -564,7 +564,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <div id="mg-cloud">
     <div id="fan-el"><img src="asset/fan.png" alt="" draggable="false"></div>
     <div id="cloud-reveal">
-      <img id="reveal-sky"   src="asset/sky.png"   alt="">
+      <img id="reveal-sky"   src="asset/sky.webp"   alt="">
       <img id="reveal-field" src="asset/field.png" alt="">
       <img id="reveal-sun"   src="asset/sun.png"   alt="">
     </div>
@@ -575,7 +575,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <!-- MG: Fly Swatter -->
   <div id="mg-swat">
     <div id="swatter-el">
-      <img src="asset/swatter.png" alt="">
+      <img src="asset/swatter.webp" alt="">
     </div>
     <div id="swat-count"></div>
   </div>
@@ -612,8 +612,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <div id="intro-overlay">
     <div id="coach">
       <div id="coach-img-wrap">
-        <img id="coach-open" src="asset/knuckle_open.png" alt="">
-        <img id="coach-fist" src="asset/knuckle_fist.png" alt="">
+        <img id="coach-open" src="asset/knuckle_open.webp" alt="">
+        <img id="coach-fist" src="asset/knuckle_fist.webp" alt="">
         <img id="coach-palm" src="asset/palm.svg" alt="">
       </div>
       <div id="coach-bottom">
@@ -828,7 +828,7 @@ function animateGlove() {
   const dir = Math.random() < 0.5 ? 1 : -1;
   const offX = dir*130, rot = dir*-40, hitRot = dir*8;
   const img = document.getElementById('glove-img');
-  if (img) img.src = dir===1 ? 'asset/glove_right.png' : 'asset/glove_left.png';
+  if (img) img.src = dir===1 ? 'asset/glove_right.webp' : 'asset/glove_left.webp';
   glove.style.transition='none';
   glove.style.transform=`translateX(calc(-50% + ${offX}px)) translateY(300px) rotate(${rot}deg)`;
   glove.style.opacity='0'; glove.style.display='block';
@@ -1014,8 +1014,9 @@ const WIPE_TOTAL = 4; // 4 waves: window_00 → 01 → 02 → 03 → 04
 const WIPE_Y = [20, 35, 52, 68]; // rag Y% per wave (within 5%~95% image bounds)
 
 function initWipe() {
+  getSFX('wipeSqueak');
   MG.wipe.done = 0; MG.wipe.animating = false;
-  document.getElementById('wipe-img').src = 'asset/window_00.png';
+  document.getElementById('wipe-img').src = 'asset/window_00.webp';
   document.getElementById('wipe-progress').textContent = 'wave to wipe';
 
   const ragEl = document.getElementById('rag-el');
@@ -1048,7 +1049,7 @@ function handleWipeWave() {
     // swap image at midpoint of sweep
     setTimeout(() => {
       const f = String(MG.wipe.done + 1).padStart(2, '0');
-      document.getElementById('wipe-img').src = `asset/window_${f}.png`;
+      document.getElementById('wipe-img').src = `asset/window_${f}.webp`;
     }, 260);
 
     setTimeout(() => {
@@ -1084,6 +1085,7 @@ function showWipeClear() {
 // ── MINIGAME: PAPER CRUMPLE ───────────────────────────────────────────────────
 
 function initCrumple() {
+  getSFX('crumplePaper'); getSFX('crumpleTrash');
   MG.crumple.stage = 0;
 
   // Reset paper image
@@ -1161,10 +1163,11 @@ function handleCrumpleShake() {
       paperEl.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease 0.2s';
       paperEl.style.transform = `translate(${tx}px,${ty}px) scale(0.08)`;
       paperEl.style.opacity = '0';
+      // 종이가 이동 중(250ms)에 쓰레기통 입구 도착 → 소리 먼저
+      setTimeout(() => playSFX('crumpleTrash'), 250);
 
       setTimeout(() => {
         if (trashImg) trashImg.src = 'asset/trash.png';
-        playSFX('crumpleTrash');
         setTimeout(() => mgClear('crumple'), 400);
       }, 550);
     }, 480);
@@ -1173,7 +1176,7 @@ function handleCrumpleShake() {
 
 // ── MINIGAME: FLY SWATTER ─────────────────────────────────────────────────────
 
-const FLY_HTML = `<img src="asset/fly.png" alt="" draggable="false">`;
+const FLY_HTML = `<img src="asset/fly.webp" alt="" draggable="false">`;
 
 let flyAnimFrame = null;
 
@@ -1311,6 +1314,7 @@ function handleSwatShake() {
 const CLOUD_COUNT = 10;
 
 function initCloud() {
+  getSFX('cloudWind');
   const wrap = document.getElementById('mg-cloud');
   wrap.querySelectorAll('.cloud-el').forEach(c => c.remove());
   ['reveal-sky','reveal-field','reveal-sun'].forEach(id =>
