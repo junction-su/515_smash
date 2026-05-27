@@ -641,9 +641,11 @@ const SFX_SRCS = {
 const SFX = {};
 function getSFX(key) {
   if (!SFX[key]) {
-    SFX[key] = new Audio(SFX_SRCS[key]);
-    if (key === 'swatFly') SFX[key].loop = true;
-    SFX[key].load();
+    const a = new Audio(SFX_SRCS[key]);
+    a.preload = 'auto';
+    if (key === 'swatFly') a.loop = true;
+    a.load();
+    SFX[key] = a;
   }
   return SFX[key];
 }
@@ -656,11 +658,12 @@ function stopSFX(key) {
 let _sfxReady = false;
 function warmupSFX() {
   if (_sfxReady) return; _sfxReady = true;
+  // iOS/Android: silent play-pause forces decode buffer ahead of time
   Object.keys(SFX_SRCS).forEach(key => {
     const a = getSFX(key);
-    a.volume = 0;
+    const prev = a.volume; a.volume = 0;
     const p = a.play();
-    if (p) p.then(() => { a.pause(); a.currentTime = 0; a.volume = 1; }).catch(() => {});
+    if (p) p.then(() => { a.pause(); a.currentTime = 0; a.volume = prev; }).catch(() => {});
   });
 }
 
@@ -1153,13 +1156,13 @@ function handleCrumpleShake() {
 
     if (handEl) handEl.style.opacity = '0';
     if (trashEl) trashEl.classList.add('show');
+    playSFX('crumpleTrash');
 
     // preload trash_open so the swap is instant
     const _preload = new Image(); _preload.src = 'asset/trash_open.png';
 
     setTimeout(() => {
       if (trashImg) trashImg.src = 'asset/trash_open.png';
-      playSFX('crumpleTrash');
 
       const trashRect = trashEl ? trashEl.getBoundingClientRect() : null;
       const sr = $stage.getBoundingClientRect();
