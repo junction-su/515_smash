@@ -1481,6 +1481,7 @@ function showCloudReveal() {
 // ── GESTURE HANDLER ───────────────────────────────────────────────────────────
 
 function gesture(raw) {
+  warmupSFX();
   const g = raw.trim().toLowerCase();
   if (!['shake','wave','idle'].includes(g)) return;
   if (g !== 'idle') S.counts[g]++;
