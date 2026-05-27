@@ -371,25 +371,35 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #intro-overlay {
   position:absolute; inset:0; z-index:80;
   pointer-events:none; transition:opacity 0.5s ease;
+  display:flex; align-items:center; justify-content:center;
 }
 #intro-overlay.fade-out { opacity:0; }
 
 #coach {
-  position:absolute; top:36%; left:50%;
-  transform:translate(-50%,-50%);
-  display:flex; flex-direction:column; align-items:center; gap:18px;
+  position:relative;
+  display:flex; flex-direction:column; align-items:center; gap:0;
   text-align:center;
+  background:rgba(255,255,255,0.86);
+  backdrop-filter:blur(18px) saturate(1.4);
+  -webkit-backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(255,255,255,0.95);
+  border-radius:28px;
+  padding:clamp(28px,3.5vw,48px) clamp(36px,5vw,64px) clamp(24px,3vw,36px);
+  box-shadow:0 12px 48px rgba(17,17,16,0.20), 0 1px 0 rgba(255,255,255,0.8) inset;
+  max-width:min(88vw, 520px);
 }
+
 #coach-img-wrap {
   position:relative;
-  width:clamp(180px,28vw,300px); height:clamp(180px,28vw,300px);
+  width:clamp(240px,36vw,380px); height:clamp(240px,36vw,380px);
+  margin-bottom:20px;
 }
 #coach-img-wrap img {
   position:absolute; inset:0; width:100%; height:auto;
-  filter:drop-shadow(0 10px 28px rgba(17,17,16,0.22));
+  filter:drop-shadow(0 12px 32px rgba(17,17,16,0.20));
 }
 
-/* STEP 1 defaults: open/fist loop */
+/* STEP 1 defaults: open/fist shake loop */
 #coach-open { animation:coach-open 4s ease-in-out infinite; }
 #coach-fist { opacity:0; animation:coach-fist 4s ease-in-out infinite; }
 #coach-palm { opacity:0; }
@@ -402,10 +412,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   transition:transform 0.12s cubic-bezier(0.16,1,0.3,1);
 }
 
-/* STEP 2: open hand sweeps side to side */
-#coach-img-wrap.step2 #coach-fist { opacity:0; animation:none; }
-#coach-img-wrap.step2 #coach-open {
-  opacity:1; animation:coach-swipe 2.5s cubic-bezier(0.4,0,0.2,1) infinite;
+/* STEP 2: fist sweeps side to side */
+#coach-img-wrap.step2 #coach-open { opacity:0; animation:none; }
+#coach-img-wrap.step2 #coach-fist {
+  opacity:1; animation:coach-swipe 2.4s cubic-bezier(0.4,0,0.2,1) infinite;
 }
 #coach-img-wrap.step2 #coach-palm { opacity:0; }
 
@@ -427,39 +437,44 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   82%,100% { opacity:0; transform:translate(0,0); }
 }
 @keyframes coach-swipe {
-  0%,100% { transform:translateX(-70px) rotate(-10deg); opacity:0.55; }
-  15%     { opacity:1; }
-  50%     { transform:translateX( 70px) rotate( 10deg); opacity:1; }
-  85%     { opacity:1; }
-  95%     { opacity:0.55; }
+  0%,100% { transform:translateX(-80px) rotate(-12deg); opacity:0.5; }
+  12%     { opacity:1; }
+  50%     { transform:translateX( 80px) rotate( 12deg); opacity:1; }
+  88%     { opacity:1; }
+  96%     { opacity:0.5; }
 }
 
 #coach-title {
   font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(2.2rem,6vw,4.5rem); letter-spacing:-0.05em;
+  font-size:clamp(2rem,5.5vw,4rem); letter-spacing:-0.05em;
   text-transform:uppercase; color:var(--ink); line-height:1;
-  text-shadow:0 2px 16px rgba(255,255,255,0.9);
+  margin-bottom:10px;
 }
 #coach-sub {
-  font-family:'Geist Mono',monospace; font-size:clamp(10px,1.2vw,12px);
-  letter-spacing:0.24em; text-transform:uppercase; color:var(--dim);
-  text-shadow:0 1px 8px rgba(255,255,255,0.8);
+  font-family:'Geist Mono',monospace; font-size:clamp(9px,1.1vw,11px);
+  letter-spacing:0.26em; text-transform:uppercase; color:var(--dim);
+  margin-bottom:18px;
 }
 #coach-dots { display:flex; gap:8px; }
 #coach-dots span {
   width:7px; height:7px; border-radius:50%;
-  background:rgba(17,17,16,0.15); transition:background 0.25s;
+  background:rgba(17,17,16,0.12); transition:background 0.25s;
 }
 #coach-dots span.on { background:var(--ink); }
 
 #coach-skip {
-  position:absolute; bottom:5.5rem; left:50%; transform:translateX(-50%);
+  position:absolute; bottom:3rem; left:50%; transform:translateX(-50%);
   pointer-events:auto;
-  font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.22em;
-  text-transform:uppercase; color:var(--dim); background:none; border:none;
-  cursor:pointer; padding:6px 10px; transition:color 0.12s;
+  font-family:'Geist Mono',monospace; font-size:11px; letter-spacing:0.18em;
+  text-transform:uppercase; color:var(--ink);
+  background:rgba(255,255,255,0.9);
+  border:1.5px solid rgba(17,17,16,0.22);
+  border-radius:100px; padding:10px 22px;
+  cursor:pointer; transition:background 0.15s, color 0.15s, border-color 0.15s;
+  backdrop-filter:blur(8px);
+  white-space:nowrap;
 }
-#coach-skip:hover { color:var(--ink); }
+#coach-skip:hover { background:var(--ink); color:#fff; border-color:var(--ink); }
 
 @media (hover:none) and (pointer:coarse) {
   #intro-overlay { display:none; }
