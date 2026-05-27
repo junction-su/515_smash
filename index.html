@@ -631,6 +631,26 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 const MINIGAME_TYPES = [/*'bubble',*/ 'wipe', 'crumple', 'swat', 'cloud'];
 
+// ── SOUND EFFECTS ─────────────────────────────────────────────────────────────
+
+const SFX = {
+  bagPunch:     new Audio('asset/sfx/bag_punch.mp3'),
+  swatFly:      Object.assign(new Audio('asset/sfx/swat_fly.mp3'), { loop: true }),
+  swatHit:      new Audio('asset/sfx/swat_hit.mp3'),
+  cloudWind:    new Audio('asset/sfx/cloud_wind.mp3'),
+  wipeSqueak:   new Audio('asset/sfx/wipe_squeak.mp3'),
+  crumplePaper: new Audio('asset/sfx/crumple_paper.mp3'),
+  crumpleTrash: new Audio('asset/sfx/crumple_trash.mp3'),
+};
+function playSFX(key) {
+  const a = SFX[key]; if (!a) return;
+  a.currentTime = 0; a.play().catch(() => {});
+}
+function stopSFX(key) {
+  const a = SFX[key]; if (!a) return;
+  a.pause(); a.currentTime = 0;
+}
+
 // 제스처 힌트 SVG — asset/fist.svg, asset/palm.svg 파일로 교체 가능
 const FIST_SVG = `<img src="asset/fist.svg" width="64" height="64" draggable="false">`;
 const PALM_SVG = `<img src="asset/palm.svg" width="64" height="64" draggable="false">`;
@@ -798,6 +818,7 @@ function doScreenShake() {
 function animateGlove() {
   const glove = document.getElementById('glove-wrap');
   if (!glove) return;
+  playSFX('bagPunch');
   const dir = Math.random() < 0.5 ? 1 : -1;
   const offX = dir*130, rot = dir*-40, hitRot = dir*8;
   const img = document.getElementById('glove-img');
@@ -1006,6 +1027,7 @@ function handleWipeWave() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'wipe') return;
   if (MG.wipe.animating || MG.wipe.done >= WIPE_TOTAL) return;
   MG.wipe.animating = true;
+  playSFX('wipeSqueak');
 
   const W = $stage.offsetWidth;
   const ragEl = document.getElementById('rag-el');
@@ -1098,6 +1120,7 @@ function handleCrumpleShake() {
   flashCrumpleHand();
 
   if (MG.crumple.stage < CRUMPLE_FRAMES) {
+    playSFX('crumplePaper');
     // Swap to next crumple image
     const f = String(MG.crumple.stage).padStart(2, '0');
     const crumpleImg = document.getElementById('crumple-img');
@@ -1135,6 +1158,7 @@ function handleCrumpleShake() {
 
       setTimeout(() => {
         if (trashImg) trashImg.src = 'asset/trash.png';
+        playSFX('crumpleTrash');
         setTimeout(() => mgClear('crumple'), 400);
       }, 550);
     }, 480);
@@ -1149,10 +1173,10 @@ let flyAnimFrame = null;
 
 function initSwat() {
   const wrap = document.getElementById('mg-swat');
-  // Clear old flies
   wrap.querySelectorAll('.fly').forEach(f => f.remove());
   MG.swat.flies = [];
   MG.swat.remaining = 5;
+  playSFX('swatFly');
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
   // 화면을 5구역으로 나눠 각 구역 안에서 스폰 → 항상 흩어져서 등장
@@ -1208,6 +1232,7 @@ function animateFlies() {
 
 function handleSwatShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'swat') return;
+  playSFX('swatHit');
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
 
   // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
@@ -1272,7 +1297,7 @@ function handleSwatShake() {
     : 'MISSED!');
 
   doScreenShake();
-  if (MG.swat.remaining <= 0) setTimeout(()=>mgClear('swat'), 400);
+  if (MG.swat.remaining <= 0) { stopSFX('swatFly'); setTimeout(()=>mgClear('swat'), 400); }
 }
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
@@ -1331,6 +1356,7 @@ function initCloud() {
 }
 
 function showFanSweep() {
+  playSFX('cloudWind');
   const fanEl = document.getElementById('fan-el');
   fanEl.style.display = 'block';
   fanEl.style.opacity = '0';
