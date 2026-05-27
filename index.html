@@ -366,6 +366,120 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     bottom: calc(1.75rem + 64px);
   }
 }
+
+/* ── INTRO OVERLAY ───────────────────────────────────────── */
+#intro-overlay {
+  position:absolute; inset:0; z-index:80; background:#FFFFFF;
+  overflow:hidden; transition:opacity 0.5s ease;
+}
+#intro-overlay.fade-out { opacity:0; pointer-events:none; }
+.intro-slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:clamp(2rem,6vw,4rem) clamp(2rem,8vw,6rem);
+  transition:transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+}
+.intro-slide.out-left  { transform:translateX(-110%); opacity:0; pointer-events:none; }
+.intro-slide.out-right { transform:translateX(110%);  opacity:0; pointer-events:none; }
+#knuckle-display {
+  background:var(--ink); border-radius:16px;
+  padding:2rem; display:flex; align-items:center; justify-content:center;
+}
+#knuckle-display img { width:clamp(160px,22vw,280px); height:auto; }
+#intro-slide-1 .slide-content {
+  display:flex; align-items:center; justify-content:center;
+  gap:clamp(2rem,5vw,5rem); width:100%; flex-wrap:wrap;
+}
+.intro-typo .intro-script {
+  display:block; font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(2.5rem,5vw,4.5rem); font-weight:400; line-height:1; color:var(--ink);
+}
+.intro-typo .intro-bold {
+  display:block; font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(4rem,8vw,7rem); letter-spacing:-0.05em; line-height:0.85;
+  text-transform:uppercase; color:var(--ink);
+}
+.intro-device-col { display:flex; flex-direction:column; align-items:center; gap:1rem; }
+.intro-device-caption {
+  font-family:'Geist Mono',monospace; font-size:clamp(10px,1.1vw,12px);
+  letter-spacing:0.2em; text-transform:uppercase; color:var(--dim);
+  text-align:center; line-height:1.7;
+}
+.intro-footer {
+  position:absolute; bottom:clamp(1.5rem,4vh,2.5rem); left:0; right:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 clamp(2rem,8vw,6rem);
+}
+.intro-footer-note {
+  font-family:'Geist Mono',monospace; font-size:clamp(9px,1vw,11px);
+  letter-spacing:0.22em; text-transform:uppercase; color:var(--dim);
+}
+.intro-btn {
+  font-family:'Geist',sans-serif; font-weight:700; font-size:clamp(0.85rem,1.4vw,1rem);
+  letter-spacing:0.06em; text-transform:uppercase;
+  color:#FFFFFF; background:var(--ink); border:none; border-radius:100px;
+  padding:12px 28px; cursor:pointer; transition:opacity 0.15s, transform 0.1s;
+}
+.intro-btn:hover { opacity:0.82; }
+.intro-btn:active { transform:scale(0.96); }
+.intro-btn.secondary {
+  color:var(--ink); background:transparent;
+  border:1.5px solid rgba(17,17,16,0.18);
+}
+#intro-slide-2 .slide-content {
+  display:flex; flex-direction:column; align-items:center;
+  gap:clamp(1.5rem,3vh,2.5rem); width:100%;
+}
+.intro-s2-head { text-align:center; }
+.intro-s2-head .intro-script {
+  display:block; font-family:'Playfair Display',serif; font-style:italic;
+  font-size:clamp(1.8rem,3.5vw,3rem); color:var(--ink);
+}
+.intro-s2-head .intro-bold {
+  display:block; font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(3rem,6vw,5.5rem); letter-spacing:-0.05em;
+  text-transform:uppercase; color:var(--ink);
+}
+.gesture-flows { display:flex; flex-direction:column; gap:1.25rem; width:100%; max-width:640px; }
+.gesture-row {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; padding:1rem 1.5rem;
+  background:rgba(17,17,16,0.04); border-radius:12px;
+}
+.gesture-step { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.gesture-step img { width:48px; height:48px; object-fit:contain; }
+.gesture-step span {
+  font-family:'Geist Mono',monospace; font-size:clamp(8px,0.9vw,10px);
+  letter-spacing:0.2em; text-transform:uppercase; color:var(--dim);
+}
+.gesture-arrow { font-size:1.2rem; color:var(--dim); flex-shrink:0; }
+.gesture-result { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.gesture-result-icon { font-size:1.6rem; }
+.gesture-result-label {
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(1rem,2vw,1.4rem); letter-spacing:-0.03em;
+  text-transform:uppercase; color:var(--ink);
+}
+.intro-connect-btn {
+  font-family:'Geist',sans-serif; font-weight:900;
+  font-size:clamp(1.1rem,2.2vw,1.5rem); letter-spacing:-0.02em; text-transform:uppercase;
+  color:#FFFFFF; background:var(--ink); border:none; border-radius:100px;
+  padding:clamp(14px,2vh,20px) clamp(2rem,5vw,3.5rem);
+  cursor:pointer; transition:opacity 0.15s, transform 0.1s;
+  width:100%; max-width:360px;
+}
+.intro-connect-btn:hover { opacity:0.82; }
+.intro-connect-btn:active { transform:scale(0.97); }
+.intro-knuckle-sm {
+  width:48px; height:48px; object-fit:contain;
+  background:var(--ink); border-radius:8px; padding:4px;
+}
+.intro-fist-hint { animation:smash-hint 1.1s ease-in-out infinite; }
+.intro-palm-hint { animation:swipe-hint 1.4s ease-in-out infinite; }
+@media (hover:none) and (pointer:coarse) {
+  #intro-overlay { display:none; }
+}
 </style>
 </head>
 <body>
@@ -477,6 +591,83 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   <div id="touch-btns">
     <button id="touch-smash">SMASH</button>
     <button id="touch-swipe">SWIPE</button>
+  </div>
+
+  <!-- Intro overlay -->
+  <div id="intro-overlay">
+
+    <!-- Slide 1: What is SMASH -->
+    <div id="intro-slide-1" class="intro-slide">
+      <div class="slide-content">
+        <div class="intro-typo">
+          <span class="intro-script">Stress</span>
+          <span class="intro-bold">SMASH</span>
+        </div>
+        <div class="intro-device-col">
+          <div id="knuckle-display">
+            <img src="asset/knucle.svg" alt="SMASH device">
+          </div>
+          <p class="intro-device-caption">
+            Wear it on your knuckles<br>
+            Button on bottom — make a fist to trigger
+          </p>
+        </div>
+      </div>
+      <div class="intro-footer">
+        <span class="intro-footer-note">⌨ Desktop · Chrome only</span>
+        <button class="intro-btn" onclick="introNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Slide 2: How to Play -->
+    <div id="intro-slide-2" class="intro-slide out-right">
+      <div class="slide-content">
+        <div class="intro-s2-head">
+          <span class="intro-script">How to</span>
+          <span class="intro-bold">PLAY</span>
+        </div>
+        <div class="gesture-flows">
+          <div class="gesture-row">
+            <div class="gesture-step">
+              <img src="asset/knucle.svg" class="intro-knuckle-sm" alt="">
+              <span>Wear device</span>
+            </div>
+            <span class="gesture-arrow">→</span>
+            <div class="gesture-step">
+              <img src="asset/fist.svg" class="intro-fist-hint" alt="">
+              <span>Make a fist</span>
+            </div>
+            <span class="gesture-arrow">→</span>
+            <div class="gesture-result">
+              <span class="gesture-result-icon">⚡</span>
+              <span class="gesture-result-label">SMASH!</span>
+            </div>
+          </div>
+          <div class="gesture-row">
+            <div class="gesture-step">
+              <img src="asset/knucle.svg" class="intro-knuckle-sm" alt="">
+              <span>Wear device</span>
+            </div>
+            <span class="gesture-arrow">→</span>
+            <div class="gesture-step">
+              <img src="asset/palm.svg" class="intro-palm-hint" alt="">
+              <span>Wave your hand</span>
+            </div>
+            <span class="gesture-arrow">→</span>
+            <div class="gesture-result">
+              <span class="gesture-result-icon">〰</span>
+              <span class="gesture-result-label">SWIPE!</span>
+            </div>
+          </div>
+        </div>
+        <button class="intro-connect-btn" onclick="connectSerial()">연결하기</button>
+      </div>
+      <div class="intro-footer">
+        <button class="intro-btn secondary" onclick="introPrev()">← 뒤로</button>
+        <button class="intro-btn secondary" onclick="exitIntro()">키보드로 시작 (1·2)</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1291,7 +1482,7 @@ async function connectSerial() {
   try {
     S.port = await navigator.serial.requestPort();
     await S.port.open({ baudRate: 115200 });
-    S.connected = true; setConnUI(true);
+    S.connected = true; setConnUI(true); exitIntro();
     const dec = new TextDecoderStream();
     const rd  = dec.readable.getReader();
     S.port.readable.pipeTo(dec.writable);
@@ -1350,6 +1541,23 @@ $hudBtn.addEventListener('click', () => {
 
 document.getElementById('touch-smash').addEventListener('click', () => gesture('shake'));
 document.getElementById('touch-swipe').addEventListener('click', () => gesture('wave'));
+
+// ── INTRO ─────────────────────────────────────────────────────────────────────
+
+function introNext() {
+  document.getElementById('intro-slide-1').classList.add('out-left');
+  document.getElementById('intro-slide-2').classList.remove('out-right');
+}
+function introPrev() {
+  document.getElementById('intro-slide-2').classList.add('out-right');
+  document.getElementById('intro-slide-1').classList.remove('out-left');
+}
+function exitIntro() {
+  const el = document.getElementById('intro-overlay');
+  if (!el || el.style.display === 'none') return;
+  el.classList.add('fade-out');
+  setTimeout(() => { el.style.display = 'none'; }, 520);
+}
 </script>
 </body>
 </html>
