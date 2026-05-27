@@ -633,22 +633,28 @@ const MINIGAME_TYPES = [/*'bubble',*/ 'wipe', 'crumple', 'swat', 'cloud'];
 
 // ── SOUND EFFECTS ─────────────────────────────────────────────────────────────
 
-const SFX = {
-  bagPunch:     new Audio('asset/sfx/bag_punch.mp3'),
-  swatFly:      Object.assign(new Audio('asset/sfx/swat_fly.mp3'), { loop: true }),
-  swatHit:      new Audio('asset/sfx/swat_hit.mp3'),
-  cloudWind:    new Audio('asset/sfx/cloud_wind.mp3'),
-  wipeSqueak:   new Audio('asset/sfx/wipe_squeak.mp3'),
-  crumplePaper: new Audio('asset/sfx/crumple_paper.mp3'),
-  crumpleTrash: new Audio('asset/sfx/crumple_trash.mp3'),
+const SFX_SRCS = {
+  bagPunch:     'asset/sfx/bag_punch.mp3',
+  swatFly:      'asset/sfx/swat_fly.mp3',
+  swatHit:      'asset/sfx/swat_hit.mp3',
+  cloudWind:    'asset/sfx/cloud_wind.mp3',
+  wipeSqueak:   'asset/sfx/wipe_squeak.mp3',
+  crumplePaper: 'asset/sfx/crumple_paper.mp3',
+  crumpleTrash: 'asset/sfx/crumple_trash.mp3',
 };
+const SFX = {};
+function getSFX(key) {
+  if (!SFX[key]) {
+    SFX[key] = new Audio(SFX_SRCS[key]);
+    if (key === 'swatFly') SFX[key].loop = true;
+  }
+  return SFX[key];
+}
 function playSFX(key) {
-  const a = SFX[key]; if (!a) return;
-  a.currentTime = 0; a.play().catch(() => {});
+  const a = getSFX(key); a.currentTime = 0; a.play().catch(() => {});
 }
 function stopSFX(key) {
-  const a = SFX[key]; if (!a) return;
-  a.pause(); a.currentTime = 0;
+  if (!SFX[key]) return; SFX[key].pause(); SFX[key].currentTime = 0;
 }
 
 // 제스처 힌트 SVG — asset/fist.svg, asset/palm.svg 파일로 교체 가능
