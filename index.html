@@ -1271,13 +1271,13 @@ function handleSwatShake() {
   playSFX('swatHit');
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
 
-  // 살아있는 파리 중 하나를 80% 확률로 겨냥, 나머지는 빗나감
+  // 65% 확률로 파리 겨냥, ±100px 오차로 미스 유도
   const alive = MG.swat.flies.filter(el => el.dataset.alive === 'true');
   let sx, sy;
-  if (alive.length > 0 && Math.random() < 0.85) {
+  if (alive.length > 0 && Math.random() < 0.65) {
     const t = alive[Math.floor(Math.random() * alive.length)];
-    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 120;
-    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 120;
+    sx = parseFloat(t.dataset.x) + 36 + (Math.random() - 0.5) * 200;
+    sy = parseFloat(t.dataset.y) + 36 + (Math.random() - 0.5) * 200;
     sx = Math.max(80, Math.min(W - 80, sx));
     sy = Math.max(80, Math.min(H - 280, sy));
   } else {
@@ -1285,9 +1285,8 @@ function handleSwatShake() {
     sy = 80 + Math.random() * (H - 280);
   }
   const swEl = document.getElementById('swatter-el');
-  // swEl is display:none here so offsetWidth=0; compute from CSS clamp directly
   const swatterW = Math.min(Math.max(320, W * 0.55), 700);
-  const RADIUS = swatterW * 0.32;
+  const RADIUS = swatterW * 0.20;
 
   // Show swatter — slam in like glove
   swEl.style.left = (sx - swatterW / 2) + 'px';
@@ -1307,10 +1306,10 @@ function handleSwatShake() {
     }, 200);
   }));
 
-  // Hit check
+  // Hit check — max 1 kill per swing
   let hit = false;
-  MG.swat.flies.forEach(el => {
-    if (el.dataset.alive !== 'true') return;
+  for (const el of MG.swat.flies) {
+    if (el.dataset.alive !== 'true') continue;
     const fx = parseFloat(el.dataset.x) + 26;
     const fy = parseFloat(el.dataset.y) + 26;
     const dx = sx - fx, dy = sy - fy;
@@ -1320,8 +1319,9 @@ function handleSwatShake() {
       spawnParts(fx, fy, 12);
       MG.swat.remaining--;
       hit = true;
+      break;
     }
-  });
+  }
 
   const cnt = document.getElementById('swat-count');
   cnt.textContent = MG.swat.remaining > 0
