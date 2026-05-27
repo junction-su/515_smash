@@ -367,166 +367,99 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   }
 }
 
-/* ── INTRO OVERLAY ───────────────────────────────────────── */
+/* ── TUTORIAL COACH ──────────────────────────────────────── */
 #intro-overlay {
-  position:absolute; inset:0; z-index:80; background:#FFFFFF;
-  overflow:hidden; transition:opacity 0.5s ease;
+  position:absolute; inset:0; z-index:80;
+  pointer-events:none; transition:opacity 0.5s ease;
 }
-#intro-overlay.fade-out { opacity:0; pointer-events:none; }
+#intro-overlay.fade-out { opacity:0; }
 
-.intro-slide {
-  position:absolute; inset:0;
-  transition:transform 0.45s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease;
+#coach {
+  position:absolute; top:36%; left:50%;
+  transform:translate(-50%,-50%);
+  display:flex; flex-direction:column; align-items:center; gap:18px;
+  text-align:center;
 }
-.intro-slide.out-left  { transform:translateX(-110%); opacity:0; pointer-events:none; }
-.intro-slide.out-right { transform:translateX(110%);  opacity:0; pointer-events:none; }
-
-/* ── SLIDE 1 — editorial split ─ */
-#intro-slide-1 { display:grid; grid-template-columns:42% 58%; }
-
-.s1-dark {
-  background:var(--ink);
-  display:flex; align-items:center; justify-content:center;
-  padding:3rem; position:relative; overflow:hidden;
+#coach-img-wrap {
+  position:relative;
+  width:clamp(180px,28vw,300px); height:clamp(180px,28vw,300px);
 }
-.s1-dark::before {
-  content:'SMASH'; position:absolute;
-  bottom:-0.1em; left:-0.05em;
+#coach-img-wrap img {
+  position:absolute; inset:0; width:100%; height:auto;
+  filter:drop-shadow(0 10px 28px rgba(17,17,16,0.22));
+}
+
+/* STEP 1 defaults: open/fist loop */
+#coach-open { animation:coach-open 4s ease-in-out infinite; }
+#coach-fist { opacity:0; animation:coach-fist 4s ease-in-out infinite; }
+#coach-palm { opacity:0; }
+
+/* STEP 1 hit: freeze fist */
+#coach-img-wrap.hit #coach-open { opacity:0; animation:none; }
+#coach-img-wrap.hit #coach-fist {
+  opacity:1; animation:none;
+  transform:scale(1.08) translateY(-6px);
+  transition:transform 0.12s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* STEP 2: open hand sweeps side to side */
+#coach-img-wrap.step2 #coach-fist { opacity:0; animation:none; }
+#coach-img-wrap.step2 #coach-open {
+  opacity:1; animation:coach-swipe 2.5s cubic-bezier(0.4,0,0.2,1) infinite;
+}
+#coach-img-wrap.step2 #coach-palm { opacity:0; }
+
+@keyframes coach-open {
+  0%,18%   { opacity:1; }
+  22%,100% { opacity:0; }
+}
+@keyframes coach-fist {
+  0%,18%   { opacity:0; transform:scale(1) translate(0,0); }
+  22%      { opacity:1; transform:scale(1.08) translateY(-6px); }
+  28%      { opacity:1; transform:scale(1) translate(0,0); }
+  33%      { transform:translate(-12px,-5px) rotate(-6deg); }
+  40%      { transform:translate( 12px, 4px) rotate( 5deg); }
+  47%      { transform:translate( -9px,-4px) rotate(-4deg); }
+  54%      { transform:translate(  9px, 4px) rotate( 4deg); }
+  61%      { transform:translate( -5px,-2px) rotate(-2deg); }
+  68%      { transform:translate(  4px, 2px) rotate( 2deg); }
+  75%      { opacity:1; transform:translate(0,0) rotate(0deg); }
+  82%,100% { opacity:0; transform:translate(0,0); }
+}
+@keyframes coach-swipe {
+  0%,100% { transform:translateX(-70px) rotate(-10deg); opacity:0.55; }
+  15%     { opacity:1; }
+  50%     { transform:translateX( 70px) rotate( 10deg); opacity:1; }
+  85%     { opacity:1; }
+  95%     { opacity:0.55; }
+}
+
+#coach-title {
   font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(6rem,16vw,14rem); letter-spacing:-0.06em; line-height:1;
-  text-transform:uppercase; color:rgba(255,255,255,0.04);
-  pointer-events:none; white-space:nowrap; user-select:none;
-}
-.s1-dark img { width:clamp(140px,18vw,260px); height:auto; position:relative; z-index:1; }
-
-.s1-light {
-  display:flex; flex-direction:column; justify-content:center;
-  padding:clamp(2.5rem,5vw,4.5rem) clamp(2rem,4vw,4rem);
-  gap:clamp(1.25rem,2.5vh,2rem);
-}
-.s1-tag {
-  font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.34em;
-  text-transform:uppercase; color:var(--dim);
-}
-.s1-heading { line-height:1; }
-.s1-script {
-  display:block; font-family:'Playfair Display',serif; font-style:italic;
-  font-size:clamp(2.8rem,5vw,4.8rem); font-weight:400; line-height:1; color:var(--ink);
-}
-.s1-bold {
-  display:block; font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(5rem,9.5vw,8.5rem); letter-spacing:-0.05em; line-height:0.82;
-  text-transform:uppercase; color:var(--ink);
-}
-.s1-divider {
-  width:2.5rem; height:2px; background:var(--ink); border-radius:2px; flex-shrink:0;
-}
-.s1-steps { display:flex; flex-direction:column; gap:0.85rem; }
-.s1-step { display:flex; align-items:baseline; gap:1rem; }
-.s1-step-num {
-  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.22em;
-  color:var(--dim); flex-shrink:0; padding-top:2px;
-}
-.s1-step-text {
-  font-family:'Geist',sans-serif; font-size:clamp(0.88rem,1.2vw,1rem);
-  color:var(--ink); line-height:1.45; font-weight:400;
-}
-.s1-footer {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-top:clamp(0.5rem,2vh,1.5rem);
-}
-.s1-chrome-note {
-  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.24em;
-  text-transform:uppercase; color:var(--dim);
-}
-
-/* ── SLIDE 2 — gesture guide ─ */
-#intro-slide-2 {
-  display:flex; flex-direction:column; justify-content:center; align-items:center;
-  padding:clamp(2rem,4vw,3.5rem) clamp(2rem,7vw,6rem);
-  gap:clamp(1.25rem,2.5vh,2rem);
-}
-.s2-heading { text-align:center; }
-.s2-script {
-  display:block; font-family:'Playfair Display',serif; font-style:italic;
-  font-size:clamp(1.4rem,2.8vw,2.4rem); color:var(--dim); line-height:1;
-}
-.s2-bold {
-  display:block; font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(3.5rem,6.5vw,6rem); letter-spacing:-0.05em; line-height:0.85;
-  text-transform:uppercase; color:var(--ink);
-}
-
-.gesture-flows {
-  display:grid; grid-template-columns:1fr 1fr; gap:1rem; width:100%; max-width:660px;
-}
-.gesture-card {
-  border:1.5px solid rgba(17,17,16,0.10); border-radius:16px;
-  padding:1.5rem 1.25rem;
-  display:flex; flex-direction:column; gap:1.1rem;
-}
-.gesture-card-label {
-  font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(1.4rem,2.6vw,2.1rem); letter-spacing:-0.04em;
+  font-size:clamp(2.2rem,6vw,4.5rem); letter-spacing:-0.05em;
   text-transform:uppercase; color:var(--ink); line-height:1;
+  text-shadow:0 2px 16px rgba(255,255,255,0.9);
 }
-.gesture-card-steps { display:flex; align-items:center; gap:0.5rem; }
-.gesture-card-step { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; }
-.gesture-card-step img { width:42px; height:42px; object-fit:contain; }
-.gesture-card-step span {
-  font-family:'Geist Mono',monospace; font-size:8px; letter-spacing:0.16em;
-  text-transform:uppercase; color:var(--dim); text-align:center;
+#coach-sub {
+  font-family:'Geist Mono',monospace; font-size:clamp(10px,1.2vw,12px);
+  letter-spacing:0.24em; text-transform:uppercase; color:var(--dim);
+  text-shadow:0 1px 8px rgba(255,255,255,0.8);
 }
-.gesture-card-arrow { color:rgba(17,17,16,0.2); font-size:0.85rem; flex-shrink:0; }
-.gesture-card-note {
-  font-family:'Geist Mono',monospace; font-size:9px; letter-spacing:0.2em;
-  text-transform:uppercase; color:var(--dim);
+#coach-dots { display:flex; gap:8px; }
+#coach-dots span {
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(17,17,16,0.15); transition:background 0.25s;
 }
+#coach-dots span.on { background:var(--ink); }
 
-.intro-actions {
-  display:flex; flex-direction:column; align-items:center; gap:0.7rem;
-  width:100%; max-width:340px;
-}
-.intro-connect-btn {
-  font-family:'Geist',sans-serif; font-weight:900;
-  font-size:clamp(0.95rem,1.8vw,1.2rem); letter-spacing:0.02em; text-transform:uppercase;
-  color:#FFFFFF; background:var(--ink); border:none; border-radius:100px;
-  padding:clamp(13px,1.8vh,17px) 2rem;
-  cursor:pointer; transition:opacity 0.15s, transform 0.1s;
-  width:100%;
-}
-.intro-connect-btn { animation:intro-pulse 2.2s ease-in-out infinite; }
-.intro-connect-btn:hover { opacity:0.82; animation:none; }
-.intro-connect-btn:active { transform:scale(0.97); animation:none; }
-@keyframes intro-pulse {
-  0%,100% { box-shadow:0 0 0 0 rgba(17,17,16,0); }
-  50%      { box-shadow:0 0 0 8px rgba(17,17,16,0.12); }
-}
-.intro-secondary-row {
-  display:flex; align-items:center; justify-content:space-between; width:100%;
-}
-.intro-ghost-btn {
-  font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.18em;
+#coach-skip {
+  position:absolute; bottom:5.5rem; left:50%; transform:translateX(-50%);
+  pointer-events:auto;
+  font-family:'Geist Mono',monospace; font-size:10px; letter-spacing:0.22em;
   text-transform:uppercase; color:var(--dim); background:none; border:none;
-  cursor:pointer; padding:4px 0; transition:color 0.12s;
+  cursor:pointer; padding:6px 10px; transition:color 0.12s;
 }
-.intro-ghost-btn:hover { color:var(--ink); }
-
-.intro-btn {
-  font-family:'Geist',sans-serif; font-weight:700; font-size:clamp(0.82rem,1.3vw,0.92rem);
-  letter-spacing:0.06em; text-transform:uppercase;
-  color:#FFFFFF; background:var(--ink); border:none; border-radius:100px;
-  padding:11px 24px; cursor:pointer; transition:opacity 0.15s, transform 0.1s;
-}
-.intro-btn:hover { opacity:0.82; }
-.intro-btn:active { transform:scale(0.96); }
-
-.intro-knuckle-sm {
-  width:42px; height:42px; object-fit:contain;
-  background:var(--ink); border-radius:6px; padding:4px;
-}
-.intro-fist-hint { animation:smash-hint 1.1s ease-in-out infinite; }
-.intro-palm-hint { animation:swipe-hint 1.4s ease-in-out infinite; }
+#coach-skip:hover { color:var(--ink); }
 
 @media (hover:none) and (pointer:coarse) {
   #intro-overlay { display:none; }
@@ -644,89 +577,19 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     <button id="touch-swipe">SWIPE</button>
   </div>
 
-  <!-- Intro overlay -->
+  <!-- Tutorial coach overlay -->
   <div id="intro-overlay">
-
-    <!-- Slide 1: What is SMASH -->
-    <div id="intro-slide-1" class="intro-slide">
-      <div class="s1-dark">
-        <img src="asset/knucle.svg" alt="SMASH device">
+    <div id="coach">
+      <div id="coach-img-wrap">
+        <img id="coach-open" src="asset/knuckle_open.png" alt="">
+        <img id="coach-fist" src="asset/knuckle_fist.png" alt="">
+        <img id="coach-palm" src="asset/palm.svg" alt="">
       </div>
-      <div class="s1-light">
-        <span class="s1-tag">What's on your hand?</span>
-        <div class="s1-heading">
-          <span class="s1-script">Stress</span>
-          <span class="s1-bold">SMASH</span>
-        </div>
-        <div class="s1-divider"></div>
-        <div class="s1-steps">
-          <div class="s1-step">
-            <span class="s1-step-num">01</span>
-            <span class="s1-step-text">Slide the device onto your knuckles like a ring (but cooler)</span>
-          </div>
-          <div class="s1-step">
-            <span class="s1-step-num">02</span>
-            <span class="s1-step-text">There's a button on the bottom edge. Clench your fist to press it.</span>
-          </div>
-          <div class="s1-step">
-            <span class="s1-step-num">03</span>
-            <span class="s1-step-text">Open your hand and flick it sideways. That's a swipe.</span>
-          </div>
-        </div>
-        <div class="s1-footer">
-          <span class="s1-chrome-note">Chrome only — we know, we know</span>
-          <button class="intro-btn" onclick="introNext()">Now show me how →</button>
-        </div>
-      </div>
+      <p id="coach-title">MAKE A FIST</p>
+      <p id="coach-sub">clench the device — or tap 1</p>
+      <div id="coach-dots"><span class="on"></span><span></span></div>
     </div>
-
-    <!-- Slide 2: How to Play -->
-    <div id="intro-slide-2" class="intro-slide out-right">
-      <div class="s2-heading">
-        <span class="s2-script">How to</span>
-        <span class="s2-bold">PLAY</span>
-      </div>
-      <div class="gesture-flows">
-        <div class="gesture-card">
-          <span class="gesture-card-label">SMASH</span>
-          <div class="gesture-card-steps">
-            <div class="gesture-card-step">
-              <img src="asset/knucle.svg" class="intro-knuckle-sm" alt="">
-              <span>Wear</span>
-            </div>
-            <span class="gesture-card-arrow">→</span>
-            <div class="gesture-card-step">
-              <img src="asset/fist.svg" class="intro-fist-hint" alt="">
-              <span>Make a fist</span>
-            </div>
-          </div>
-          <span class="gesture-card-note">Clench. That's literally it.</span>
-        </div>
-        <div class="gesture-card">
-          <span class="gesture-card-label">SWIPE</span>
-          <div class="gesture-card-steps">
-            <div class="gesture-card-step">
-              <img src="asset/knucle.svg" class="intro-knuckle-sm" alt="">
-              <span>Wear</span>
-            </div>
-            <span class="gesture-card-arrow">→</span>
-            <div class="gesture-card-step">
-              <img src="asset/palm.svg" class="intro-palm-hint" alt="">
-              <span>Wave hand</span>
-            </div>
-          </div>
-          <span class="gesture-card-note">Wave. Like you mean it.</span>
-        </div>
-      </div>
-      <div class="intro-actions">
-        <button class="intro-connect-btn" onclick="connectSerial()">Plug in &amp; play</button>
-        <div class="intro-secondary-row">
-          <button class="intro-ghost-btn" onclick="introPrev()">← Back</button>
-          <button class="intro-ghost-btn" onclick="exitIntro()">I'll use my keyboard, I guess</button>
-        </div>
-      </div>
-    </div>
-
+    <button id="coach-skip" onclick="exitIntro()">skip</button>
   </div>
 </div>
 
@@ -1510,6 +1373,12 @@ function gesture(raw) {
   if (!['shake','wave','idle'].includes(g)) return;
   if (g !== 'idle') S.counts[g]++;
 
+  if (S.phase === 'TUTORIAL') {
+    if (g === 'shake') doScreenShake();
+    tutorialHit(g);
+    return;
+  }
+
   if (g === 'shake') {
     doScreenShake();
 
@@ -1541,7 +1410,7 @@ async function connectSerial() {
   try {
     S.port = await navigator.serial.requestPort();
     await S.port.open({ baudRate: 115200 });
-    S.connected = true; setConnUI(true); exitIntro();
+    S.connected = true; setConnUI(true);
     const dec = new TextDecoderStream();
     const rd  = dec.readable.getReader();
     S.port.readable.pipeTo(dec.writable);
@@ -1601,22 +1470,51 @@ $hudBtn.addEventListener('click', () => {
 document.getElementById('touch-smash').addEventListener('click', () => gesture('shake'));
 document.getElementById('touch-swipe').addEventListener('click', () => gesture('wave'));
 
-// ── INTRO ─────────────────────────────────────────────────────────────────────
+// ── TUTORIAL COACH ────────────────────────────────────────────────────────────
 
-function introNext() {
-  document.getElementById('intro-slide-1').classList.add('out-left');
-  document.getElementById('intro-slide-2').classList.remove('out-right');
+const TUT_STEPS = [
+  { g:'shake', title:'MAKE A FIST',  sub:'clench the device — or tap 1', words:['NICE!','BOOM!','YES!'] },
+  { g:'wave',  title:'NOW SWIPE',    sub:'wave your hand — or tap 2',     words:['WHOOSH!','SMOOTH!','PERFECT!'] },
+];
+let tutIdx = 0;
+
+function startTutorial() {
+  S.phase = 'TUTORIAL'; tutIdx = 0; renderCoach();
 }
-function introPrev() {
-  document.getElementById('intro-slide-2').classList.add('out-right');
-  document.getElementById('intro-slide-1').classList.remove('out-left');
+function renderCoach() {
+  const step = TUT_STEPS[tutIdx];
+  const wrap = document.getElementById('coach-img-wrap');
+  wrap.className = tutIdx === 1 ? 'step2' : '';
+  document.getElementById('coach-title').textContent = step.title;
+  document.getElementById('coach-sub').textContent   = step.sub;
+  document.querySelectorAll('#coach-dots span').forEach((d,i) => d.classList.toggle('on', i <= tutIdx));
+}
+function tutorialHit(g) {
+  const step = TUT_STEPS[tutIdx];
+  if (!step || g !== step.g) return;
+  animImpact(step.words[Math.random() * step.words.length | 0]);
+  if (g === 'shake') {
+    document.getElementById('coach-img-wrap').classList.add('hit');
+    animateGlove();
+  }
+  tutIdx++;
+  if (tutIdx >= TUT_STEPS.length) setTimeout(finishTutorial, 700);
+  else setTimeout(renderCoach, 600);
+}
+function finishTutorial() {
+  const $i = document.getElementById('mg-intro');
+  $i.textContent = "LET'S GO!"; $i.classList.add('show');
+  setTimeout(() => { $i.classList.remove('show'); exitIntro(); }, 900);
 }
 function exitIntro() {
   const el = document.getElementById('intro-overlay');
   if (!el || el.style.display === 'none') return;
+  S.phase = 'WARMUP'; S.warmupHits = 0;
   el.classList.add('fade-out');
   setTimeout(() => { el.style.display = 'none'; }, 520);
 }
+
+if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) startTutorial();
 </script>
 </body>
 </html>
