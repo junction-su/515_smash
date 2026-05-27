@@ -14,6 +14,8 @@ TECHIN 515 — Hardware Software Lab II, Spring 2026 capstone project.
 2. If you have the device, click "connect device" → select the USB port
 3. Keyboard fallback works without a device
 
+On mobile, the app shows a short touch demo start screen instead of the device onboarding flow. Desktop with the knuckle device is recommended, but the game can be tried with the on-screen **SMASH** / **SWIPE** controls.
+
 | Key | Gesture |
 |-----|---------|
 | `1` | SMASH (fist clench) |
@@ -108,3 +110,4 @@ python convert_model.py
 - Web Serial requires **Chrome or Edge** (not supported in Firefox)
 - Close Arduino IDE before connecting in the browser to avoid Serial port conflicts
 - Full game is playable with keyboard `1` / `2` — no device needed
+- Mobile/touch browsers skip device onboarding and use on-screen SMASH / SWIPE buttons

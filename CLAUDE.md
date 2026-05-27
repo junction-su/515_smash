@@ -16,7 +16,7 @@ WarioWare-style stress relief minigame collection controlled by a wearable knuck
 | `idle` | nothing | `3` |
 
 ## Game Phases
-`S.phase`: `TUTORIAL` → `WARMUP` → `MG_INTRO` → `MG_ACTIVE` → `MG_CLEAR` → `ROUND_CLEAR` → (repeat)
+`S.phase`: `TUTORIAL` (desktop only) or `MOBILE_INTRO` (touch only) → `WARMUP` → `MG_INTRO` → `MG_ACTIVE` → `MG_CLEAR` → `ROUND_CLEAR` → (repeat)
 
 ## Minigames
 `MINIGAME_TYPES = ['wipe', 'crumple', 'swat', 'cloud']`
@@ -58,15 +58,23 @@ playSFX(key)   // currentTime=0 then play
 stopSFX(key)   // pause + reset
 warmupSFX()    // called at first gesture() — silent play-pause forces decode on all audio
 ```
-**Note**: `warmupSFX()` is called at the top of `gesture()` (covers keyboard, touch buttons, and serial device). Each `initXxx()` function preloads via `getSFX()`.
+**Note**: `warmupSFX()` is called at the top of `gesture()` (covers keyboard, touch buttons, and serial device), on connect button clicks, and on mobile START. It uses temporary muted audio elements so failed browser autoplay attempts cannot leave real SFX instances muted. Each `initXxx()` function preloads via `getSFX()`.
 
 ## Tutorial (desktop only)
-- Mobile `@media (hover:none)` → `display:none`
+- Desktop pointer query: `(hover:hover) and (pointer:fine)` → `startTutorial()`
+- Touch/mobile pointer query skips tutorial and uses `#mobile-intro`
 - `S.phase = 'TUTORIAL'` → `gesture()` routes to `tutorialHit()` at top
 - STEP 0: connect screen — card centered with dark dim overlay, slides left on connect/skip
-- STEP 1: shake → `animateGlove()` + fist confirm
-- STEP 2: wave → sandbag `tut-sway` + `cloud_wind` SFX
+- STEP 1: SMASH — "punch forward with the device — or press 1" → `animateGlove()` + fist confirm
+- STEP 2: SWIPE — "swipe sideways with the device — or press 2" → sandbag `tut-sway` + `cloud_wind` SFX
 - Done: "LET'S GO!" flash → `exitIntro()` → WARMUP
+
+## Mobile Touch Demo
+- `#mobile-intro` appears on touch/coarse-pointer environments instead of desktop onboarding.
+- `S.phase = 'MOBILE_INTRO'` until the user taps START, then `startMobileDemo()` sets `S.phase = 'WARMUP'`.
+- On-screen controls: `#touch-smash` → `gesture('shake')`, `#touch-swipe` → `gesture('wave')`.
+- `#touch-btns[data-needed]` dims the currently unnecessary touch action. `setTouchNeeded('smash'|'swipe')` updates this during WARMUP, MG_INTRO, and round reset.
+- DevTools desktop→mobile switching is handled by the pointer media query change listener, which hides desktop onboarding and shows mobile intro.
 
 ## Branch
 `claude/build-smash-html-PzfLq`
