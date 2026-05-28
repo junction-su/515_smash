@@ -626,13 +626,22 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 #menu-btn {
   position:absolute; top:1.4rem; left:1.4rem; z-index:76;
   width:36px; height:36px; background:none; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  padding:0; pointer-events:auto;
+}
+#menu-btn .bars {
   display:flex; flex-direction:column; justify-content:space-between;
-  padding:7px 5px; pointer-events:auto;
+  width:22px; height:16px;
 }
-#menu-btn span {
-  display:block; height:2px; background:var(--ink);
-  border-radius:2px;
+#menu-btn .bars span {
+  display:block; height:2px; background:var(--ink); border-radius:2px;
 }
+#menu-btn .x {
+  display:none; font-size:1.2rem; line-height:1;
+  color:var(--ink); font-family:sans-serif;
+}
+#menu-btn.open .bars { display:none; }
+#menu-btn.open .x   { display:block; }
 
 #game-menu {
   position:absolute; inset:0; z-index:75;
@@ -715,7 +724,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .mg-rag        { width:55%; top:20%; left:-60%; }
 .mg-trash      { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
 .mg-trash-open { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-fan        { width:10%; bottom:6%; right:6%; transform-origin:85% 90%; }
+.mg-fan        { width:5%; bottom:6%; right:6%; transform-origin:85% 90%; }
 /* fan & trash: opacity controlled by hover state, not keyframes */
 .mg-card[data-mg="cloud"]:hover   .mg-fan   { opacity:1; }
 .mg-card[data-mg="crumple"]:hover .mg-trash { opacity:1; }
@@ -923,7 +932,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   </div>
 
   <!-- Hamburger menu -->
-  <button id="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <button id="menu-btn" onclick="toggleMenu()">
+    <span class="bars"><span></span><span></span><span></span></span>
+    <span class="x">✕</span>
+  </button>
   <div id="game-menu">
     <button id="game-menu-close" onclick="toggleMenu()">✕</button>
     <div id="game-menu-grid">
@@ -1954,7 +1966,8 @@ function setConnUI(on) {
 // ── HAMBURGER MENU ────────────────────────────────────────────────────────────
 
 function toggleMenu() {
-  document.getElementById('game-menu').classList.toggle('open');
+  const isOpen = document.getElementById('game-menu').classList.toggle('open');
+  document.getElementById('menu-btn').classList.toggle('open', isOpen);
 }
 
 function selectGame(type) {
