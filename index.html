@@ -621,6 +621,36 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 @media (hover:none) and (pointer:coarse) {
   #intro-overlay { display:none; }
 }
+
+/* ── HAMBURGER MENU ──────────────────────────────────────── */
+#menu-btn {
+  position:absolute; top:1.4rem; left:1.4rem; z-index:35;
+  width:36px; height:36px; background:none; border:none; cursor:pointer;
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:7px 5px; pointer-events:auto;
+}
+#menu-btn span {
+  display:block; height:2px; background:var(--ink);
+  border-radius:2px;
+}
+#game-menu {
+  position:absolute; top:3.8rem; left:1rem; z-index:35;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-radius:10px; padding:6px;
+  box-shadow:0 4px 20px rgba(17,17,16,0.13);
+  display:none; flex-direction:column; gap:2px; min-width:140px;
+}
+#game-menu.open { display:flex; }
+#game-menu button {
+  font-family:'Geist',sans-serif; font-weight:700; font-size:11px;
+  letter-spacing:0.08em; text-transform:uppercase; text-align:left;
+  padding:9px 12px; border:none; border-radius:6px;
+  background:none; color:var(--dim); cursor:pointer;
+  transition:background 0.1s, color 0.1s;
+}
+#game-menu button:hover { background:rgba(17,17,16,0.07); color:var(--ink); }
+#game-menu button.active { background:var(--ink); color:#fff; }
 </style>
 </head>
 <body>
@@ -749,6 +779,17 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     </div>
   </div>
 
+  <!-- Hamburger menu -->
+  <button id="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <div id="game-menu">
+    <button data-mg="random"  onclick="selectGame('random')">Random</button>
+    <button data-mg="sandbag" onclick="selectGame('sandbag')">Sandbag</button>
+    <button data-mg="wipe"    onclick="selectGame('wipe')">Wipe</button>
+    <button data-mg="crumple" onclick="selectGame('crumple')">Crumple</button>
+    <button data-mg="swat"    onclick="selectGame('swat')">Swat</button>
+    <button data-mg="cloud"   onclick="selectGame('cloud')">Cloud</button>
+  </div>
+
   <!-- Tutorial coach overlay -->
   <div id="intro-overlay">
     <div id="coach-dim"></div>
@@ -831,6 +872,7 @@ const MG_INTRO_LABELS = {
   crumple: 'CRUMPLE!',
   swat:    'SWAT IT!',
   cloud:   'BLOW IT!',
+  sandbag: 'SMASH IT!',
 };
 
 const WORDS_SHAKE = ['SMASH', 'POW', 'CRUSH', 'BAM', 'WHAM'];
@@ -850,6 +892,8 @@ const S = {
   warmupTarget: 4 + Math.floor(Math.random() * 2),
   mgQueue: [],
   currentMG: null,
+  menuMode: 'random',
+  sandbagHits: 0,
   counts: { shake: 0, wave: 0 },
   connected: false, port: null, writer: null,
   bagAngle: 0, bagV: 0, bagDamp: 0.95, bagPhase: 0,
@@ -1060,8 +1104,9 @@ function showBag() {
 }
 
 function launchMinigameRound() {
-  // Pick 4 random from 5 types each round
-  S.mgQueue = shuffle(MINIGAME_TYPES).slice(0, 4);
+  S.mgQueue = S.menuMode !== 'random' && S.menuMode !== 'sandbag'
+    ? [S.menuMode]
+    : shuffle(MINIGAME_TYPES).slice(0, 4);
   startNextMinigame();
 }
 
@@ -1109,7 +1154,11 @@ function mgClear(type) {
   const words = { bubble:'ALL CLEAR!', wipe:'SPOTLESS!', crumple:'TRASHED!', swat:'GOT EM!', cloud:'SUNSHINE!' };
   animImpact(words[type] || 'CLEAR!');
   $ghost.textContent = 'YES';
-  setTimeout(startNextMinigame, 900);
+  if (S.menuMode !== 'random' && S.menuMode !== 'sandbag') {
+    setTimeout(() => { S.mgQueue = [S.menuMode]; startNextMinigame(); }, 900);
+  } else {
+    setTimeout(startNextMinigame, 900);
+  }
 }
 
 function hideMinigameUI(type) {
@@ -1626,10 +1675,15 @@ function gesture(raw) {
 
     if (S.phase === 'WARMUP') {
       animateGlove();
-      S.warmupHits++;
-      showWarmupCount();
-      if (S.warmupHits >= S.warmupTarget) {
-        setTimeout(() => hideBag(launchMinigameRound), 300);
+      if (S.menuMode === 'sandbag') {
+        S.sandbagHits++;
+        showSandbagCount();
+      } else {
+        S.warmupHits++;
+        showWarmupCount();
+        if (S.warmupHits >= S.warmupTarget) {
+          setTimeout(() => hideBag(launchMinigameRound), 300);
+        }
       }
     } else if (S.phase === 'MG_ACTIVE') {
       if (S.currentMG === 'bubble')  { animateGlove(); handleBubbleShake(); }
@@ -1691,6 +1745,97 @@ function setConnUI(on) {
   $hudStatus.textContent = on ? 'connected' : 'disconnected';
   $hudBtn.textContent    = on ? 'disconnect' : 'connect device';
 }
+
+// ── HAMBURGER MENU ────────────────────────────────────────────────────────────
+
+function toggleMenu() {
+  document.getElementById('game-menu').classList.toggle('open');
+}
+
+function selectGame(type) {
+  S.menuMode = type;
+  document.getElementById('game-menu').classList.remove('open');
+  document.querySelectorAll('#game-menu button').forEach(b =>
+    b.classList.toggle('active', b.dataset.mg === type));
+  cleanupCurrentMG();
+  if (type === 'random') {
+    resetToWarmup();
+  } else if (type === 'sandbag') {
+    startSandbagMode();
+  } else {
+    startSingleGame(type);
+  }
+}
+
+function cleanupCurrentMG() {
+  stopSFX('swatFly');
+  S.phase = 'MG_CLEAR';
+  ['mg-swat','mg-cloud','mg-wipe-bg','mg-crumple'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.opacity = '0'; setTimeout(() => { el.style.display = 'none'; }, 300); }
+  });
+  $fogCanvas.style.display = 'none';
+  const fCtx = $fogCanvas.getContext('2d');
+  fCtx.clearRect(0, 0, $fogCanvas.width, $fogCanvas.height);
+  ['reveal-sky','reveal-field','reveal-sun'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+}
+
+function resetToWarmup() {
+  S.warmupHits = 0;
+  S.warmupTarget = 4 + Math.floor(Math.random() * 2);
+  S.phase = 'WARMUP';
+  $ghost.textContent = 'STRESS';
+  $typoScript.textContent = 'Stress';
+  $typoBold.textContent = 'SMASH';
+  showBag();
+}
+
+function startSingleGame(type) {
+  S.mgQueue = [type];
+  if ($bagWrap.style.display !== 'none') {
+    hideBag(() => startNextMinigame());
+  } else {
+    startNextMinigame();
+  }
+}
+
+function startSandbagMode() {
+  S.sandbagHits = 0;
+  S.phase = 'MG_INTRO';
+  $mgIntro.textContent = 'SMASH IT!';
+  $mgIntro.classList.add('show');
+  $hintIcon.innerHTML = FIST_SVG;
+  $hintIcon.style.animation = 'smash-hint 0.38s ease-in-out infinite';
+  $hintLabel.textContent = 'SMASH';
+  $mgGestureHint.classList.add('show');
+  setTimeout(() => {
+    $mgIntro.classList.remove('show');
+    $mgGestureHint.classList.remove('show');
+    $hintIcon.style.animation = '';
+    setTimeout(() => {
+      $ghost.textContent = 'STRESS';
+      $typoScript.textContent = 'Stress';
+      $typoBold.textContent = 'SMASH';
+      showBag();
+      S.phase = 'WARMUP';
+    }, 150);
+  }, 1100);
+}
+
+function showSandbagCount() {
+  clearTimeout(S._wt);
+  $warmupN.textContent = S.sandbagHits;
+  $warmupN.style.opacity = '1';
+  S._wt = setTimeout(() => { $warmupN.style.opacity = '0'; }, 600);
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#menu-btn') && !e.target.closest('#game-menu'))
+    document.getElementById('game-menu').classList.remove('open');
+});
 
 // ── KEYBOARD ─────────────────────────────────────────────────────────────────
 
@@ -1761,6 +1906,7 @@ let tutIdx = 0;
 function startTutorial() {
   S.phase = 'TUTORIAL'; tutIdx = 0;
   document.getElementById('intro-overlay').classList.add('step-connect');
+  document.getElementById('menu-btn').style.display = 'none';
   renderCoach();
 }
 function renderCoach() {
@@ -1824,6 +1970,7 @@ function exitIntro() {
   setTouchNeeded('smash');
   el.classList.add('fade-out');
   setTimeout(() => { el.style.display = 'none'; }, 520);
+  document.getElementById('menu-btn').style.display = '';
 }
 
 function disableTutorialForTouch() {
