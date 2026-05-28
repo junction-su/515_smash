@@ -779,11 +779,24 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   }
 }
 
-.mg-card-body { text-align:center; }
+.mg-card-body {
+  text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.mg-card-gesture {
+  font-family:'Geist Mono',monospace; font-weight:500;
+  font-size:clamp(0.5rem,1.1vw,0.65rem); letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--dim);
+}
 .mg-card-title {
   font-family:'Geist',sans-serif; font-weight:900;
   font-size:clamp(1rem,3vw,1.65rem);
-  color:#111110; text-transform:uppercase; line-height:1.4;
+  color:#111110; text-transform:uppercase; line-height:1.2;
+}
+.mg-card-desc {
+  font-family:'Geist Mono',monospace; font-weight:400;
+  font-size:clamp(0.55rem,1.2vw,0.7rem); letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--dim); line-height:1.4;
 }
 </style>
 </head>
@@ -923,13 +936,16 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
         <div class="mg-card-img"><img src="asset/knuckle_device.png" alt=""></div>
         <div class="mg-card-body">
           <span class="mg-card-title">Random</span>
+          <span class="mg-card-desc">All games, random order</span>
         </div>
       </button>
 
       <button class="mg-card" data-mg="sandbag" onclick="selectGame('sandbag')">
         <div class="mg-card-img"><img src="asset/sandbag.webp" alt=""></div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Smash</span>
           <span class="mg-card-title">Sandbag</span>
+          <span class="mg-card-desc">Infinite hits</span>
         </div>
       </button>
 
@@ -939,7 +955,9 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
           <img class="mg-rag" src="asset/rag.png" alt="">
         </div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Swipe</span>
           <span class="mg-card-title">Wipe</span>
+          <span class="mg-card-desc">Clean the window</span>
         </div>
       </button>
 
@@ -950,14 +968,18 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
           <img class="mg-trash-open" src="asset/trash_open.png" alt="">
         </div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Smash</span>
           <span class="mg-card-title">Crumple</span>
+          <span class="mg-card-desc">Crumple the paper</span>
         </div>
       </button>
 
       <button class="mg-card" data-mg="swat" onclick="selectGame('swat')">
         <div class="mg-card-img"><img src="asset/swatter.webp" alt=""></div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Smash</span>
           <span class="mg-card-title">Swat</span>
+          <span class="mg-card-desc">Swat the flies</span>
         </div>
       </button>
 
@@ -967,7 +989,9 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
           <img class="mg-fan" src="asset/fan.png" alt="">
         </div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Swipe</span>
           <span class="mg-card-title">Cloud</span>
+          <span class="mg-card-desc">Blow away clouds</span>
         </div>
       </button>
 
