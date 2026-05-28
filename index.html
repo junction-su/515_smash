@@ -602,7 +602,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   font-family:'Geist',sans-serif; font-weight:700;
   font-size:11px; letter-spacing:0.06em; text-transform:uppercase;
   color:#fff; background:var(--ink);
-  border:none; border-radius:6px; padding:11px 16px;
+  border:none; border-radius:6px; padding:15px 16px;
   cursor:pointer; transition:opacity 0.15s, transform 0.1s;
 }
 #coach-connect:hover { opacity:0.82; }
@@ -724,7 +724,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .mg-rag        { width:55%; top:20%; left:-60%; }
 .mg-trash      { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
 .mg-trash-open { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-fan        { width:5%; max-width:16px; bottom:6%; right:6%; transform-origin:85% 90%; }
+.mg-fan        { width:12%; height:auto; object-fit:unset; bottom:6%; right:6%; transform-origin:85% 90%; }
 /* fan & trash: opacity controlled by hover state, not keyframes */
 .mg-card[data-mg="cloud"]:hover   .mg-fan   { opacity:1; }
 .mg-card[data-mg="crumple"]:hover .mg-trash { opacity:1; }
