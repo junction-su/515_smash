@@ -680,11 +680,11 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   #game-menu { padding:clamp(1.5rem,4vw,3rem) 0 2.5rem; }
   #game-menu-grid {
     display:block !important;
-    overflow:hidden;
+    overflow-x:clip;    /* clip side-cards horizontally only */
+    overflow-y:visible; /* let shadow breathe vertically */
     width:100%;
     margin-top:2rem;
-    padding:24px 0; /* shadow room */
-    box-sizing:border-box;
+    padding:20px 0;
   }
   #carousel-track {
     display:flex;
@@ -698,9 +698,9 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   #carousel-dots { display:flex; }
 
   /* mobile fonts */
-  .mg-card-gesture { font-size:12px; }
-  .mg-card-title   { font-size:18px; }
-  .mg-card-desc    { font-size:12px; }
+  #carousel-track .mg-card-gesture { font-size:14px; }
+  #carousel-track .mg-card-title   { font-size:18px; }
+  #carousel-track .mg-card-desc    { font-size:16px; }
 
   /* card scale: non-active cards slightly smaller for depth */
   #carousel-track .mg-card {
