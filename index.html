@@ -707,15 +707,18 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 /* swatter: contain but scaled up to fill frame better */
 [data-mg="swat"]   .mg-card-img img { object-fit:contain; object-position:center; transform:scale(1.25); }
 
-/* overlay images (rag, trash, fan) — hidden by default */
+/* overlay images — hidden by default */
 .mg-rag, .mg-trash, .mg-trash-open, .mg-fan {
   position:absolute; object-fit:contain;
   pointer-events:none; z-index:2; opacity:0;
 }
-.mg-rag      { width:55%; top:20%; left:-60%; }
-.mg-trash    { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
+.mg-rag        { width:55%; top:20%; left:-60%; }
+.mg-trash      { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
 .mg-trash-open { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-fan      { width:42%; bottom:4%; right:4%; transform-origin:80% 90%; }
+.mg-fan        { width:42%; bottom:4%; right:4%; transform-origin:80% 90%; }
+/* fan & trash: opacity controlled by hover state, not keyframes */
+.mg-card[data-mg="cloud"]:hover   .mg-fan   { opacity:1; }
+.mg-card[data-mg="crumple"]:hover .mg-trash { opacity:1; }
 
 /* hover animations — desktop only */
 @media (hover:hover) and (pointer:fine) {
@@ -740,8 +743,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     0%,40% { opacity:0; } 45%,95% { opacity:1; } 100% { opacity:0; }
   }
   @keyframes mg-fan-wave {
-    0%,100% { transform:rotate(-20deg); opacity:1; }
-    50%     { transform:rotate(10deg);  opacity:1; }
+    0%,100% { transform:rotate(-20deg); }
+    50%     { transform:rotate(10deg);  }
   }
   @keyframes mg-cloud-blown {
     0%,100% { transform:translateX(0) scale(1); }
@@ -765,14 +768,14 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   .mg-card[data-mg="cloud"]:hover .mg-card-img img {
     animation:mg-cloud-blown 1.1s ease-in-out infinite;
   }
-  .mg-card[data-mg="cloud"]:hover .mg-fan {
-    animation:mg-fan-wave 0.75s ease-in-out infinite;
-  }
   .mg-card[data-mg="crumple"]:hover .mg-trash {
-    animation:mg-trash-closed 1.3s ease-in-out infinite;
+    animation:mg-trash-closed 1.3s ease-in-out infinite; opacity:1;
   }
   .mg-card[data-mg="crumple"]:hover .mg-trash-open {
     animation:mg-trash-opened 1.3s ease-in-out infinite;
+  }
+  .mg-card[data-mg="cloud"]:hover .mg-fan {
+    animation:mg-fan-wave 0.75s ease-in-out infinite;
   }
   .mg-card[data-mg="random"]:hover .mg-card-img img {
     animation:mg-knuckle 0.85s ease-in-out infinite;
@@ -795,8 +798,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 .mg-card-desc {
   font-family:'Geist Mono',monospace; font-weight:400;
-  font-size:clamp(0.55rem,1.2vw,0.7rem); letter-spacing:0.08em;
-  text-transform:uppercase; color:var(--dim); line-height:1.4;
+  font-size:clamp(0.55rem,1.2vw,0.7rem); letter-spacing:0.04em;
+  color:var(--dim); line-height:1.4;
 }
 </style>
 </head>
@@ -935,6 +938,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
       <button class="mg-card" data-mg="random" onclick="selectGame('random')">
         <div class="mg-card-img"><img src="asset/knuckle_device.png" alt=""></div>
         <div class="mg-card-body">
+          <span class="mg-card-gesture">Smash / Swipe</span>
           <span class="mg-card-title">Random</span>
           <span class="mg-card-desc">All games, random order</span>
         </div>
