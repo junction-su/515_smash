@@ -716,18 +716,22 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 /* swatter: contain but scaled up to fill frame better */
 [data-mg="swat"]   .mg-card-img img { object-fit:contain; object-position:center; transform:scale(1.25); }
 
-/* overlay images — hidden by default */
-.mg-rag, .mg-trash, .mg-trash-open, .mg-fan {
+/* overlay images — higher specificity than .mg-card-img img to override width:100% */
+.mg-card-img img.mg-rag,
+.mg-card-img img.mg-trash,
+.mg-card-img img.mg-trash-open,
+.mg-card-img img.mg-fan {
   position:absolute; object-fit:contain;
   pointer-events:none; z-index:2; opacity:0;
+  width:auto; height:auto;
 }
-.mg-rag        { width:55%; top:20%; left:-60%; }
-.mg-trash      { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-trash-open { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-fan        { width:20px; height:20px; object-fit:contain; bottom:6%; right:6%; transform-origin:85% 90%; }
-/* fan & trash: opacity controlled by hover state, not keyframes */
-.mg-card[data-mg="cloud"]:hover   .mg-fan   { opacity:1; }
-.mg-card[data-mg="crumple"]:hover .mg-trash { opacity:1; }
+.mg-card-img img.mg-rag        { width:55%; top:20%; left:-60%; }
+.mg-card-img img.mg-trash      { height:38%; bottom:4%; left:50%; transform:translateX(-50%); }
+.mg-card-img img.mg-trash-open { height:38%; bottom:4%; left:50%; transform:translateX(-50%); }
+.mg-card-img img.mg-fan        { height:20px; bottom:6%; right:6%; transform-origin:85% 90%; }
+/* fan & trash: opacity controlled by hover state */
+.mg-card[data-mg="cloud"]:hover   .mg-card-img img.mg-fan   { opacity:1; }
+.mg-card[data-mg="crumple"]:hover .mg-card-img img.mg-trash { opacity:1; }
 
 /* hover animations — desktop only */
 @media (hover:hover) and (pointer:fine) {
@@ -764,19 +768,19 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   .mg-card[data-mg="sandbag"]:hover .mg-card-img img {
     animation:mg-sway 1.2s ease-in-out infinite; transform-origin:top center;
   }
-  .mg-card[data-mg="wipe"]:hover .mg-rag {
+  .mg-card[data-mg="wipe"]:hover .mg-card-img img.mg-rag {
     animation:mg-rag-sweep 1.4s ease-in-out infinite;
   }
   .mg-card[data-mg="swat"]:hover .mg-card-img img {
     animation:mg-swat 0.65s ease-in-out infinite; transform-origin:top center;
   }
-  .mg-card[data-mg="crumple"]:hover .mg-trash {
+  .mg-card[data-mg="crumple"]:hover .mg-card-img img.mg-trash {
     animation:mg-trash-closed 1.3s ease-in-out infinite; opacity:1;
   }
-  .mg-card[data-mg="crumple"]:hover .mg-trash-open {
+  .mg-card[data-mg="crumple"]:hover .mg-card-img img.mg-trash-open {
     animation:mg-trash-opened 1.3s ease-in-out infinite;
   }
-  .mg-card[data-mg="cloud"]:hover .mg-fan {
+  .mg-card[data-mg="cloud"]:hover .mg-card-img img.mg-fan {
     animation:mg-fan-wave 1.2s ease-in-out infinite;
   }
   .mg-card[data-mg="random"]:hover .mg-card-img img {
