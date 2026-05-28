@@ -2,7 +2,9 @@
 
 A wearable gesture-controlled stress relief game. Clench your fist and wave your hand to smash through minigames using a knuckle-worn device.
 
-TECHIN 515 — Hardware Software Lab II, Spring 2026 capstone project.
+TECHIN 515 — Hardware Software Lab II.
+
+**Live demo: [515-smash.vercel.app](https://515-smash.vercel.app)**
 
 ---
 
