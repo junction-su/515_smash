@@ -696,17 +696,46 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   overflow:hidden;
   display:flex; align-items:center; justify-content:center;
 }
-.mg-card-img:not(.random-collage) > img {
-  width:100%; height:100%; object-fit:contain;
+.mg-card-img img {
+  width:100%; height:100%; object-fit:cover; object-position:top center;
 }
 
-.random-collage {
-  display:grid; grid-template-columns:1fr 1fr;
-  gap:1px; background:#E5E5E5;
-}
-.random-collage img {
-  width:100%; aspect-ratio:1; object-fit:contain;
-  padding:0.4rem; background:#fff;
+/* hover animations — desktop only */
+@media (hover:hover) and (pointer:fine) {
+  @keyframes mg-sway {
+    0%,100% { transform:rotate(-5deg) translateX(-4px); }
+    50%      { transform:rotate(5deg)  translateX(4px);  }
+  }
+  @keyframes mg-wipe {
+    0%   { transform:translateX(-30%) rotate(-5deg); opacity:0.6; }
+    50%  { transform:translateX(0%)   rotate(0deg);  opacity:1;   }
+    100% { transform:translateX(30%)  rotate(5deg);  opacity:0.6; }
+  }
+  @keyframes mg-swat {
+    0%,100% { transform:rotate(-20deg) translateY(-8px); }
+    45%     { transform:rotate(15deg)  translateY(6px);  }
+    55%     { transform:rotate(15deg)  translateY(6px);  }
+  }
+  @keyframes mg-cloud {
+    0%,100% { transform:translateX(0)    scale(1);    }
+    50%     { transform:translateX(-18px) scale(0.92); }
+  }
+  @keyframes mg-crumple {
+    0%,100% { transform:scale(1)    rotate(0deg);  }
+    50%     { transform:scale(0.82) rotate(-8deg); }
+  }
+  @keyframes mg-knuckle {
+    0%,100% { transform:scale(1)    rotate(0deg); }
+    40%     { transform:scale(1.08) rotate(-4deg);}
+    60%     { transform:scale(1.08) rotate(4deg); }
+  }
+
+  .mg-card[data-mg="sandbag"]:hover  .mg-card-img img { animation:mg-sway    1.2s ease-in-out infinite; transform-origin:top center; }
+  .mg-card[data-mg="wipe"]:hover     .mg-card-img img { animation:mg-wipe    1.0s ease-in-out infinite; }
+  .mg-card[data-mg="swat"]:hover     .mg-card-img img { animation:mg-swat    0.7s ease-in-out infinite; transform-origin:top center; }
+  .mg-card[data-mg="cloud"]:hover    .mg-card-img img { animation:mg-cloud   1.1s ease-in-out infinite; }
+  .mg-card[data-mg="crumple"]:hover  .mg-card-img img { animation:mg-crumple 0.9s ease-in-out infinite; transform-origin:center; }
+  .mg-card[data-mg="random"]:hover   .mg-card-img img { animation:mg-knuckle 0.8s ease-in-out infinite; transform-origin:center; }
 }
 
 .mg-card-body { text-align:center; }
@@ -850,12 +879,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     <div id="game-menu-grid">
 
       <button class="mg-card" data-mg="random" onclick="selectGame('random')">
-        <div class="mg-card-img random-collage">
-          <img src="asset/window_00.webp" alt="">
-          <img src="asset/swatter.webp" alt="">
-          <img src="asset/crumple_04.png" alt="">
-          <img src="asset/cloud.png" alt="">
-        </div>
+        <div class="mg-card-img"><img src="asset/knuckle_device.png" alt=""></div>
         <div class="mg-card-body">
           <span class="mg-card-title">Random</span>
         </div>
