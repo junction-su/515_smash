@@ -41,6 +41,7 @@ asset/
     crumple_trash.mp3
   *.webp         ← images (converted from PNG, 1920px max)
   knuckle_open.webp / knuckle_fist.webp  ← tutorial coach images
+  knuckle_device.png / favicon.png        ← device-only mobile intro image + square favicon
 ```
 
 ## CSS Variables (`:root`)

@@ -3,97 +3,146 @@
 Single-file browser app. No build step. Vanilla HTML/CSS/JS + Canvas.
 
 ## Files
+
 ```
-smash.html          ← 전체 게임 (HTML+CSS+JS 단일 파일)
-asset/              ← 모든 에셋 (PNG + SVG, transparent bg)
-docs/DESIGN.md      ← 비주얼 디자인 스펙
-smash.ino           ← Arduino 펌웨어 (수정 금지)
-gesture_model.h     ← ML 모델 헤더 (수정 금지)
+index.html          <- full game, single HTML/CSS/JS file
+asset/              <- all visual and audio assets
+docs/DESIGN.md      <- visual design specification
+smash/smash.ino     <- Arduino firmware; avoid editing unless firmware changes are requested
+smash/gesture_model.h <- ML model header; avoid editing unless retraining/conversion is requested
 ```
 
 ## Stack
+
 - Vanilla HTML/CSS/JS only. No framework, no bundler.
-- Canvas API: 파티클 시스템
-- Web Serial API: 디바이스 연결 (Chrome only)
-- Google Fonts: Geist + Geist Mono + Playfair Display
+- Canvas API for particles.
+- Web Serial API for device connection, Chrome/Edge only.
+- Google Fonts: Geist + Geist Mono + Playfair Display.
 
 ## Game Structure
 
-**WarioWare 스타일.** 5개 미니게임 중 매 라운드 랜덤 4개 선택.
+WarioWare-style minigame loop. Each round selects four random minigames from the active set.
+
 ```
-샌드백 워밍업 (4~5 smash) → 미니게임 4개 랜덤 → ROUND CLEAR → 반복
+Sandbag warmup (4-5 smash actions) -> 4 random minigames -> ROUND CLEAR -> repeat
 ```
 
-게임 페이즈: `WARMUP` → `MG_INTRO` → `MG_ACTIVE` → `MG_CLEAR` → `ROUND_CLEAR`
+Phases:
 
-## 미니게임 목록
+```
+TUTORIAL (desktop only)
+MOBILE_INTRO (touch only)
+WARMUP
+MG_INTRO
+MG_ACTIVE
+MG_CLEAR
+ROUND_CLEAR
+```
 
-| ID | 지시문 | 제스처 | 상태 |
+## Minigames
+
+| ID | Prompt | Gesture | Status |
 |---|---|---|---|
-| `bubble` | POP IT! | smash | **비활성** (주석처리) |
-| `wipe` | WIPE IT! | swipe | `window_00~04.png` + `rag.png` |
-| `crumple` | CRUMPLE! | smash | `crumple_00~04.png` + `trash.png/trash_open.png` + `hand_open/close.png` |
-| `swat` | SWAT IT! | smash | `fly.png` 5마리 + `swatter.png` |
-| `cloud` | BLOW IT! | swipe | `cloud.png` 10개 + `fan.png` + reveal(sky/field/sun) |
+| `bubble` | POP IT! | smash | disabled/commented out |
+| `wipe` | WIPE IT! | swipe | `window_00~04` + `rag.png` |
+| `crumple` | CRUMPLE! | smash | `crumple_00~04` + `trash.png/trash_open.png` + `hand_open/close.png` |
+| `swat` | SWAT IT! | smash | five `fly.webp` elements + `swatter.webp` |
+| `cloud` | BLOW IT! | swipe | ten `cloud.png` elements + `fan.png` + sky/field/sun reveal |
 
-미니게임 활성/비활성: `MINIGAME_TYPES` 배열에서 주석 처리.
+Enable/disable minigames through the `MINIGAME_TYPES` array.
 
-## 에셋 목록
+## Assets
+
 ```
-asset/sandbag.png
-asset/glove_left.png, glove_right.png
-asset/fist.svg, palm.svg              ← 인트로 제스처 힌트 아이콘
-asset/bubble_00~06.png                (비활성)
-asset/window_00~04.png, rag.png
-asset/crumple_00~04.png               ← 종이 5단계
-asset/trash.png, trash_open.png       ← 휴지통 닫힘/열림
-asset/hand_open.png, hand_close.png   ← 구기기 중 제스처 표시
-asset/swatter.png, fly.png
-asset/cloud.png, fan.png, sky.png, field.png, sun.png
+asset/sandbag.webp
+asset/glove_left.webp, glove_right.webp
+asset/fist.svg, palm.svg              <- intro gesture hint icons
+asset/knuckle_open.webp, knuckle_fist.webp
+asset/knuckle_device.png              <- device-only mobile intro/deck image
+asset/favicon.png                     <- square favicon generated from knuckle_device.png
+asset/bubble_00~06.png                <- currently disabled
+asset/window_00~04.webp, rag.png
+asset/crumple_00~04.png
+asset/trash.png, trash_open.png
+asset/hand_open.png, hand_close.png
+asset/swatter.webp, fly.webp
+asset/cloud.png, fan.png, sky.webp, field.png, sun.png
+asset/sfx/*.mp3
 ```
 
-## Key JS 구조
+## Key JS Structure
+
 ```js
 const S = { phase, warmupHits, warmupTarget, mgQueue, currentMG, ... }
 const MG = { bubble, wipe, crumple, swat, cloud }
 
-function gesture(raw)         // 'shake' | 'wave' | 'idle' (디바이스 프로토콜 그대로)
-function initMinigame(type)   // 미니게임 초기화
-function mgClear(type)        // 미니게임 클리어 → 다음으로
-function hideMinigameUI(type) // 즉시 display:none
-function startNextMinigame()  // MG_INTRO 플래시 + 제스처 힌트 → initMinigame
+function gesture(raw)         // 'shake' | 'wave' | 'idle', matching the device protocol
+function initMinigame(type)   // initialize minigame UI/state
+function mgClear(type)        // clear minigame -> next
+function hideMinigameUI(type) // immediate display:none cleanup
+function startNextMinigame()  // MG_INTRO flash + gesture hint -> initMinigame
 ```
 
-## 제스처 네이밍
-- 디바이스 수신: `'shake'` / `'wave'` (프로토콜 불변)
-- UI 표시: **SMASH** (shake) / **SWIPE** (wave)
-- 인트로 힌트: SMASH = `fist.svg` 위아래 bounce / SWIPE = `palm.svg` 좌우 sweep
-- `#mg-gesture-hint` z-index:60, 인트로 텍스트와 1.1초 함께 표시
+## Gesture Naming
 
-## 키보드 (데모용)
+- Device protocol: `'shake'` / `'wave'` / `'idle'`
+- UI labels: **SMASH** for shake, **SWIPE** for wave
+- Intro hint: SMASH uses `fist.svg` vertical bounce; SWIPE uses `palm.svg` horizontal sweep
+- `#mg-gesture-hint` is shown with the intro text for 1.1s
+
+## Input
+
 ```
-1 → smash (shake)
-2 → swipe (wave)
-r → record (디바이스 연결 시)
+1 -> smash (shake)
+2 -> swipe (wave)
+r -> record, only when a device is connected
+```
+
+Mobile/touch controls:
+
+```
+#touch-smash -> gesture('shake')
+#touch-swipe -> gesture('wave')
+#touch-btns[data-needed="smash"|"swipe"] dims the inactive action
 ```
 
 ## Web Serial
+
 ```js
 port = await navigator.serial.requestPort();
 await port.open({ baudRate: 115200 });
-// 수신: 'shake' | 'wave' | 'idle'
-// 무시: 'READY', 'START', 'END', 'Recording...'
-// 전송: 'r'
+// receive: 'shake' | 'wave' | 'idle'
+// ignore: 'READY', 'START', 'END', 'Recording...'
+// send: 'r'
 ```
 
-## 규칙
-- `transform`, `opacity`만 애니메이션. `top`/`left`/`width` 직접 애니메이션 금지.
-- `hideMinigameUI()` 로만 숨김 (즉시, 타이머 지연 없음).
-- `#typo-block` z-index: 25 / `#mg-intro` + `#mg-gesture-hint` z-index: 60 / HUD z-index: 30.
-- box-shadow / border-radius 추가 금지 (명시 요청 없으면).
-- `spawnParts(x, y, count)` 파티클 호출.
+## Onboarding
 
-## 미니게임별 clear 흐름
-- `wipe`: `showWipeClear()` → window_04 위에 "Spotless/CLEARED" 2.2초 오버레이 → 다음
-- `cloud`: `showCloudReveal()` → sky 0ms → field 500ms → sun 900ms → 텍스트 2000ms → 종료 3600ms
-- 나머지: `mgClear(type)` → `animImpact` → `startNextMinigame` 900ms
+Desktop:
+
+- `(hover:hover) and (pointer:fine)` starts the desktop tutorial.
+- Step 0 connects or skips the device.
+- Step 1 teaches SMASH: "punch forward with the device — or press 1".
+- Step 2 teaches SWIPE: "swipe sideways with the device — or press 2".
+- Completion shows "LET'S GO!" then enters `WARMUP`.
+
+Mobile:
+
+- Touch/coarse-pointer environments skip desktop onboarding.
+- `#mobile-intro` appears with `knuckle_device.png`, a START DEMO button, and blurred stage background.
+- START DEMO fades out over 0.28s and enters `WARMUP`.
+- DevTools desktop-to-mobile switching is handled by the pointer media query change listener.
+
+## Rules
+
+- Animate only `transform` and `opacity` unless there is a strong reason.
+- Use `hideMinigameUI()` for immediate minigame cleanup.
+- Keep z-index relationships aligned with `docs/DESIGN.md`.
+- Avoid adding new shadows, rounded containers, or gradients unless the change explicitly needs them.
+- Use `spawnParts(x, y, count)` for particle bursts.
+
+## Clear Flow
+
+- `wipe`: `showWipeClear()` -> "Spotless/CLEARED" overlay on `window_04` for 2.2s -> next
+- `cloud`: `showCloudReveal()` -> sky 0ms -> field 500ms -> sun 900ms -> text at 2000ms -> finish at 3600ms
+- Other minigames: `mgClear(type)` -> `animImpact` -> `startNextMinigame` after 900ms
