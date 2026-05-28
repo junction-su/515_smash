@@ -410,12 +410,20 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   padding:24px 18px calc(24px + env(safe-area-inset-bottom));
   background:rgba(250,250,248,0.72);
   backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  opacity:0;
+  transition:opacity 0.28s ease;
 }
-#mobile-intro.show { display:flex; }
+#mobile-intro.show { display:flex; opacity:1; }
+#mobile-intro.hide { opacity:0; }
 #mobile-intro-card {
   width:min(390px, 100%);
   padding:0 4px;
   text-align:center;
+  transition:transform 0.28s ease, opacity 0.28s ease;
+}
+#mobile-intro.hide #mobile-intro-card {
+  transform:translateY(-8px);
+  opacity:0;
 }
 #mobile-intro-visual {
   height:156px;
@@ -464,13 +472,6 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   transition:transform 0.08s, opacity 0.08s;
 }
 #mobile-start:active { transform:scale(0.98); opacity:0.78; }
-#mobile-intro-note {
-  margin-top:12px;
-  font-family:'Geist Mono',monospace; font-size:9px;
-  letter-spacing:0.10em; line-height:1.45; text-transform:uppercase;
-  color:rgba(17,17,16,0.38);
-  text-align:center;
-}
 @media (hover:hover) and (pointer:fine) {
   #mobile-intro.show { display:none; }
 }
@@ -745,7 +746,6 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
         Best with the desktop knuckle device.<br>On mobile, jump in with quick touch controls.
       </div>
       <button id="mobile-start">START DEMO</button>
-      <div id="mobile-intro-note">SMASH and SWIPE stand in for device gestures.</div>
     </div>
   </div>
 
@@ -1728,11 +1728,17 @@ function showMobileIntro() {
   if (mobileIntroDone || !$mobileIntro) return;
   S.phase = 'MOBILE_INTRO';
   setTouchNeeded('smash');
+  $mobileIntro.classList.remove('hide');
   $mobileIntro.classList.add('show');
 }
 function startMobileDemo() {
   mobileIntroDone = true;
-  if ($mobileIntro) $mobileIntro.classList.remove('show');
+  if ($mobileIntro) {
+    $mobileIntro.classList.add('hide');
+    setTimeout(() => {
+      $mobileIntro.classList.remove('show', 'hide');
+    }, 300);
+  }
   S.phase = 'WARMUP';
   S.warmupHits = 0;
   setTouchNeeded('smash');
