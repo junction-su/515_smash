@@ -715,7 +715,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 .mg-rag        { width:55%; top:20%; left:-60%; }
 .mg-trash      { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
 .mg-trash-open { width:38%; bottom:4%; left:50%; transform:translateX(-50%); }
-.mg-fan        { width:26%; bottom:6%; right:6%; transform-origin:85% 90%; }
+.mg-fan        { width:18%; bottom:6%; right:6%; transform-origin:85% 90%; }
 /* fan & trash: opacity controlled by hover state, not keyframes */
 .mg-card[data-mg="cloud"]:hover   .mg-fan   { opacity:1; }
 .mg-card[data-mg="crumple"]:hover .mg-trash { opacity:1; }
@@ -743,12 +743,8 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     0%,40% { opacity:0; } 45%,95% { opacity:1; } 100% { opacity:0; }
   }
   @keyframes mg-fan-wave {
-    0%      { transform:rotate(0deg); }
-    20%     { transform:rotate(-40deg); }
-    45%     { transform:rotate(10deg); }
-    65%     { transform:rotate(-35deg); }
-    85%     { transform:rotate(8deg); }
-    100%    { transform:rotate(0deg); }
+    0%,100% { transform:rotate(-5deg); }
+    50%     { transform:rotate(-30deg); }
   }
   @keyframes mg-knuckle {
     0%,100% { transform:scale(1); }
@@ -772,7 +768,7 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
     animation:mg-trash-opened 1.3s ease-in-out infinite;
   }
   .mg-card[data-mg="cloud"]:hover .mg-fan {
-    animation:mg-fan-wave 0.6s ease-in-out infinite;
+    animation:mg-fan-wave 1.2s ease-in-out infinite;
   }
   .mg-card[data-mg="random"]:hover .mg-card-img img {
     animation:mg-knuckle 0.85s ease-in-out infinite;
