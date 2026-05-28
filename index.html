@@ -686,19 +686,15 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 }
 .mg-card.active { border-color:var(--ink); border-width:2px; }
 
-/* image frame: square, Figma proportions, clips overflow */
 .mg-card-img {
-  margin:6.9% 12.8% 0;
-  aspect-ratio:1;
+  width:100%; aspect-ratio:1;
+  background:#EEE9E2;
   overflow:hidden;
-  position:relative;
-  background:#fff;
+  display:flex; align-items:center; justify-content:center;
 }
-/* single image: 118% wide so it overflows — tall images crop at bottom */
 .mg-card-img:not(.random-collage) > img {
-  position:absolute;
-  width:118%; left:-9%; top:0;
-  height:auto;
+  width:100%; height:100%; object-fit:contain;
+  padding:1rem;
 }
 
 /* random collage: 2×2 grid fills the frame */
