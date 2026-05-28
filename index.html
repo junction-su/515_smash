@@ -677,7 +677,24 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   width:100%; max-width:840px;
 }
 @media (max-width:600px) {
-  #game-menu-grid { grid-template-columns:repeat(2,1fr); }
+  #game-menu { padding:clamp(1.5rem,4vw,3rem) 0 2.5rem; }
+  #game-menu-grid {
+    display:block !important;
+    overflow:hidden;
+    width:100%;
+    margin-top:2rem;
+  }
+  #carousel-track {
+    display:flex;
+    gap:16px;
+    will-change:transform;
+    padding:8px 0;
+  }
+  #carousel-track .mg-card {
+    flex:0 0 78vw;
+    width:78vw;
+  }
+  #carousel-dots { display:flex; }
 }
 
 /* card: matches Figma — visible border, 14px radius */
@@ -807,6 +824,18 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   font-size:clamp(0.55rem,1.2vw,0.7rem); letter-spacing:0.04em;
   color:var(--dim); line-height:1.4;
 }
+
+/* carousel dots — hidden on desktop */
+#carousel-dots {
+  display:none; justify-content:center; gap:7px;
+  margin-top:1.25rem;
+}
+.carousel-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--ink); opacity:0.18;
+  transition:opacity 0.2s, transform 0.2s;
+}
+.carousel-dot.active { opacity:1; transform:scale(1.35); }
 </style>
 </head>
 <body>
@@ -1007,6 +1036,14 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
         </div>
       </button>
 
+    </div>
+    <div id="carousel-dots">
+      <span class="carousel-dot"></span>
+      <span class="carousel-dot"></span>
+      <span class="carousel-dot"></span>
+      <span class="carousel-dot"></span>
+      <span class="carousel-dot"></span>
+      <span class="carousel-dot"></span>
     </div>
   </div>
 
@@ -1969,13 +2006,19 @@ function setConnUI(on) {
 // ── HAMBURGER MENU ────────────────────────────────────────────────────────────
 
 function toggleMenu() {
-  const isOpen = document.getElementById('game-menu').classList.toggle('open');
-  document.getElementById('menu-btn').classList.toggle('open', isOpen);
+  const menu = document.getElementById('game-menu');
+  const btn  = document.getElementById('menu-btn');
+  const isOpen = menu.classList.toggle('open');
+  btn.classList.toggle('open', isOpen);
+  if (isOpen && window.innerWidth <= CAROUSEL_BP) buildCarousel();
+  else if (!isOpen) destroyCarousel();
 }
 
 function selectGame(type) {
   S.menuMode = type;
   document.getElementById('game-menu').classList.remove('open');
+  document.getElementById('menu-btn').classList.remove('open');
+  destroyCarousel();
   document.querySelectorAll('.mg-card').forEach(b =>
     b.classList.toggle('active', b.dataset.mg === type));
   cleanupCurrentMG();
@@ -2209,6 +2252,93 @@ else disableTutorialForTouch();
 desktopPointerQuery.addEventListener('change', e => {
   if (!e.matches) disableTutorialForTouch();
 });
+
+// ── Mobile carousel ───────────────────────────────────────────────────
+const CAROUSEL_BP = 600;
+let _ct = null, _cCur = 0, _cN = 0, _cStep = 0, _cOff = 0;
+let _tStartX = 0, _tStartT = 0, _tStartTx = 0, _tDrag = false;
+
+function buildCarousel() {
+  const grid = document.getElementById('game-menu-grid');
+  if (_ct) return; // already built
+  const realCards = [...grid.querySelectorAll(':scope > .mg-card')];
+  _cN = realCards.length; // 6
+
+  _ct = document.createElement('div');
+  _ct.id = 'carousel-track';
+  grid.appendChild(_ct);
+
+  // extended set: [clone_of_last, real_0..real_N-1, clone_of_first]
+  _ct.appendChild(realCards[_cN - 1].cloneNode(true));
+  realCards.forEach(c => _ct.appendChild(c));
+  _ct.appendChild(realCards[0].cloneNode(true));
+
+  const vw = window.innerWidth;
+  const cardW = vw * 0.78;
+  _cStep = cardW + 16;
+  _cOff = (vw - cardW) / 2;
+
+  // start at sandbag = realCards[1] → extended index 2
+  _cCur = 2;
+  _ctSetPos(_cCur, false);
+  _ctDots(_cCur - 1);
+
+  _ct.addEventListener('transitionend', _ctWrap);
+  _ct.addEventListener('touchstart', _ctTS, { passive: true });
+  _ct.addEventListener('touchmove', _ctTM, { passive: false });
+  _ct.addEventListener('touchend', _ctTE);
+}
+
+function destroyCarousel() {
+  if (!_ct) return;
+  const grid = document.getElementById('game-menu-grid');
+  const kids = [..._ct.children];
+  // real cards are at indices 1.._cN (skip first clone, skip last clone)
+  kids.slice(1, _cN + 1).forEach(c => grid.insertBefore(c, _ct));
+  _ct.remove();
+  _ct = null;
+}
+
+function _ctSetPos(idx, anim) {
+  _ct.style.transition = anim ? 'transform 0.3s cubic-bezier(0.25,0.1,0.25,1)' : 'none';
+  _ct.style.transform = `translateX(${_cOff - idx * _cStep}px)`;
+}
+
+function _ctDots(realIdx) {
+  const ri = ((realIdx % _cN) + _cN) % _cN;
+  document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === ri);
+  });
+}
+
+function _ctWrap() {
+  if (_cCur === 0) { _cCur = _cN; _ctSetPos(_cCur, false); }
+  else if (_cCur === _cN + 1) { _cCur = 1; _ctSetPos(_cCur, false); }
+}
+
+function _ctTS(e) {
+  _tStartX = e.touches[0].clientX;
+  _tStartT = Date.now();
+  _tStartTx = new DOMMatrix(getComputedStyle(_ct).transform).m41;
+  _tDrag = true;
+  _ct.style.transition = 'none';
+}
+function _ctTM(e) {
+  if (!_tDrag) return;
+  const dx = e.touches[0].clientX - _tStartX;
+  if (Math.abs(dx) > 6) e.preventDefault();
+  _ct.style.transform = `translateX(${_tStartTx + dx}px)`;
+}
+function _ctTE(e) {
+  if (!_tDrag) return;
+  _tDrag = false;
+  const dx = e.changedTouches[0].clientX - _tStartX;
+  const v = dx / (Date.now() - _tStartT);
+  if (dx < -_cStep * 0.22 || v < -0.35) _cCur++;
+  else if (dx > _cStep * 0.22 || v > 0.35) _cCur--;
+  _ctSetPos(_cCur, true);
+  _ctDots(_cCur - 1);
+}
 </script>
 </body>
 </html>
