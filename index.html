@@ -2030,8 +2030,13 @@ function toggleMenu() {
   const btn  = document.getElementById('menu-btn');
   const isOpen = menu.classList.toggle('open');
   btn.classList.toggle('open', isOpen);
-  if (isOpen && window.innerWidth <= CAROUSEL_BP) buildCarousel();
-  else if (!isOpen) destroyCarousel();
+  if (isOpen) {
+    document.querySelectorAll('.mg-card').forEach(b =>
+      b.classList.toggle('active', b.dataset.mg === S.menuMode));
+    if (window.innerWidth <= CAROUSEL_BP) buildCarousel();
+  } else {
+    destroyCarousel();
+  }
 }
 
 function selectGame(type) {
