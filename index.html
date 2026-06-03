@@ -864,21 +864,24 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
 
 /* menu footer */
 #menu-footer {
-  display:flex; align-items:center; justify-content:center;
-  flex-wrap:wrap; gap:0.4rem 0.7rem;
-  margin-top:2.5rem; padding:0 1.5rem 0.5rem;
-  font-family:'Geist Mono',monospace; font-size:0.65rem;
-  letter-spacing:0.08em; color:var(--dim);
+  position:absolute; bottom:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:0.5rem;
+  padding:1rem clamp(1.5rem,4vw,3rem);
+  font-family:'Geist Mono',monospace; font-size:0.6rem;
+  letter-spacing:0.07em; color:var(--dim);
+  background:linear-gradient(to top, var(--paper) 70%, transparent);
 }
-.menu-footer-name { font-weight:500; color:var(--ink); }
-.menu-footer-sep  { opacity:0.35; }
-.menu-footer-tag  { text-transform:uppercase; opacity:0.6; }
+.menu-footer-copy { opacity:0.55; white-space:nowrap; }
+.menu-footer-links {
+  display:flex; align-items:center; gap:1rem;
+}
 .menu-footer-link {
   background:none; border:none; padding:0; cursor:pointer;
   font-family:inherit; font-size:inherit; letter-spacing:inherit;
   color:var(--dim); text-decoration:none;
-  position:relative;
-  transition:color 0.15s;
+  position:relative; transition:color 0.15s;
+  white-space:nowrap;
 }
 .menu-footer-link:hover { color:var(--ink); }
 .menu-footer-link.copied::after {
@@ -887,6 +890,10 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
   font-size:0.6rem; background:var(--ink); color:var(--paper);
   padding:2px 6px; border-radius:4px; white-space:nowrap;
   pointer-events:none;
+}
+@media (max-width:600px) {
+  #menu-footer { justify-content:center; text-align:center; }
+  .menu-footer-links { gap:0.75rem; }
 }
 
 /* carousel dots — hidden on desktop */
@@ -1110,12 +1117,11 @@ html, body { width:100%; height:100dvh; overflow:hidden; font-family:'Geist',san
       <span class="carousel-dot"></span>
     </div>
     <footer id="menu-footer">
-      <span class="menu-footer-name">Su Hyun Jung</span>
-      <span class="menu-footer-sep">·</span>
-      <span class="menu-footer-tag">TECHIN 515</span>
-      <span class="menu-footer-sep">·</span>
-      <button class="menu-footer-link" onclick="copyEmail()" title="Copy email">connect@junction.work</button>
-      <a class="menu-footer-link" href="https://www.linkedin.com/in/junction-su/" target="_blank" rel="noopener" title="LinkedIn">LinkedIn</a>
+      <span class="menu-footer-copy">© 2026 Su Hyun Jung · TECHIN 515</span>
+      <span class="menu-footer-links">
+        <button class="menu-footer-link" onclick="copyEmail()" title="Copy email">✉ connect@junction.work</button>
+        <a class="menu-footer-link" href="https://www.linkedin.com/in/junction-su/" target="_blank" rel="noopener">in LinkedIn</a>
+      </span>
     </footer>
   </div>
 
