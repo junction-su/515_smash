@@ -1239,6 +1239,8 @@ const S = {
   warmupTarget: 4 + Math.floor(Math.random() * 2),
   mgQueue: [],
   currentMG: null,
+  flowToken: 0,
+  flowTimers: [],
   menuMode: 'random',
   sandbagHits: 0,
   counts: { shake: 0, wave: 0 },
@@ -1431,11 +1433,36 @@ function setTouchNeeded(kind) {
 
 // ── GAME FLOW ─────────────────────────────────────────────────────────────────
 
+function clearFlowTimers() {
+  S.flowTimers.forEach(clearTimeout);
+  S.flowTimers = [];
+}
+
+function newFlowToken() {
+  clearFlowTimers();
+  S.flowToken++;
+  return S.flowToken;
+}
+
+function flowTimeout(token, cb, ms) {
+  const id = setTimeout(() => {
+    S.flowTimers = S.flowTimers.filter(t => t !== id);
+    if (token === S.flowToken) cb();
+  }, ms);
+  S.flowTimers.push(id);
+  return id;
+}
+
+function isCurrentMinigame(type, token = S.flowToken) {
+  return token === S.flowToken && S.currentMG === type;
+}
+
 function hideBag(cb) {
+  const token = S.flowToken;
   $bagWrap.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.4,0,1,1)';
   $bagWrap.style.opacity = '0';
   $bagWrap.style.transform = 'translateX(-50%) translateY(-40px)';
-  setTimeout(() => { $bagWrap.style.display = 'none'; if(cb) cb(); }, 420);
+  flowTimeout(token, () => { $bagWrap.style.display = 'none'; if(cb) cb(); }, 420);
 }
 
 function showBag() {
@@ -1451,6 +1478,7 @@ function showBag() {
 }
 
 function launchMinigameRound() {
+  newFlowToken();
   S.mgQueue = S.menuMode !== 'random' && S.menuMode !== 'sandbag'
     ? [S.menuMode]
     : shuffle(MINIGAME_TYPES).slice(0, 4);
@@ -1460,6 +1488,7 @@ function launchMinigameRound() {
 function startNextMinigame() {
   if (!S.mgQueue.length) { showRoundClear(); return; }
   const type = S.mgQueue.shift();
+  const token = newFlowToken();
   S.currentMG = type;
   S.phase = 'MG_INTRO';
   setTouchNeeded(['crumple','swat','bubble'].includes(type) ? 'smash' : 'swipe');
@@ -1474,15 +1503,16 @@ function startNextMinigame() {
     : 'swipe-hint 0.85s cubic-bezier(0.4,0,0.2,1) infinite';
   $hintLabel.textContent = isSmash ? 'SMASH' : 'SWIPE';
   $mgGestureHint.classList.add('show');
-  setTimeout(() => {
+  flowTimeout(token, () => {
     $mgIntro.classList.remove('show');
     $mgGestureHint.classList.remove('show');
     $hintIcon.style.animation = '';
-    setTimeout(() => initMinigame(type), 150);
+    flowTimeout(token, () => initMinigame(type, token), 150);
   }, 1100);
 }
 
-function initMinigame(type) {
+function initMinigame(type, token = S.flowToken) {
+  if (!isCurrentMinigame(type, token)) return;
   S.phase = 'MG_ACTIVE';
   $ghost.textContent = MG_INTRO_LABELS[type].replace('!','');
   $typoScript.textContent = type.charAt(0).toUpperCase() + type.slice(1);
@@ -1496,15 +1526,17 @@ function initMinigame(type) {
 }
 
 function mgClear(type) {
+  if (!isCurrentMinigame(type)) return;
+  const token = newFlowToken();
   S.phase = 'MG_CLEAR';
   hideMinigameUI(type);
   const words = { bubble:'ALL CLEAR!', wipe:'SPOTLESS!', crumple:'TRASHED!', swat:'GOT EM!', cloud:'SUNSHINE!' };
   animImpact(words[type] || 'CLEAR!');
   $ghost.textContent = 'YES';
   if (S.menuMode !== 'random' && S.menuMode !== 'sandbag') {
-    setTimeout(() => { S.mgQueue = [S.menuMode]; startNextMinigame(); }, 900);
+    flowTimeout(token, () => { S.mgQueue = [S.menuMode]; startNextMinigame(); }, 900);
   } else {
-    setTimeout(startNextMinigame, 900);
+    flowTimeout(token, startNextMinigame, 900);
   }
 }
 
@@ -1524,6 +1556,8 @@ function hideMinigameUI(type) {
 }
 
 function showRoundClear() {
+  const token = newFlowToken();
+  S.currentMG = null;
   S.phase = 'ROUND_CLEAR';
   $ghost.textContent = 'CLEAR';
   document.getElementById('cleared-script').textContent = 'All';
@@ -1531,9 +1565,9 @@ function showRoundClear() {
   document.getElementById('cleared-sub').textContent = 'another round starting';
   $cleared.style.transition = 'opacity 0.35s ease';
   $cleared.style.opacity = '1';
-  setTimeout(() => {
+  flowTimeout(token, () => {
     $cleared.style.opacity = '0';
-    setTimeout(() => {
+    flowTimeout(token, () => {
       S.warmupHits = 0;
       S.warmupTarget = 4 + Math.floor(Math.random() * 2);
       S.phase = 'WARMUP';
@@ -1574,7 +1608,10 @@ function handleBubbleShake() {
   document.getElementById('bubble-count').textContent =
     rem > 0 ? `${rem} pops left` : 'DONE!';
   animImpact(WORDS_POP[Math.floor(Math.random()*WORDS_POP.length)]);
-  if (MG.bubble.frame >= BUBBLE_FRAMES - 1) setTimeout(() => mgClear('bubble'), 350);
+  if (MG.bubble.frame >= BUBBLE_FRAMES - 1) {
+    const token = S.flowToken;
+    flowTimeout(token, () => mgClear('bubble'), 350);
+  }
 }
 
 // ── MINIGAME: WINDOW WIPE ─────────────────────────────────────────────────────
@@ -1603,6 +1640,7 @@ function handleWipeWave() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'wipe') return;
   if (MG.wipe.animating || MG.wipe.done >= WIPE_TOTAL) return;
   MG.wipe.animating = true;
+  const token = S.flowToken;
   playSFX('wipeSqueak');
 
   const W = $stage.offsetWidth;
@@ -1616,37 +1654,40 @@ function handleWipeWave() {
     ragEl.style.transform = `translateX(${W + 250}px) translateY(-50%)`;
 
     // swap image at midpoint of sweep
-    setTimeout(() => {
+    flowTimeout(token, () => {
+      if (!isCurrentMinigame('wipe', token)) return;
       const f = String(MG.wipe.done + 1).padStart(2, '0');
       document.getElementById('wipe-img').src = `asset/window_${f}.webp`;
     }, 260);
 
-    setTimeout(() => {
+    flowTimeout(token, () => {
+      if (!isCurrentMinigame('wipe', token)) return;
       MG.wipe.done++;
       MG.wipe.animating = false;
       const rem = WIPE_TOTAL - MG.wipe.done;
       document.getElementById('wipe-progress').textContent =
         rem > 0 ? `${rem} more wipe${rem > 1 ? 's' : ''}` : 'done!';
       animImpact(WORDS_WIPE[Math.floor(Math.random() * WORDS_WIPE.length)]);
-      if (MG.wipe.done >= WIPE_TOTAL) setTimeout(() => showWipeClear(), 400);
+      if (MG.wipe.done >= WIPE_TOTAL) flowTimeout(token, () => showWipeClear(token), 400);
     }, 620);
   }));
 }
 
-function showWipeClear() {
+function showWipeClear(token = S.flowToken) {
+  if (!isCurrentMinigame('wipe', token)) return;
   // window_04 이미지 위에 cleared 텍스트 오버레이 (배경 유지)
   document.getElementById('cleared-script').textContent = 'Spotless';
   document.getElementById('cleared-bold').textContent = 'CLEARED';
   document.getElementById('cleared-sub').textContent = 'crystal clean';
   $cleared.style.transition = 'opacity 0.4s ease';
   $cleared.style.opacity = '1';
-  setTimeout(() => {
+  flowTimeout(token, () => {
     $cleared.style.opacity = '0';
-    setTimeout(() => {
+    flowTimeout(token, () => {
       S.phase = 'MG_CLEAR';
       hideMinigameUI('wipe');
       $ghost.textContent = 'YES';
-      setTimeout(startNextMinigame, 300);
+      flowTimeout(token, startNextMinigame, 300);
     }, 400);
   }, 2200); // 2.2초 동안 보여줌
 }
@@ -1655,7 +1696,7 @@ function showWipeClear() {
 
 function initCrumple() {
   getSFX('crumplePaper'); getSFX('crumpleTrash');
-  MG.crumple.stage = 0;
+  MG.crumple.stage = 0; MG.crumple.done = false;
 
   // Reset paper image
   const paperEl = document.getElementById('paper-el');
@@ -1691,6 +1732,8 @@ function flashCrumpleHand() {
 
 function handleCrumpleShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'crumple') return;
+  if (MG.crumple.done) return;
+  const token = S.flowToken;
   MG.crumple.stage++;
   const paperEl = document.getElementById('paper-el');
   animImpact(WORDS_CRUMPLE[Math.floor(Math.random()*WORDS_CRUMPLE.length)]);
@@ -1703,12 +1746,14 @@ function handleCrumpleShake() {
     const crumpleImg = document.getElementById('crumple-img');
     crumpleImg.style.transition = 'transform 0.15s cubic-bezier(0.16,1,0.3,1)';
     crumpleImg.style.transform = 'scale(1.06)';
-    setTimeout(() => {
+    flowTimeout(token, () => {
+      if (!isCurrentMinigame('crumple', token)) return;
       crumpleImg.src = `asset/crumple_${f}.png`;
       crumpleImg.style.transform = 'scale(1)';
     }, 80);
   } else {
     // Final: fly into trash can
+    MG.crumple.done = true;
     const trashEl = document.getElementById('crumple-trash');
     const trashImg = document.getElementById('crumple-trash-img');
     const handEl = document.getElementById('crumple-hand');
@@ -1720,7 +1765,8 @@ function handleCrumpleShake() {
     // preload trash_open so the swap is instant
     const _preload = new Image(); _preload.src = 'asset/trash_open.png';
 
-    setTimeout(() => {
+    flowTimeout(token, () => {
+      if (!isCurrentMinigame('crumple', token)) return;
       if (trashImg) trashImg.src = 'asset/trash_open.png';
 
       const trashRect = trashEl ? trashEl.getBoundingClientRect() : null;
@@ -1734,9 +1780,10 @@ function handleCrumpleShake() {
       paperEl.style.transform = `translate(${tx}px,${ty}px) scale(0.08)`;
       paperEl.style.opacity = '0';
 
-      setTimeout(() => {
+      flowTimeout(token, () => {
+        if (!isCurrentMinigame('crumple', token)) return;
         if (trashImg) trashImg.src = 'asset/trash.png';
-        setTimeout(() => mgClear('crumple'), 400);
+        flowTimeout(token, () => mgClear('crumple'), 400);
       }, 550);
     }, 480);
   }
@@ -1753,6 +1800,7 @@ function initSwat() {
   wrap.querySelectorAll('.fly').forEach(f => f.remove());
   MG.swat.flies = [];
   MG.swat.remaining = 5;
+  MG.swat.done = false;
   playSFX('swatFly');
 
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
@@ -1809,6 +1857,7 @@ function animateFlies() {
 
 function handleSwatShake() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'swat') return;
+  if (MG.swat.done) return;
   playSFX('swatHit');
   const W = $stage.offsetWidth, H = $stage.offsetHeight;
 
@@ -1874,7 +1923,12 @@ function handleSwatShake() {
     : 'MISSED!');
 
   doScreenShake();
-  if (MG.swat.remaining <= 0) { stopSFX('swatFly'); setTimeout(()=>mgClear('swat'), 400); }
+  if (MG.swat.remaining <= 0) {
+    const token = S.flowToken;
+    MG.swat.done = true;
+    stopSFX('swatFly');
+    flowTimeout(token, () => mgClear('swat'), 400);
+  }
 }
 
 // ── MINIGAME: CLOUD BLOW ──────────────────────────────────────────────────────
@@ -1960,6 +2014,7 @@ function handleCloudWave() {
   if (S.phase !== 'MG_ACTIVE' || S.currentMG !== 'cloud') return;
   const alive = MG.cloud.clouds.filter(c => !c.classList.contains('blown'));
   if (!alive.length) return;
+  const token = S.flowToken;
 
   showFanSweep();
 
@@ -1978,14 +2033,15 @@ function handleCloudWave() {
     : 'DONE!';
   animImpact(WORDS_CLOUD[Math.floor(Math.random() * WORDS_CLOUD.length)]);
 
-  if (MG.cloud.remaining <= 0) setTimeout(showCloudReveal, 500);
+  if (MG.cloud.remaining <= 0) flowTimeout(token, () => showCloudReveal(token), 500);
 }
 
-function showCloudReveal() {
+function showCloudReveal(token = S.flowToken) {
+  if (!isCurrentMinigame('cloud', token)) return;
   document.getElementById('reveal-sky').classList.add('show');
-  setTimeout(() => document.getElementById('reveal-field').classList.add('show'), 500);
-  setTimeout(() => document.getElementById('reveal-sun').classList.add('show'), 900);
-  setTimeout(() => {
+  flowTimeout(token, () => document.getElementById('reveal-field').classList.add('show'), 500);
+  flowTimeout(token, () => document.getElementById('reveal-sun').classList.add('show'), 900);
+  flowTimeout(token, () => {
     $ghost.textContent = 'YES';
     document.getElementById('cleared-script').textContent = 'Sunshine';
     document.getElementById('cleared-bold').textContent = 'CLEARED';
@@ -1993,12 +2049,12 @@ function showCloudReveal() {
     $cleared.style.transition = 'opacity 0.4s ease';
     $cleared.style.opacity = '1';
   }, 2000);
-  setTimeout(() => {
+  flowTimeout(token, () => {
     $cleared.style.opacity = '0';
-    setTimeout(() => {
+    flowTimeout(token, () => {
       S.phase = 'MG_CLEAR';
       hideMinigameUI('cloud');
-      setTimeout(startNextMinigame, 300);
+      flowTimeout(token, startNextMinigame, 300);
     }, 400);
   }, 3600);
 }
@@ -2028,8 +2084,10 @@ function gesture(raw) {
       } else {
         S.warmupHits++;
         showWarmupCount();
-        if (S.warmupHits >= S.warmupTarget) {
-          setTimeout(() => hideBag(launchMinigameRound), 300);
+        if (S.warmupHits === S.warmupTarget) {
+          const token = newFlowToken();
+          S.phase = 'ROUND_START';
+          flowTimeout(token, () => hideBag(launchMinigameRound), 300);
         }
       }
     } else if (S.phase === 'MG_ACTIVE') {
@@ -2135,11 +2193,22 @@ function selectGame(type) {
 }
 
 function cleanupCurrentMG() {
+  newFlowToken();
   stopSFX('swatFly');
+  stopSFX('cloudWind');
   S.phase = 'MG_CLEAR';
-  ['mg-swat','mg-cloud','mg-wipe-bg','mg-crumple'].forEach(id => {
+  S.currentMG = null;
+  S.mgQueue = [];
+  $mgIntro.classList.remove('show');
+  $mgGestureHint.classList.remove('show');
+  $hintIcon.style.animation = '';
+  $cleared.style.opacity = '0';
+  ['mg-bubble','mg-swat','mg-cloud','mg-wipe-bg','mg-crumple'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) { el.style.opacity = '0'; setTimeout(() => { el.style.display = 'none'; }, 300); }
+    if (el) {
+      el.style.opacity = '0';
+      el.style.display = 'none';
+    }
   });
   $fogCanvas.style.display = 'none';
   const fCtx = $fogCanvas.getContext('2d');
@@ -2151,9 +2220,13 @@ function cleanupCurrentMG() {
 }
 
 function resetToWarmup() {
+  newFlowToken();
   S.warmupHits = 0;
   S.warmupTarget = 4 + Math.floor(Math.random() * 2);
+  S.currentMG = null;
+  S.mgQueue = [];
   S.phase = 'WARMUP';
+  setTouchNeeded('smash');
   $ghost.textContent = 'STRESS';
   $typoScript.textContent = 'Stress';
   $typoBold.textContent = 'SMASH';
@@ -2161,6 +2234,7 @@ function resetToWarmup() {
 }
 
 function startSingleGame(type) {
+  newFlowToken();
   S.mgQueue = [type];
   if ($bagWrap.style.display !== 'none') {
     hideBag(() => startNextMinigame());
@@ -2170,19 +2244,23 @@ function startSingleGame(type) {
 }
 
 function startSandbagMode() {
+  const token = newFlowToken();
   S.sandbagHits = 0;
+  S.currentMG = null;
+  S.mgQueue = [];
   S.phase = 'MG_INTRO';
+  setTouchNeeded('smash');
   $mgIntro.textContent = 'SMASH IT!';
   $mgIntro.classList.add('show');
   $hintIcon.innerHTML = FIST_SVG;
   $hintIcon.style.animation = 'smash-hint 0.38s ease-in-out infinite';
   $hintLabel.textContent = 'SMASH';
   $mgGestureHint.classList.add('show');
-  setTimeout(() => {
+  flowTimeout(token, () => {
     $mgIntro.classList.remove('show');
     $mgGestureHint.classList.remove('show');
     $hintIcon.style.animation = '';
-    setTimeout(() => {
+    flowTimeout(token, () => {
       $ghost.textContent = 'STRESS';
       $typoScript.textContent = 'Stress';
       $typoBold.textContent = 'SMASH';
